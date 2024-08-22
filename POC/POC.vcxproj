@@ -135,6 +135,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Constents.h" />
+    <ClInclude Include="SyntaxError.h" />
     <ClInclude Include="SyntexAnalysis.h" />
     <ClInclude Include="Tokenizer.h" />
   </ItemGroup>
