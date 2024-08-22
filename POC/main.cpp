@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+#include "Tokenizer.h"
 
 int main(int argc, char* argv[])
 {
@@ -22,6 +23,9 @@ int main(int argc, char* argv[])
         buffer << file.rdbuf();  // Read file content into stringstream
         std::string file_content = buffer.str();  // Store content into a string
 
+        Tokeniser* tokeniser = new Tokeniser(file_content);
+
+        std::cout << *tokeniser;
 
         file.close();  // Close the file
     }
