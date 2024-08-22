@@ -9,24 +9,24 @@ SyntexAnalysis::SyntexAnalysis(const std::vector<std::pair<std::string, Tokens>>
 
 void SyntexAnalysis::checkPernthesis()
 {
-    int lprenCount = 0;
+    int LPARENCount = 0;
     int chrIndex = 0;
     for (auto pr : tokens)
     {
         chrIndex += pr.first.size();
         // Check for left parenthesis and increment the counter
-        if (pr.second == LPREN)
+        if (pr.second == LPAREN)
         {
-            lprenCount++;
+            LPARENCount++;
         }
         // Check for right parenthesis and decrement the counter
 
-        else if (pr.second == RPREN)
+        else if (pr.second == RPAREN)
         {
-            lprenCount--;
+            LPARENCount--;
 
             // If count goes negative, there's an unmatched right parenthesis
-            if (lprenCount < 0)
+            if (LPARENCount < 0)
             {
                 throw SyntaxError("Unmatched right parenthesis", chrIndex);
             }
@@ -34,7 +34,7 @@ void SyntexAnalysis::checkPernthesis()
     }
 
     // After loop, if count is positive, there are unmatched left parentheses
-    if (lprenCount > 0)
+    if (LPARENCount > 0)
     {
         throw SyntaxError("Unmatched left parenthesis", chrIndex);
     }
@@ -58,7 +58,7 @@ void SyntexAnalysis::noTwoOperationAfterEachOther()
 
             isThereSign = true;
         }
-        else if (pr.second == LPREN || pr.second == RPREN)
+        else if (pr.second == LPAREN || pr.second == RPAREN)
         {
             isTherePren = true;
         }
@@ -68,7 +68,7 @@ void SyntexAnalysis::noTwoOperationAfterEachOther()
             isTherePren = false;
             isThereANumber = true;
         }
-        else if (pr.second == ADDITION || pr.second == SUBSTRACTION)
+        else if (pr.second == ADDITION || pr.second == SUBTRACTION)
         {
             if (isTherePren)
             {

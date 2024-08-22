@@ -1,16 +1,16 @@
 #pragma once
 enum Tokens {
 	INT,
-	LPREN,
-	RPREN,
+	LPAREN,
+	RPAREN,
 	ADDITION,
 	MULTIPLICATION,
 	DIVISION,
-	SUBSTRACTION
+	SUBTRACTION
 };
 
-#define RPREN_LITERAL ')'
-#define LPREN_LITERAL '('
+#define RPAREN_LITERAL ')'
+#define LPAREN_LITERAL '('
 #define ADDITION_LITERAL '+'
 #define MULTIPLICATION_LITERAL '*'
 #define DIVISION_LITERAL '/'

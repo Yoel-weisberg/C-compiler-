@@ -3,7 +3,7 @@
 
 int Node::getLevel(Tokens type)
 {
-    if (type == ADDITION || type == SUBSTRACTION)
+    if (type == ADDITION || type == SUBTRACTION)
     {
         return 0;
     }

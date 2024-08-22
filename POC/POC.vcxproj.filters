@@ -30,7 +30,7 @@
     <ClCompile Include="INode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="AST.cpp">
+    <ClCompile Include="ParseToAst.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -55,10 +55,7 @@
     <ClInclude Include="Optimiser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AST.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="INode.h">
+    <ClInclude Include="ParseToAst.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

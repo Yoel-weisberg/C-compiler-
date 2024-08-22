@@ -14,7 +14,7 @@ Tokeniser::Tokeniser(const std::string& string)
                 currentLiteral = "";
             }
 		}
-        else if (string[i] == LPREN_LITERAL || string[i] == RPREN_LITERAL ||
+        else if (string[i] == LPAREN_LITERAL || string[i] == RPAREN_LITERAL ||
             string[i] == ADDITION_LITERAL || string[i] == MULTIPLICATION_LITERAL ||
             string[i] == DIVISION_LITERAL || string[i] == SUBSTRICTION_LITERAL)
         {
@@ -44,13 +44,13 @@ std::vector<std::pair<std::string, Tokens>> Tokeniser::getTokens() const
 
 Tokens Tokeniser::categoriseLiteral(const std::string& literal)
 {
-    if (literal == std::string(1, LPREN_LITERAL))
+    if (literal == std::string(1, LPAREN_LITERAL))
     {
-        return LPREN;
+        return LPAREN;
     }
-    else if (literal == std::string(1, RPREN_LITERAL))
+    else if (literal == std::string(1, RPAREN_LITERAL))
     {
-        return RPREN;
+        return RPAREN;
     }
     else if (literal == std::string(1, ADDITION_LITERAL))
     {
@@ -66,7 +66,7 @@ Tokens Tokeniser::categoriseLiteral(const std::string& literal)
     }
     else if (literal == std::string(1, SUBSTRICTION_LITERAL))
     {
-        return SUBSTRACTION;
+        return SUBTRACTION;
     }
     else if (isNumber(literal))
     {

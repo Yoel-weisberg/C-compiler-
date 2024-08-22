@@ -22,16 +22,16 @@ void Optimiser::m_optimisePlusAndMinus()
 			val *= 1;
 			wasTherePlusOrMinus = true;
 		}
-		else if (pr.second == SUBSTRACTION)
+		else if (pr.second == SUBTRACTION)
 		{
 			val *= -1;
 			wasTherePlusOrMinus = true;
 		}
-		else if (pr.second == INT)
+		else if (pr.second == INT || pr.second == LPAREN)
 		{
 			if (wasTherePlusOrMinus)
 			{
-				m_optimisedTokens.push_back({ val == 1 ? std::string(1, ADDITION_LITERAL) : std::string(1, SUBSTRICTION_LITERAL) , val == 1 ? ADDITION : SUBSTRACTION });
+				m_optimisedTokens.push_back({ val == 1 ? std::string(1, ADDITION_LITERAL) : std::string(1, SUBSTRICTION_LITERAL) , val == 1 ? ADDITION : SUBTRACTION });
 			}
 			m_optimisedTokens.push_back(pr);
 			wasTherePlusOrMinus = false;
@@ -45,7 +45,7 @@ void Optimiser::m_optimisePlusAndMinus()
 
 	for (int i = 0; i < m_optimisedTokens.size(); i++)
 	{
-		if (m_optimisedTokens[i].second == SUBSTRACTION)
+		if (m_optimisedTokens[i].second == SUBTRACTION)
 		{
 			m_optimisedTokens[i + 1].first = "-" + m_optimisedTokens[i + 1].first;
 			m_optimisedTokens[i].first = ADDITION_LITERAL;

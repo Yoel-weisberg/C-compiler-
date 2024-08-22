@@ -5,7 +5,7 @@
 #include "Tokenizer.h"
 #include "SyntexAnalysis.h"
 #include "Optimiser.h"
-#include "AST.h"
+#include "ParseToAst.h"
 
 int main(int argc, char* argv[])
 {
@@ -32,7 +32,12 @@ int main(int argc, char* argv[])
 
         Optimiser* optimiser = new Optimiser(tokeniser->getTokens());
 
-        AST* ast = new AST(optimiser->getOptimised());
+        Parser parser(optimiser->getOptimised());
+
+        auto ast = parser.parseExpression();
+
+        std::cout << "AST:" << std::endl;
+        printAST(ast);
 
         file.close();  // Close the file
     }
@@ -44,3 +49,7 @@ int main(int argc, char* argv[])
 
     return 0;
 }
+
+
+
+
