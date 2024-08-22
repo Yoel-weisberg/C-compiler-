@@ -4,6 +4,8 @@
 #include <stdexcept>
 #include "Tokenizer.h"
 #include "SyntexAnalysis.h"
+#include "Optimiser.h"
+#include "AST.h"
 
 int main(int argc, char* argv[])
 {
@@ -27,6 +29,10 @@ int main(int argc, char* argv[])
         Tokeniser* tokeniser = new Tokeniser(file_content);
 
         SyntexAnalysis* analysis = new SyntexAnalysis(tokeniser->getTokens());
+
+        Optimiser* optimiser = new Optimiser(tokeniser->getTokens());
+
+        AST* ast = new AST(optimiser->getOptimised());
 
         file.close();  // Close the file
     }

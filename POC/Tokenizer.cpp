@@ -32,6 +32,8 @@ Tokeniser::Tokeniser(const std::string& string)
             currentLiteral += string[i];
         }
 	}
+    
+    this->tokens.push_back({ currentLiteral, categoriseLiteral(currentLiteral) });
 }
 
 std::vector<std::pair<std::string, Tokens>> Tokeniser::getTokens() const

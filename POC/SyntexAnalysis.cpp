@@ -45,6 +45,7 @@ void SyntexAnalysis::noTwoOperationAfterEachOther()
     bool isThereSign = true; // indicates if there is * or / signs in the current session
     int chrIndex = 0;
     bool isTherePren = false;
+    bool isThereANumber = false;
     for (auto pr : tokens)
     {
         chrIndex += pr.first.size();
@@ -65,6 +66,7 @@ void SyntexAnalysis::noTwoOperationAfterEachOther()
         {
             isThereSign = false;
             isTherePren = false;
+            isThereANumber = true;
         }
         else if (pr.second == ADDITION || pr.second == SUBSTRACTION)
         {
@@ -74,5 +76,9 @@ void SyntexAnalysis::noTwoOperationAfterEachOther()
             }
             isThereSign = true;
         }
+    }
+    if (!isThereANumber)
+    {
+        throw SyntaxError("There is no integer in the expression", chrIndex);
     }
 }

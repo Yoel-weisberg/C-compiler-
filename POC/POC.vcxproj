@@ -127,7 +127,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AST.cpp" />
+    <ClCompile Include="INode.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Optimiser.cpp" />
     <ClCompile Include="SyntexAnalysis.cpp" />
     <ClCompile Include="Tokenizer.cpp" />
   </ItemGroup>
@@ -135,7 +138,10 @@
     <Text Include="expression.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AST.h" />
     <ClInclude Include="Constents.h" />
+    <ClInclude Include="INode.h" />
+    <ClInclude Include="Optimiser.h" />
     <ClInclude Include="SyntaxError.h" />
     <ClInclude Include="SyntexAnalysis.h" />
     <ClInclude Include="Tokenizer.h" />
