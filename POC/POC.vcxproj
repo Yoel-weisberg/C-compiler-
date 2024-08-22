@@ -134,6 +134,8 @@
     <Text Include="expression.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Constents.h" />
+    <ClInclude Include="SyntexAnalysis.h" />
     <ClInclude Include="Tokenizer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
