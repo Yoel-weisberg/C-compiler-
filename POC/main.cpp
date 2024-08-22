@@ -3,6 +3,7 @@
 #include <sstream>
 #include <stdexcept>
 #include "Tokenizer.h"
+#include "SyntexAnalysis.h"
 
 int main(int argc, char* argv[])
 {
@@ -25,7 +26,7 @@ int main(int argc, char* argv[])
 
         Tokeniser* tokeniser = new Tokeniser(file_content);
 
-        std::cout << *tokeniser;
+        SyntexAnalysis* analysis = new SyntexAnalysis(tokeniser->getTokens());
 
         file.close();  // Close the file
     }

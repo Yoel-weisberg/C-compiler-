@@ -1,5 +1,12 @@
 #include "SyntexAnalysis.h"
 
+SyntexAnalysis::SyntexAnalysis(const std::vector<std::pair<std::string, Tokens>>& tokens) :
+    tokens(tokens)
+{
+    checkPernthesis();
+    noTwoOperationAfterEachOther();
+}
+
 void SyntexAnalysis::checkPernthesis()
 {
     int lprenCount = 0;
@@ -35,22 +42,37 @@ void SyntexAnalysis::checkPernthesis()
 
 void SyntexAnalysis::noTwoOperationAfterEachOther()
 {
-    bool isThereNoContinuesSign = true; // indicates if there is * or / signs in the current session
+    bool isThereSign = true; // indicates if there is * or / signs in the current session
+    int chrIndex = 0;
+    bool isTherePren = false;
     for (auto pr : tokens)
     {
-        int chrIndex = 0;
-        
+        chrIndex += pr.first.size();
         if (pr.second == MULTIPLICATION || pr.second == DIVISION)
         {
-            if (!isThereNoContinuesSign)
+            if (isThereSign || isTherePren)
             {
                 throw SyntaxError("There are  too many operaters ", chrIndex);
             }
-            isThereNoContinuesSign = true;
+
+            isThereSign = true;
+        }
+        else if (pr.second == LPREN || pr.second == RPREN)
+        {
+            isTherePren = true;
         }
         else if (pr.second == INT)
         {
-            isThereNoContinuesSign = false;
+            isThereSign = false;
+            isTherePren = false;
+        }
+        else if (pr.second == ADDITION || pr.second == SUBSTRACTION)
+        {
+            if (isTherePren)
+            {
+                throw SyntaxError("There are  too many operaters ", chrIndex);
+            }
+            isThereSign = true;
         }
     }
 }
