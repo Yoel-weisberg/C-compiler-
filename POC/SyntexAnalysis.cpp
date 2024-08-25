@@ -44,33 +44,38 @@ void SyntexAnalysis::noTwoOperationAfterEachOther()
 {
     bool isThereSign = true; // indicates if there is * or / signs in the current session
     int chrIndex = 0;
-    bool isTherePren = false;
+    bool isTherelPren = false;
     bool isThereANumber = false;
     for (auto pr : tokens)
     {
         chrIndex += pr.first.size();
         if (pr.second == MULTIPLICATION || pr.second == DIVISION)
         {
-            if (isThereSign || isTherePren)
+            if (isThereSign || isTherelPren)
             {
                 throw SyntaxError("There are  too many operaters ", chrIndex);
             }
 
             isThereSign = true;
         }
-        else if (pr.second == LPAREN || pr.second == RPAREN)
+        else if (pr.second == LPAREN)
         {
-            isTherePren = true;
+            isTherelPren = true;
+        }
+        else if (pr.second == RPAREN)
+        {
+            if (!isThereANumber)  throw SyntaxError("There is nothing in the pernthesis", chrIndex);
+            isTherelPren = false;
         }
         else if (pr.second == INT)
         {
             isThereSign = false;
-            isTherePren = false;
             isThereANumber = true;
+            isTherelPren = false;
         }
         else if (pr.second == ADDITION || pr.second == SUBTRACTION)
         {
-            if (isTherePren)
+            if (isTherelPren)
             {
                 throw SyntaxError("There are  too many operaters ", chrIndex);
             }

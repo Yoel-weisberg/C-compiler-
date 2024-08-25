@@ -43,19 +43,20 @@ void Optimiser::m_optimisePlusAndMinus()
 		}
 	}
 
-	for (int i = 0; i < m_optimisedTokens.size(); i++)
-	{
-		if (m_optimisedTokens[i].second == SUBTRACTION)
-		{
-			m_optimisedTokens[i + 1].first = "-" + m_optimisedTokens[i + 1].first;
-			m_optimisedTokens[i].first = ADDITION_LITERAL;
-			m_optimisedTokens[i].second = ADDITION;
-		}
-		else if (m_optimisedTokens[i].second == DIVISION)
-		{
-			m_optimisedTokens[i + 1].first = "1/" + m_optimisedTokens[i + 1].first;
-			m_optimisedTokens[i].first = MULTIPLICATION_LITERAL;
-			m_optimisedTokens[i].second = MULTIPLICATION;
-		}
-	}
+	//for (int i = 0; i < m_optimisedTokens.size(); i++)
+	//{
+	//	if (m_optimisedTokens[i].second == SUBTRACTION)
+	//	{
+	//		m_optimisedTokens[i + 1].first = "-" + m_optimisedTokens[i + 1].first;
+	//		m_optimisedTokens[i].first = ADDITION_LITERAL;
+	//		m_optimisedTokens[i].second = ADDITION;
+	//	}
+	//	else if (m_optimisedTokens[i].second == DIVISION)
+	//	{
+	//		m_optimisedTokens[i + 1].first = "1";
+	//		m_optimisedTokens.insert(m_optimisedTokens.begin() + i + 2, )
+	//		m_optimisedTokens[i].first = MULTIPLICATION_LITERAL;
+	//		m_optimisedTokens[i].second = MULTIPLICATION;
+	//	}
+	//}
 }
