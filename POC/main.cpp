@@ -6,6 +6,8 @@
 #include "SyntexAnalysis.h"
 #include "Optimiser.h"
 #include "ParseToAst.h"
+#include "Asm.h"
+
 
 int main(int argc, char* argv[])
 {
@@ -34,10 +36,7 @@ int main(int argc, char* argv[])
 
         Parser parser(optimiser->getOptimised());
 
-        auto ast = parser.parseExpression();
-
-        std::cout << "AST:" << std::endl;
-        printAST(ast);
+        ConvortASTtoASM* converter = new ConvortASTtoASM(parser.parseExpression());
 
         file.close();  // Close the file
     }

@@ -13,6 +13,8 @@ struct ASTNode {
     ASTNode(std::string val, Tokens tok)
         : value(val), token(tok), left(nullptr), right(nullptr) {}
 
+    ASTNode(std::string val, Tokens tok, ASTNode* left, ASTNode* right) : value(val), token(tok), left(left), right(right) {}
+
     bool haveKids() { return (left != nullptr || right != nullptr);  }
 
     int toInt() { return std::stoi(value); }
