@@ -16,6 +16,18 @@ ASTNode* Parser::parsePrimary()
         pos++;
         return new ASTNode(token.first, token.second);
     }
+    else if(token.second == SUBTRACTION)
+    {
+        pos++; // Skip the '-' token
+
+        // Parse the primary expression after the '-'
+        ASTNode* node = parsePrimary();
+
+        // Create a unary negation node
+        ASTNode* newNode = new ASTNode("-", SUBTRACTION); // Use SUBTRACTION as a token type
+        newNode->right = node; // Unary negation only has a right child
+        return newNode;
+    }
     else if (token.second == LPAREN) {
         pos++;
 

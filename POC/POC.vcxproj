@@ -104,6 +104,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>D:\Yoel-Stuff\Maghimim\Final Project\asmjit\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -127,6 +128,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Asm.cpp" />
     <ClCompile Include="INode.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Optimiser.cpp" />
@@ -138,6 +140,7 @@
     <Text Include="expression.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Asm.h" />
     <ClInclude Include="Constents.h" />
     <ClInclude Include="Optimiser.h" />
     <ClInclude Include="ParseToAst.h" />

@@ -33,6 +33,9 @@
     <ClCompile Include="ParseToAst.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Asm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="expression.txt">
@@ -56,6 +59,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ParseToAst.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Asm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

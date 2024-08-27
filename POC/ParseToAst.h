@@ -13,6 +13,10 @@ struct ASTNode {
     ASTNode(std::string val, Tokens tok)
         : value(val), token(tok), left(nullptr), right(nullptr) {}
 
+    bool haveKids() { return (left != nullptr || right != nullptr);  }
+
+    int toInt() { return std::stoi(value); }
+
     ~ASTNode() {
         delete left;
         delete right;
@@ -35,4 +39,4 @@ private:
     ASTNode* parseAdditionSubtraction();
 };
 
-void printAST(const ASTNode* node, int indent = 0);
+void printAST(const ASTNode* node, int indent = 1);
