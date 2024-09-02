@@ -6,14 +6,14 @@ Tokeniser::Tokeniser(const std::string& string)
 
 	for (int i = 0; i < string.size(); i++)
 	{
-		if (string[i] == ' ')
+		if (string[i] == ' ') // If it's a blank space
 		{
             if (currentLiteral.size() != 0)
             {
                 this->tokens.push_back({ currentLiteral, categoriseLiteral(currentLiteral) });
                 currentLiteral = "";
             }
-		}
+		} // Any other valid char exept for a digit
         else if (string[i] == LPAREN_LITERAL || string[i] == RPAREN_LITERAL ||
             string[i] == ADDITION_LITERAL || string[i] == MULTIPLICATION_LITERAL ||
             string[i] == DIVISION_LITERAL || string[i] == SUBSTRICTION_LITERAL)
