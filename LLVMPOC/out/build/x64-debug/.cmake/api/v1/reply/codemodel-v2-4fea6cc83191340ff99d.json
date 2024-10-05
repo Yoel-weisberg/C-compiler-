@@ -1,0 +1,123 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-d0094a50bb2071803777.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.8"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "LLVMPOC",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5,
+						6,
+						7
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "AArch64TargetParserTableGen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-AArch64TargetParserTableGen-Debug-605dfcb3e6a656d82ef1.json",
+					"name" : "AArch64TargetParserTableGen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "ARMTargetParserTableGen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-ARMTargetParserTableGen-Debug-fabf390665922dc9675b.json",
+					"name" : "ARMTargetParserTableGen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "LLVMPOC::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-LLVMPOC-Debug-df931c1a8ed05d900935.json",
+					"name" : "LLVMPOC",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "RISCVTargetParserTableGen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-RISCVTargetParserTableGen-Debug-855ffeae4b93502167f9.json",
+					"name" : "RISCVTargetParserTableGen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "acc_gen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-acc_gen-Debug-ab873b7472c6cc98703d.json",
+					"name" : "acc_gen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "intrinsics_gen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-intrinsics_gen-Debug-ee04d0af4c849740c2df.json",
+					"name" : "intrinsics_gen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "omp_gen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-omp_gen-Debug-7ea0ccc998937f324cdb.json",
+					"name" : "omp_gen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "vt_gen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-vt_gen-Debug-5acde0086bab7046d6a0.json",
+					"name" : "vt_gen",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "D:/Yoel-Stuff/Maghimim/Final Project/LLVMPOC/out/build/x64-debug",
+		"source" : "D:/Yoel-Stuff/Maghimim/Final Project/LLVMPOC"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 6
+	}
+}
