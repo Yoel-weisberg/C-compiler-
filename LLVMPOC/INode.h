@@ -1,6 +1,9 @@
 #pragma once
+
+#include <memory>
 #include <vector>
 #include <string>
+#include <map>
 #include "Constents.h"
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/STLExtras.h"
@@ -13,7 +16,6 @@
 #include "llvm/IR/Module.h"
 #include "llvm/IR/Type.h"
 #include "llvm/IR/Verifier.h"
-#include <map>
 
 #define LEFT_CHILD 0
 #define RIGHT_CHILD 1
@@ -27,24 +29,10 @@ public:
     static std::unique_ptr<Module> TheModule;
     static std::map<std::string, Value*> NamedValues;
 
-    static void initializeLLVM() {
-        if (!TheContext) {
-            TheContext = std::make_unique<LLVMContext>();
-            Builder = std::make_unique<IRBuilder<>>(*TheContext);
-            TheModule = std::make_unique<Module>("my cool jit", *TheContext);
-        }
-    }
+    static void initializeLLVM(); // Declaration only
+    static Value* LogErrorV(const char* Str); // Declaration only
+    static void LogError(const char* Str); // Declaration only
 
-    Value* LogErrorV(const char* Str) {
-        LogError(Str);
-        return nullptr;
-    }
-
-    void LogError(const char* Str) {
-        fprintf(stderr, "Error: %s\n", Str);
-    }
-
-    virtual ~INode() = default;
-
-    virtual llvm::Value* codegen() = 0;
+    virtual ~INode() = default; // Virtual destructor
+    virtual llvm::Value* codegen() = 0; // Pure virtual function
 };

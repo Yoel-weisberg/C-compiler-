@@ -11,8 +11,10 @@ endif()
 
 project(LLVMPOC)
 
-# Add source to this project's executable.
-add_executable(LLVMPOC "LLVMPOC.cpp"  "IntConstentNode.cpp" "BinaryOperationNode.cpp")
+file(GLOB SOURCES "*.cpp")
+
+# Create an executable target
+add_executable(LLVMPOC ${SOURCES})
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET LLVMPOC PROPERTY CXX_STANDARD 20)

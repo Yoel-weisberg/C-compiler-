@@ -4,7 +4,7 @@
 #include <string>
 #include "Constents.h"
 #include "INode.h"
-#include "IntConstentNode.h"
+#include "IntConstantNode.h"
 #include "BinaryOperationNode.h"
 
 class Parser {
@@ -22,5 +22,3 @@ private:
     INode* parseMultiplicationDivision();
     INode* parseAdditionSubtraction();
 };
-
-void printAST(const INode* node, int indent = 1);
