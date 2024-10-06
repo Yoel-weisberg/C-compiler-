@@ -1,9 +1,9 @@
 #include "INode.h"
 
-class ConstentNode : public INode
+class IntConstentNode : public INode
 {
 public:
-	ConstentNode(double value) : INode(), m_value(value) {}
+	IntConstentNode(double value) : INode(), m_value(value) {}
 	llvm::Value* codegen() override;
 
 private:

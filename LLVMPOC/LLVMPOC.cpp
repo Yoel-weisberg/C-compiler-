@@ -7,7 +7,7 @@
 #include "Optimiser.h"
 #include "ParseToAst.h"
 #include "Asm.h"
-
+#include "INode.h"
 
 int main(int argc, char* argv[])
 {
@@ -36,7 +36,8 @@ int main(int argc, char* argv[])
 
         Parser parser(optimiser->getOptimised());
 
-        ConvortASTtoASM* converter = new ConvortASTtoASM(parser.parseExpression());
+        INode::initializeLLVM();
+
 
         file.close();  // Close the file
     }

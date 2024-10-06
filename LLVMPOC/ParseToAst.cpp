@@ -1,6 +1,6 @@
 #include "ParseToAst.h"
 
-void printAST(const ASTNode* node, int indent)
+void printAST(const INode* node, int indent)
 {
     if (node == nullptr) return;
     for (int i = 0; i < indent; ++i) std::cout << "  ";
@@ -9,66 +9,67 @@ void printAST(const ASTNode* node, int indent)
     printAST(node->right, indent + 1);
 }
 
-ASTNode* Parser::parsePrimary()
+INode* Parser::parsePrimary()
 {
     const auto& token = tokens[pos];
     if (token.second == INT) {
         pos++;
-        return new ASTNode(token.first, token.second);
+        return new IntConstantNode(token.first);
     }
-    else if(token.second == SUBTRACTION)
-    {
+    else if (token.second == SUBTRACTION) {
         pos++; // Skip the '-' token
 
         // Parse the primary expression after the '-'
-        ASTNode* node = parsePrimary();
+        INode* node = parsePrimary();
 
         // Create a unary negation node
-        ASTNode* newNode = new ASTNode("-", SUBTRACTION); // Use SUBTRACTION as a token type
-        newNode->right = node; // Unary negation only has a right child
-        return newNode;
+        return new BinaryNode('-', nullptr, std::unique_ptr<INode>(node));
     }
     else if (token.second == LPAREN) {
         pos++;
 
-        // parsing the code inside the pernthesis
-        ASTNode* node = parseExpression();
+        // parsing the code inside the parentheses
+        INode* node = parseExpression();
 
-        // skipping the closing prenthesis
+        if (tokens[pos].second != RPAREN) {
+            LogErrorV("Expected closing parenthesis");
+            return nullptr;
+        }
+
+        // skipping the closing parenthesis
         pos++;
-
         return node;
     }
+
+    return LogErrorV("Unknown token when expecting an expression");
 }
 
-ASTNode* Parser::parseMultiplicationDivision()
+
+INode* Parser::parseMultiplicationDivision()
 {
-    ASTNode* node = parsePrimary();
+    INode* node = parsePrimary();
 
     while (pos < tokens.size() && (tokens[pos].second == MULTIPLICATION || tokens[pos].second == DIVISION)) {
         auto op = tokens[pos++];
-        ASTNode* rightNode = parsePrimary();
-        ASTNode* newNode = new ASTNode(op.first, op.second);
-        newNode->left = node;
-        newNode->right = rightNode;
+        INode* rightNode = parsePrimary();
+        INode* newNode = new BinaryNode(op.first, std::unique_ptr<INode>(node), std::unique_ptr<INode>(rightNode));
         node = newNode;
     }
 
     return node;
 }
 
-ASTNode* Parser::parseAdditionSubtraction()
+INode* Parser::parseAdditionSubtraction()
 {
-    ASTNode* node = parseMultiplicationDivision();
+    INode* node = parseMultiplicationDivision();
 
     while (pos < tokens.size() && (tokens[pos].second == ADDITION || tokens[pos].second == SUBTRACTION)) {
         auto op = tokens[pos++];
-        ASTNode* rightNode = parseMultiplicationDivision();
-        ASTNode* newNode = new ASTNode(op.first, op.second);
-        newNode->left = node;
-        newNode->right = rightNode;
+        INode* rightNode = parseMultiplicationDivision();
+        INode* newNode = new BinaryNode(op.first, std::unique_ptr<INode>(node), std::unique_ptr<INode>(rightNode));
         node = newNode;
     }
 
     return node;
 }
+
