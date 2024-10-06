@@ -1,40 +1,50 @@
-﻿#include "llvm/IR/LLVMContext.h"
-#include "llvm/IR/Module.h"
-#include "llvm/IR/IRBuilder.h"
-#include "llvm/IR/Verifier.h"
+﻿#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <stdexcept>
+#include "Tokenizer.h"
+#include "SyntexAnalysis.h"
+#include "Optimiser.h"
+#include "ParseToAst.h"
+#include "Asm.h"
 
-int main() {
-    llvm::LLVMContext Context;
-    llvm::Module* Module = new llvm::Module("MyModule", Context);
-    llvm::IRBuilder<> Builder(Context);
 
-    // Create a function signature: int add(int a, int b)
-    llvm::FunctionType* funcType = llvm::FunctionType::get(Builder.getInt32Ty(),
-        { Builder.getInt32Ty(), Builder.getInt32Ty() }, false);
-    llvm::Function* addFunc = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage,
-        "add", Module);
+int main(int argc, char* argv[])
+{
+    try
+    {
+        if (argc != 2)  // argc should be 2, since argv[0] is the program name and argv[1] is the file path
+        {
+            throw std::invalid_argument("You need to specify the file you want to open");
+        }
 
-    // Create a basic block and set the insertion point
-    llvm::BasicBlock* BB = llvm::BasicBlock::Create(Context, "entry", addFunc);
-    Builder.SetInsertPoint(BB);
+        std::ifstream file(argv[1]);  // Open the file
+        if (!file.is_open())
+        {
+            throw std::runtime_error("Could not open the specified file");
+        }
 
-    // Get function arguments
-    llvm::Function::arg_iterator args = addFunc->arg_begin();
-    llvm::Value* a = args++;
-    llvm::Value* b = args++;
+        std::stringstream buffer;
+        buffer << file.rdbuf();  // Read file content into stringstream
+        std::string file_content = buffer.str();  // Store content into a string
 
-    // Add the two arguments
-    llvm::Value* sum = Builder.CreateAdd(a, b, "sum");
+        Tokeniser* tokeniser = new Tokeniser(file_content);
 
-    // Return the result
-    Builder.CreateRet(sum);
+        SyntexAnalysis* analysis = new SyntexAnalysis(tokeniser->getTokens());
 
-    // Verify the function
-    llvm::verifyFunction(*addFunc);
+        Optimiser* optimiser = new Optimiser(tokeniser->getTokens());
 
-    // Output the LLVM IR to stdout
-    Module->print(llvm::outs(), nullptr);
+        Parser parser(optimiser->getOptimised());
 
-    delete Module;
+        ConvortASTtoASM* converter = new ConvortASTtoASM(parser.parseExpression());
+
+        file.close();  // Close the file
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return 1;
+    }
+
     return 0;
 }

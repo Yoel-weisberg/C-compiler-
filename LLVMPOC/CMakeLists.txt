@@ -12,7 +12,7 @@ endif()
 project(LLVMPOC)
 
 # Add source to this project's executable.
-add_executable(LLVMPOC "LLVMPOC.cpp" "LLVMPOC.h")
+add_executable(LLVMPOC "LLVMPOC.cpp" "LLVMPOC.h" "ConstentNode.h" "BinaryOperationNode.h")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET LLVMPOC PROPERTY CXX_STANDARD 20)

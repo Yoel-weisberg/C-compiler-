@@ -283,7 +283,9 @@
 			"name" : "Header Files",
 			"sourceIndexes" : 
 			[
-				1
+				1,
+				2,
+				3
 			]
 		}
 	],
@@ -298,6 +300,16 @@
 		{
 			"backtrace" : 1,
 			"path" : "LLVMPOC.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "ConstentNode.h",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "BinaryOperationNode.h",
 			"sourceGroupIndex" : 1
 		}
 	],
