@@ -3,9 +3,9 @@
 class ConstentNode : public INode
 {
 public:
-	ConstentNode(double value);
+	ConstentNode(double value) : INode(), m_value(value) {}
 	llvm::Value* codegen() override;
 
 private:
-	double value;
+	double m_value;
 };
