@@ -57,6 +57,22 @@ build CMakeFiles\LLVMPOC.dir\LLVMPOC.cpp.obj: CXX_COMPILER__LLVMPOC_unscanned_Re
   TARGET_COMPILE_PDB = CMakeFiles\LLVMPOC.dir\
   TARGET_PDB = LLVMPOC.pdb
 
+build CMakeFiles\LLVMPOC.dir\IntConstentNode.cpp.obj: CXX_COMPILER__LLVMPOC_unscanned_Release D$:\Yoel-Stuff\Maghimim\Final$ Project\LLVMPOC\IntConstentNode.cpp || cmake_object_order_depends_target_LLVMPOC
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MD /O2 /Ob2 /DNDEBUG -std:c++20   -D_CRT_SECURE_NO_DEPRECATE -D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_DEPRECATE -D_CRT_NONSTDC_NO_WARNINGS -D_SCL_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_WARNINGS -DUNICODE -D_UNICODE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS
+  INCLUDES = -II:\llvm\include
+  OBJECT_DIR = CMakeFiles\LLVMPOC.dir
+  OBJECT_FILE_DIR = CMakeFiles\LLVMPOC.dir
+  TARGET_COMPILE_PDB = CMakeFiles\LLVMPOC.dir\
+  TARGET_PDB = LLVMPOC.pdb
+
+build CMakeFiles\LLVMPOC.dir\BinaryOperationNode.cpp.obj: CXX_COMPILER__LLVMPOC_unscanned_Release D$:\Yoel-Stuff\Maghimim\Final$ Project\LLVMPOC\BinaryOperationNode.cpp || cmake_object_order_depends_target_LLVMPOC
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MD /O2 /Ob2 /DNDEBUG -std:c++20   -D_CRT_SECURE_NO_DEPRECATE -D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_DEPRECATE -D_CRT_NONSTDC_NO_WARNINGS -D_SCL_SECURE_NO_DEPRECATE -D_SCL_SECURE_NO_WARNINGS -DUNICODE -D_UNICODE -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS
+  INCLUDES = -II:\llvm\include
+  OBJECT_DIR = CMakeFiles\LLVMPOC.dir
+  OBJECT_FILE_DIR = CMakeFiles\LLVMPOC.dir
+  TARGET_COMPILE_PDB = CMakeFiles\LLVMPOC.dir\
+  TARGET_PDB = LLVMPOC.pdb
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target LLVMPOC
@@ -65,7 +81,7 @@ build CMakeFiles\LLVMPOC.dir\LLVMPOC.cpp.obj: CXX_COMPILER__LLVMPOC_unscanned_Re
 #############################################
 # Link the executable LLVMPOC.exe
 
-build LLVMPOC.exe: CXX_EXECUTABLE_LINKER__LLVMPOC_Release CMakeFiles\LLVMPOC.dir\LLVMPOC.cpp.obj | I$:\llvm\lib\LLVMSupport.lib I$:\llvm\lib\LLVMCore.lib I$:\llvm\lib\LLVMIRReader.lib I$:\llvm\lib\LLVMAsmParser.lib I$:\llvm\lib\LLVMBitReader.lib I$:\llvm\lib\LLVMCore.lib I$:\llvm\lib\LLVMBinaryFormat.lib I$:\llvm\lib\LLVMRemarks.lib I$:\llvm\lib\LLVMTargetParser.lib I$:\llvm\lib\LLVMBitstreamReader.lib I$:\llvm\lib\LLVMSupport.lib I$:\llvm\lib\LLVMDemangle.lib
+build LLVMPOC.exe: CXX_EXECUTABLE_LINKER__LLVMPOC_Release CMakeFiles\LLVMPOC.dir\LLVMPOC.cpp.obj CMakeFiles\LLVMPOC.dir\IntConstentNode.cpp.obj CMakeFiles\LLVMPOC.dir\BinaryOperationNode.cpp.obj | I$:\llvm\lib\LLVMSupport.lib I$:\llvm\lib\LLVMCore.lib I$:\llvm\lib\LLVMIRReader.lib I$:\llvm\lib\LLVMAsmParser.lib I$:\llvm\lib\LLVMBitReader.lib I$:\llvm\lib\LLVMCore.lib I$:\llvm\lib\LLVMBinaryFormat.lib I$:\llvm\lib\LLVMRemarks.lib I$:\llvm\lib\LLVMTargetParser.lib I$:\llvm\lib\LLVMBitstreamReader.lib I$:\llvm\lib\LLVMSupport.lib I$:\llvm\lib\LLVMDemangle.lib
   FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MD /O2 /Ob2 /DNDEBUG
   LINK_FLAGS = /machine:x64 /INCREMENTAL:NO /subsystem:console
   LINK_LIBRARIES = I:\llvm\lib\LLVMSupport.lib  I:\llvm\lib\LLVMCore.lib  I:\llvm\lib\LLVMIRReader.lib  I:\llvm\lib\LLVMAsmParser.lib  I:\llvm\lib\LLVMBitReader.lib  I:\llvm\lib\LLVMCore.lib  I:\llvm\lib\LLVMBinaryFormat.lib  I:\llvm\lib\LLVMRemarks.lib  I:\llvm\lib\LLVMTargetParser.lib  I:\llvm\lib\LLVMBitstreamReader.lib  I:\llvm\lib\LLVMSupport.lib  psapi.lib  shell32.lib  ole32.lib  uuid.lib  advapi32.lib  ws2_32.lib  ntdll.lib  delayimp.lib  -delayload:shell32.dll  -delayload:ole32.dll  I:\llvm\lib\LLVMDemangle.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib

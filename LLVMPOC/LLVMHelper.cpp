@@ -1,6 +1,7 @@
-#include "INode.h"
+#include "LLVMHelper.h"
 
-llvm::Function* createFunction() {
+llvm::Function* LLVMHelper::createFunction()
+{
     // Create a function type: double foo()
     llvm::FunctionType* funcType = llvm::FunctionType::get(llvm::Type::getDoubleTy(*INode::TheContext), false);
 
@@ -14,8 +15,8 @@ llvm::Function* createFunction() {
     return function;
 }
 
-
-void generateIR(INode* astRoot) {
+void LLVMHelper::generateIR(INode* astRoot)
+{
     // Create a function
     llvm::Function* function = createFunction();
 

@@ -8,11 +8,14 @@
 #include "ParseToAst.h"
 #include "Asm.h"
 #include "INode.h"
+#include "LLVMHelper.h"
 
 int main(int argc, char* argv[])
 {
     try
     {
+        INode::initializeLLVM();
+
         if (argc != 2)  // argc should be 2, since argv[0] is the program name and argv[1] is the file path
         {
             throw std::invalid_argument("You need to specify the file you want to open");
@@ -36,8 +39,14 @@ int main(int argc, char* argv[])
 
         Parser parser(optimiser->getOptimised());
 
-        INode::initializeLLVM();
+        INode rootAST = parser.parseExpression();
 
+        if (astRoot) {
+            generateIR(astRoot);  // Generate LLVM IR from the AST
+        }
+        else {
+            std::cerr << "Parsing failed." << std::endl;
+        }
 
         file.close();  // Close the file
     }
