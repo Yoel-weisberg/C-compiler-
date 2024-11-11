@@ -77,8 +77,37 @@ void Preprocess::handleMacroVariebles()
     replaceMacro();
 }
 
-void Preprocess::replaceMacro()
+std::string Preprocess::replaceMacro()
 {
+    std::fstream file (_fileName, std::ios::in | std::ios::out);
+    if (!file.is_open()){
+        throw SyntaxError("Invalid file name", 0);
+    }
+    char ch;
+    std::string codeStream, currentBlock;
+    bool isThereQuetes = false, singleQuete = false;
+    while (file.get(ch))
+    {
+        // were not appling macros inside strings 
+        (ch == '"' && !singleQuete)  ? isThereQuetes = !isThereQuetes : true;
+        (ch == '\'' && !isThereQuetes) ? singleQuete = !singleQuete : true;
+
+        if ((ch == ' ' || ch == '\n') && !isThereQuetes)
+        {
+            if (currentBlock.empty()) {
+                continue;
+            }
+            auto it = _macroTable.find(currentBlock);
+            if (it!= _macroTable.end()) {
+                codeStream += getFinalValue(it->first);
+            } else {
+                codeStream += currentBlock;
+            }
+            currentBlock.clear();
+        }
+
+    }
+    
 }
 
 bool Preprocess::checkMacroKeyValidity(const std::string &macroKey)
@@ -154,4 +183,16 @@ bool Preprocess::checkMacroValueValidity(const std::string &macroValue)
 bool Preprocess::isNumber(const std::string &number)
 {
     return !number.empty() && std::all_of(number.begin(), number.end(), ::isdigit);
+}
+
+std::string Preprocess::getFinalValue(std::string key)
+{
+    if (_macroTable.find(_macroTable.find(key)->second) == _macroTable.end())
+    {
+        return _macroTable.find(key)->second;
+    }
+    else
+    {
+        return getFinalValue(_macroTable.find(key)->second);
+    }
 }

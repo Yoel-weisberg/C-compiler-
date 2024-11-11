@@ -12,10 +12,11 @@ private:
     void removeComments ();
     void manageIncludes();
     void handleMacroVariebles();
-    void replaceMacro();
+    std::string replaceMacro();
     // void handleFunctinMacro(); - sprint2
     bool checkMacroKeyValidity (const std::string& macroKey);
     bool checkMacroValueValidity (const std::string& macroValue);
     bool isNumber(const std::string& number);
+    std::string getFinalValue(std::string key);
     std::map <std::string, std::string> _macroTable;
 };
