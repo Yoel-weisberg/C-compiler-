@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <map>
+#include "SyntexError.h"
 
 class Preprocess{
 public:
@@ -11,6 +12,9 @@ private:
     void removeComments ();
     void manageIncludes();
     void handleMacroVariebles();
+    void replaceMacro();
     // void handleFunctinMacro(); - sprint2
+    bool checkMacroKeyValidity (const std::string& macroKey);
+    bool checkMacroValueValidity (const std::string& macroValue);
     std::map <std::string, std::string> _macroTable;
 };
