@@ -1,5 +1,5 @@
 #pragma once
-enum Tokens {
+enum Tokens_type {
 	INT,
 	LPAREN,
 	RPAREN,

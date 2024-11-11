@@ -36,13 +36,13 @@ Tokeniser::Tokeniser(const std::string& string)
     this->tokens.push_back({ currentLiteral, categoriseLiteral(currentLiteral) });
 }
 
-std::vector<std::pair<std::string, Tokens>> Tokeniser::getTokens() const
+std::vector<std::pair<std::string, Tokens_type>> Tokeniser::getTokens() const
 {
     return this->tokens;
 }
 
 
-Tokens Tokeniser::categoriseLiteral(const std::string& literal)
+Tokens_type Tokeniser::categoriseLiteral(const std::string& literal)
 {
     if (literal == std::string(1, LPAREN_LITERAL))
     {

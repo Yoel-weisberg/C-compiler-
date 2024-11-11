@@ -24,6 +24,7 @@ using namespace llvm;
 
 class INode {
 public:
+    // llvm related
     static std::unique_ptr<LLVMContext> TheContext;
     static std::unique_ptr<IRBuilder<>> Builder;
     static std::unique_ptr<Module> TheModule;

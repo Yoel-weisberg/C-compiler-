@@ -4,15 +4,16 @@
 #include <iostream>
 #include <string>
 #include "SyntaxError.h"
+#include "Tokenizer.h"
 
 class SyntexAnalysis
 {
 public:
-	SyntexAnalysis(const std::vector<std::pair<std::string, Tokens>>& tokens);
+	SyntexAnalysis(const std::vector<Token>& tokens);
 	
 private:
 	void checkPernthesis();
 	void noTwoOperationAfterEachOther();
 
-	std::vector<std::pair<std::string, Tokens>> tokens;
+	std::vector<Token> tokens;
 };
