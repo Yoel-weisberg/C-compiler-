@@ -2,7 +2,7 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "LexicalAnalyzer"
+			"path" : "C_Compiler"
 		}
 	],
 	"backtrace" : 1,
@@ -24,7 +24,7 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 7,
+				"line" : 4,
 				"parent" : 0
 			}
 		]
@@ -35,25 +35,17 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "-g -std=gnu++2b -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.4.sdk -mmacosx-version-min=14.0"
+					"fragment" : "-g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.4.sdk -mmacosx-version-min=14.0"
 				}
 			],
 			"language" : "CXX",
-			"languageStandard" : 
-			{
-				"backtraces" : 
-				[
-					1
-				],
-				"standard" : "23"
-			},
 			"sourceIndexes" : 
 			[
 				0
 			]
 		}
 	],
-	"id" : "LexicalAnalyzer::@6890427a1f51a3e7e1df",
+	"id" : "C_Compiler::@6890427a1f51a3e7e1df",
 	"link" : 
 	{
 		"commandFragments" : 
@@ -69,8 +61,8 @@
 		],
 		"language" : "CXX"
 	},
-	"name" : "LexicalAnalyzer",
-	"nameOnDisk" : "LexicalAnalyzer",
+	"name" : "C_Compiler",
+	"nameOnDisk" : "C_Compiler",
 	"paths" : 
 	{
 		"build" : ".",

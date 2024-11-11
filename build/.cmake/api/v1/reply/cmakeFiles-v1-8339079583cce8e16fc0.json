@@ -20,6 +20,10 @@
 		},
 		{
 			"isGenerated" : true,
+			"path" : "build/CMakeFiles/3.28.3/CMakeCCompiler.cmake"
+		},
+		{
+			"isGenerated" : true,
 			"path" : "build/CMakeFiles/3.28.3/CMakeCXXCompiler.cmake"
 		},
 		{
@@ -50,7 +54,7 @@
 		{
 			"isCMake" : true,
 			"isExternal" : true,
-			"path" : "/Applications/CMake.app/Contents/share/cmake-3.28/Modules/CMakeCXXInformation.cmake"
+			"path" : "/Applications/CMake.app/Contents/share/cmake-3.28/Modules/CMakeCInformation.cmake"
 		},
 		{
 			"isCMake" : true,
@@ -60,7 +64,7 @@
 		{
 			"isCMake" : true,
 			"isExternal" : true,
-			"path" : "/Applications/CMake.app/Contents/share/cmake-3.28/Modules/Compiler/AppleClang-CXX.cmake"
+			"path" : "/Applications/CMake.app/Contents/share/cmake-3.28/Modules/Compiler/AppleClang-C.cmake"
 		},
 		{
 			"isCMake" : true,
@@ -81,6 +85,46 @@
 			"isCMake" : true,
 			"isExternal" : true,
 			"path" : "/Applications/CMake.app/Contents/share/cmake-3.28/Modules/Compiler/CMakeCommonCompilerMacros.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/Applications/CMake.app/Contents/share/cmake-3.28/Modules/Platform/Apple-AppleClang-C.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/Applications/CMake.app/Contents/share/cmake-3.28/Modules/Platform/Apple-Clang-C.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/Applications/CMake.app/Contents/share/cmake-3.28/Modules/Platform/Apple-Clang.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/Applications/CMake.app/Contents/share/cmake-3.28/Modules/CMakeCommonLanguageInclude.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/Applications/CMake.app/Contents/share/cmake-3.28/Modules/CMakeCXXInformation.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/Applications/CMake.app/Contents/share/cmake-3.28/Modules/CMakeLanguageInformation.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/Applications/CMake.app/Contents/share/cmake-3.28/Modules/Compiler/AppleClang-CXX.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "/Applications/CMake.app/Contents/share/cmake-3.28/Modules/Compiler/Clang.cmake"
 		},
 		{
 			"isCMake" : true,
@@ -106,8 +150,8 @@
 	"kind" : "cmakeFiles",
 	"paths" : 
 	{
-		"build" : "/Users/netaorevi/Documents/Maghsimim/Year3/Final_project_03/poc-neta-and-yoel/build",
-		"source" : "/Users/netaorevi/Documents/Maghsimim/Year3/Final_project_03/poc-neta-and-yoel"
+		"build" : "/Users/netaorevi/Documents/Maghsimim/FinalProj-implementation/poc-neta-and-yoel/build",
+		"source" : "/Users/netaorevi/Documents/Maghsimim/FinalProj-implementation/poc-neta-and-yoel"
 	},
 	"version" : 
 	{

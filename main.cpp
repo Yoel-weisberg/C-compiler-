@@ -5,7 +5,8 @@
 
  int main(int argc, char *argv[]){
    std::cout << "----      Compiler for C :)       ----" << std::endl;
-   SourceFileHandler sourceFile = SourceFileHandler(argv); 
+   
+   SourceFileHandler sourceFile(argv); 
    sourceFile.handleFile();
    
     // ----     Preprocessor                   ----
