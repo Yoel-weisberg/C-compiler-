@@ -6,9 +6,22 @@ void SourceFileHandler::handleFile()
     if(!_sourceFile.is_open())
     {
         std::cerr << "[PREPROCESSOR ERROR]  Unable to open source file" << std::endl;
+        return;
     }
     // Check for correct file type 
-    
+    if(isFileTypeCorrect())
+    {   
+        // Read file content and append it into '_fileContent'
+        while (getline(_sourceFile, _srcFileContent))
+        {
+            std::cout << _srcFileContent << std::endl;
+        }
+    }
+}
+
+std::string SourceFileHandler::getSrcFileContent()
+{
+    return _srcFileContent;
 }
 
 bool SourceFileHandler::isFileTypeCorrect()

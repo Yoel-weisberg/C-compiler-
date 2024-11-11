@@ -11,7 +11,7 @@ private:
     std::string _fileName;
     void removeComments ();
     void manageIncludes();
-    void handleMacroVariebles();
+    void handleMacroVariables();
     std::string replaceMacro();
     // void handleFunctinMacro(); - sprint2
     bool checkMacroKeyValidity (const std::string& macroKey);

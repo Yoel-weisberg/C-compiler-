@@ -7,7 +7,7 @@ void Preprocess::removeComments()
     
 }
 
-void Preprocess::handleMacroVariebles()
+void Preprocess::handleMacroVariables()
 {
     std::fstream file (_fileName, std::ios::in | std::ios::out);
     if (!file.is_open()){
