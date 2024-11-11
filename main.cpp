@@ -4,13 +4,13 @@
  #include "Preprocess.h"
 
  int main(int argc, char *argv[]){
-    std::cout << "----      Compiler for C :)       ----" << std::endl;
-    SourceFileHandler sourceFile = SourceFileHandler(argv);
-    sourceFile.handleFile();
-
-    // ----     Preprocessor                   ----
-   Preprocess preprocessFile = Preprocess(argv[1]);
+   std::cout << "----      Compiler for C :)       ----" << std::endl;
+   SourceFileHandler sourceFile = SourceFileHandler(argv); 
+   sourceFile.handleFile();
    
+    // ----     Preprocessor                   ----
+   Preprocess preprocessFile = Preprocess(sourceFile.getSrcFileContent());
+
     // ----     Lexical Analyzer               ----
     // ----     Syntax Analyzer                ----
     // ----     Semantic Analyzer              ----

@@ -7,13 +7,16 @@
 class SourceFileHandler
 {
 public:
-    SourceFileHandler(char *argv[]): _sourceFile(argv[0]), _fileName(argv[0]){};
+
+    SourceFileHandler(char *argv[]): _sourceFile(argv[1]), _fileName(argv[2]){};
     void handleFile();
     std::string getSrcFileContent();
 
 private:
+
     std::ifstream _sourceFile;
     std::string _fileName;
     std::string _srcFileContent;
     bool isFileTypeCorrect();
+    
 };
