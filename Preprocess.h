@@ -16,5 +16,6 @@ private:
     // void handleFunctinMacro(); - sprint2
     bool checkMacroKeyValidity (const std::string& macroKey);
     bool checkMacroValueValidity (const std::string& macroValue);
+    bool isNumber(const std::string& number);
     std::map <std::string, std::string> _macroTable;
 };

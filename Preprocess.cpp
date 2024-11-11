@@ -1,5 +1,6 @@
 #include "Preprocess.h"
 #include <cctype>
+#include <algorithm>
 
 void Preprocess::removeComments()
 {
@@ -99,5 +100,51 @@ bool Preprocess::checkMacroKeyValidity(const std::string &macroKey)
 
 bool Preprocess::checkMacroValueValidity(const std::string &macroValue)
 {
-    // TODO: check if macro value is valid
+    if (macroValue.empty()) { return false; }
+
+    // if the macro is a string
+    if (macroValue[0] == '"')
+    {
+        bool escapeChar = false;
+        // we only need to check that it ends with a quote
+        if (macroValue[macroValue.length() - 1] != '"') {return false;}
+        // checking that it is a vlid string - it dosent contain quotes
+        for (int i = 1; i < macroValue.length() - 1; i++)
+        {
+            if (macroValue[i] == '\\')
+            {
+                escapeChar = true;
+            }
+            else if (macroValue[i] == '"')
+            {
+                if (!escapeChar)
+                {
+                    return false;
+                }
+                escapeChar = false;
+            }
+            else
+            {
+                escapeChar = false;
+            }
+        }
+    }
+    if (isNumber(macroValue))
+    {
+        return true;
+    }
+    if (macroValue[0] == '\'')
+    {
+        if (macroValue[macroValue.length() - 1] != '\'') {return false;}
+        if (macroValue.length() == 1 || (macroValue[1] == '/' && macroValue.length() == 2))
+        {
+            return true;
+        }
+        return false;
+    }
+}
+
+bool Preprocess::isNumber(const std::string &number)
+{
+    return !number.empty() && std::all_of(number.begin(), number.end(), ::isdigit);
 }
