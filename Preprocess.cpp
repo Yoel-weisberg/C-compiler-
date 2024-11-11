@@ -77,6 +77,10 @@ void Preprocess::handleMacroVariebles()
     replaceMacro();
 }
 
+void Preprocess::replaceMacro()
+{
+}
+
 bool Preprocess::checkMacroKeyValidity(const std::string &macroKey)
 {
     if (macroKey.empty()) {
@@ -142,6 +146,9 @@ bool Preprocess::checkMacroValueValidity(const std::string &macroValue)
         }
         return false;
     }
+    // a macro can hold a different macro
+    if (checkMacroKeyValidity(macroValue)) { return true;}
+    return false;
 }
 
 bool Preprocess::isNumber(const std::string &number)
