@@ -1,50 +1,36 @@
 #include "../Header/sourceFileHandler.h"
 #include "../Header/SyntexError.h"
+#include <iostream>
+#include <limits.h>
 
 SourceFileHandler::SourceFileHandler(char* argv[], int argc)
 {
-    if (argc == 2) {
-        _fileName = argv[1];
-    }
-    else
-    {
-        _fileName = "../testFiles/main.c";
-    }
-    _sourceFile.open(_fileName);
 
-}
+	if (argc == 2) {
+		_fileName = argv[1];
+	}
+	else
+	{
+		_fileName = "testFiles/testFile.c";
+	}
+	_sourceFile.open(_fileName);
+	// Check if file opens
+	if (!_sourceFile.is_open())
+	{
+		throw SyntaxError("File cant open " + _fileName, 0);
+	}
 
-void SourceFileHandler::handleFile()
-{
-    // Check if file opens
-    if(!_sourceFile.is_open())
-    {
-        throw SyntaxError("File cant open", 0);
-    }
-    // Check for correct file type 
-    if(isFileTypeCorrect())
-    {   
-        // Read file content and append it into '_fileContent'
-        while (getline(_sourceFile, _srcFileContent))
-        {
-            std::cout << _srcFileContent << std::endl;
-        }
-    }
+	std::ostringstream buffer;
+	buffer << _sourceFile.rdbuf();
+	_srcFileContent = buffer.str();  // Store the entire file content in _srcFileContent
+
+	// Close the file after reading
+	_sourceFile.close();
 }
 
 std::string SourceFileHandler::getSrcFileContent()
 {
-    return _srcFileContent;
+	return _srcFileContent;
 }
 
-bool SourceFileHandler::isFileTypeCorrect()
-{
-    std::filesystem::path path(_fileName);
-    if(path.extension() != TARGET_FILE_TYPE)
-    {
-        std::cerr << "[PREPROCESSOR ERROR]  File type: '" << path.extension() << "' incorect!, only '" << TARGET_FILE_TYPE << "'!" << std::endl;
-        return true;
-    }
-    return false;
-}
 

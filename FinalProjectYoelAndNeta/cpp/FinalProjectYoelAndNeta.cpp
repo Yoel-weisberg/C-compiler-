@@ -10,7 +10,6 @@
          std::cout << "----      Compiler for C :)       ----" << std::endl;
 
          SourceFileHandler sourceFile(argv, argc);
-         sourceFile.handleFile();
 
          // ----     Preprocessor                   ----
          Preprocess preprocessFile = Preprocess(sourceFile.getSrcFileContent());
