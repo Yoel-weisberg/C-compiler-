@@ -1,8 +1,0 @@
-[
-{
-  "directory": "/Users/netaorevi/Documents/Maghsimim/FinalProj-implementation/poc-neta-and-yoel/build",
-  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.4.sdk -mmacosx-version-min=14.0 -o CMakeFiles/C_Compiler.dir/main.cpp.o -c /Users/netaorevi/Documents/Maghsimim/FinalProj-implementation/poc-neta-and-yoel/main.cpp",
-  "file": "/Users/netaorevi/Documents/Maghsimim/FinalProj-implementation/poc-neta-and-yoel/main.cpp",
-  "output": "CMakeFiles/C_Compiler.dir/main.cpp.o"
-}
-]

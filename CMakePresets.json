@@ -1,0 +1,24 @@
+{
+    "version": 4,
+    "configurePresets": [
+      {
+        "name": "msvc",
+        "generator": "Visual Studio 17 2022",
+        "binaryDir": "${sourceDir}/out/build/${presetName}",
+        "architecture": {
+          "value": "x64"
+        },
+        "cacheVariables": {
+          "CMAKE_CXX_STANDARD": "17",
+          "CMAKE_BUILD_TYPE": "Debug"
+        }
+      }
+    ],
+    "buildPresets": [
+      {
+        "name": "msvc",
+        "configurePreset": "msvc"
+      }
+    ]
+  }
+  

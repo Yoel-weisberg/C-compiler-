@@ -1,8 +1,17 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
-    "configurations": [],
-    "args": ["${cwd}/testFiles/testFile.c"]
+    "configurations": [
+      {
+        "name": "Debug C_Compiler",
+        "type": "cppvsdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/out/build/Debug/C_Compiler.exe",
+        "args": [],
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder}",
+        "environment": [],
+        "console": "integratedTerminal",
+        "preLaunchTask": "build C_Compiler"
+      }
+    ]
 }

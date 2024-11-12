@@ -1,4 +1,10 @@
 {
+    "cmake.configureOnOpen": true,
+    "cmake.preferredGenerators": [
+      "Ninja"
+    ],
+    "cmake.generator": "Ninja",
+    "cmake.buildDirectory": "${workspaceFolder}/out/build/${buildType}",
     "files.associations": {
         "map": "cpp",
         "__bit_reference": "cpp",
@@ -56,6 +62,7 @@
         "ratio": "cpp",
         "unordered_map": "cpp",
         "variant": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "xstring": "cpp"
     }
 }
