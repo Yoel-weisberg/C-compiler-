@@ -10,7 +10,7 @@
 class Preprocess{
 public:
     Preprocess(const std::string& fileContent);
-
+    std::string getFinalStream() const { return _fileRawContent; }
 private:
     // Handle Comments
     void removeComments ();

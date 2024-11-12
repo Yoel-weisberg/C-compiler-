@@ -14,6 +14,8 @@
          // ----     Preprocessor                   ----
          Preprocess preprocessFile = Preprocess(sourceFile.getSrcFileContent());
 
+         std::cout << "After preprocesser: " << preprocessFile.getFinalStream() << std::endl;
+
          // ----     Lexical Analyzer               ----
          // ----     Syntax Analyzer                ----
          // ----     Semantic Analyzer              ----

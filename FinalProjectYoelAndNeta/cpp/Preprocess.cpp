@@ -39,6 +39,7 @@ void Preprocess::removeComments()
             updatedStream.push_back(_fileRawContent[pos++]);
         }
     }
+    _fileRawContent = updatedStream;
 }
 
 void Preprocess::manageIncludes() {
@@ -48,22 +49,27 @@ void Preprocess::manageIncludes() {
 void Preprocess::handleMacroVariables() {
     size_t pos = 0;
     int currentLine = 0;
+    std::string newStream;
+
     while (pos < _fileRawContent.size()) {
         char ch = _fileRawContent[pos++];
         if (ch == '#') {
             std::string macroName;
-            while (pos < _fileRawContent.size() && (ch = _fileRawContent[pos++]) != ' ') {
+
+            // Extract the macro name
+            while (pos < _fileRawContent.size() && (ch = _fileRawContent[pos++]) != ' ' && ch != '\n') {
                 macroName += ch;
             }
+
             if (macroName == "define") {
                 std::string macroKey, macroValue;
-                bool multyLine = false, gotEnd = false;
+                bool multiLine = false, gotEnd = false;
 
                 // Skip spaces before macro key
                 while (pos < _fileRawContent.size() && (ch = _fileRawContent[pos]) == ' ') pos++;
 
                 // Get macro key
-                while (pos < _fileRawContent.size() && (ch = _fileRawContent[pos]) != ' ') {
+                while (pos < _fileRawContent.size() && (ch = _fileRawContent[pos]) != ' ' && ch != '\n') {
                     macroKey += ch;
                     pos++;
                 }
@@ -74,36 +80,57 @@ void Preprocess::handleMacroVariables() {
                 // Get macro value
                 while (pos < _fileRawContent.size() && !gotEnd) {
                     ch = _fileRawContent[pos++];
-                    macroValue += ch;
+
+                    // Check for multi-line definition
                     if (ch == '\\') {
-                        multyLine = true;
+                        multiLine = true;
+                        continue; // Skip the '\' character
                     }
+
                     if (ch == '\n') {
-                        multyLine ? gotEnd = false : gotEnd = true;
-                        multyLine = false;
                         currentLine++;
+                        if (!multiLine) gotEnd = true; // End if not a multi-line macro
+                        multiLine = false; // Reset multi-line flag
+                    }
+                    else {
+                        macroValue += ch;
                     }
                 }
 
                 // Check key and value validity
-                if (!checkMacroKeyValidity(macroKey)) throw SyntaxError("Macro key not valid", currentLine);
-                if (!checkMacroValueValidity(macroValue)) throw SyntaxError("Macro value not valid", currentLine);
+                if (!checkMacroKeyValidity(macroKey)) {
+                    throw SyntaxError("Macro key not valid", currentLine);
+                }
+                if (!checkMacroValueValidity(macroValue)) {
+                    throw SyntaxError("Macro value not valid", currentLine);
+                }
 
+                // Add to macro table
                 _macroTable[macroKey] = macroValue;
+            }
+            else if (macroName == "include ")
+            {
+                // TODO - manage includes
+            }
+        }
+        else
+        {
+            newStream += ch;
         }
     }
 
-    // Replace macros in the macro table
+    // Replace macros in the file content using the macro table
+    _fileRawContent = newStream;
     _fileRawContent = replaceMacro();
 }
-}
+
 
 std::string Preprocess::replaceMacro() {
     std::string codeStream;
     std::string currentBlock;
     bool isThereQuotes = false, singleQuote = false;
 
-    for (size_t pos = 0; pos < _fileRawContent.size(); ++pos) {
+    for (size_t pos = 0; pos < _fileRawContent.size(); pos++) {
         char ch = _fileRawContent[pos];
 
         (ch == '"' && !singleQuote) ? isThereQuotes = !isThereQuotes : true;
@@ -114,9 +141,9 @@ std::string Preprocess::replaceMacro() {
 
             auto it = _macroTable.find(currentBlock);
             if (it != _macroTable.end()) {
-                codeStream += getFinalValue(it->first);
+                codeStream += getFinalValue(it->first) + ' ';
             } else {
-                codeStream += currentBlock;
+                codeStream += currentBlock + ' ';
             }
             currentBlock.clear();
         } else {
