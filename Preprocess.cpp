@@ -4,7 +4,31 @@
 #include "SyntexError.h"
 
 void Preprocess::removeComments() {
-    // Implement comment removal logic using _fileRawContent.
+    size_t pos = 0, currentPlaceInUpdated = 0;
+    std::string updatedStream;
+    while (pos < _fileRawContent.size() - 1)
+    {
+        // single line comment
+        if (_fileRawContent[pos] == '/' && _fileRawContent[pos + 1] == '/')
+        {
+            // Skip until end of line
+            while (pos < _fileRawContent.size() && _fileRawContent[pos] != '\n') pos++;
+        }
+        // multi-line comment
+        else if (_fileRawContent[pos] == '/' && _fileRawContent[pos + 1] == '*') {
+            while (pos < _fileRawContent.size() - 1 &&
+                   (_fileRawContent[pos]!= '*' || _fileRawContent[pos + 1]!= '/'))
+            {
+                pos++;
+            }
+            // moving to the end of the comment
+            pos += 2;
+        }
+        else
+        {
+            updatedStream[currentPlaceInUpdated++] = _fileRawContent[pos];
+        }
+    }
 }
 
 void Preprocess::manageIncludes() {
@@ -66,7 +90,7 @@ void Preprocess::handleMacroVariables() {
     }
 
     // Replace macros in the macro table
-    replaceMacro();
+    _fileRawContent = replaceMacro();
 }
 
 std::string Preprocess::replaceMacro() {
@@ -98,3 +122,89 @@ std::string Preprocess::replaceMacro() {
 }
 
 // The rest of your functions remain the same
+bool Preprocess::checkMacroKeyValidity(const std::string &macroKey)
+{
+    if (macroKey.empty()) {
+        return false; // Empty strings are not valid identifiers
+    }
+
+    // Check the first character: it must be a letter or underscore
+    if (!(std::isalpha(macroKey[0]) || macroKey[0] == '_')) {
+        return false;
+    }
+
+    // Check the rest of the characters: they must be letters, digits, or underscores
+    for (size_t i = 1; i < macroKey.length(); ++i) {
+        if (!(std::isalnum(macroKey[i]) || macroKey[i] == '_')) {
+            return false;
+        }
+    }
+
+    return true;  
+}
+
+bool Preprocess::checkMacroValueValidity(const std::string &macroValue)
+{
+    if (macroValue.empty()) { return false; }
+
+    // if the macro is a string
+    if (macroValue[0] == '"')
+    {
+        bool escapeChar = false;
+        // we only need to check that it ends with a quote
+        if (macroValue[macroValue.length() - 1] != '"') {return false;}
+        // checking that it is a vlid string - it dosent contain quotes
+        for (int i = 1; i < macroValue.length() - 1; i++)
+        {
+            if (macroValue[i] == '\\')
+            {
+                escapeChar = true;
+            }
+            else if (macroValue[i] == '"')
+            {
+                if (!escapeChar)
+                {
+                    return false;
+                }
+                escapeChar = false;
+            }
+            else
+            {
+                escapeChar = false;
+            }
+        }
+    }
+    if (isNumber(macroValue))
+    {
+        return true;
+    }
+    if (macroValue[0] == '\'')
+    {
+        if (macroValue[macroValue.length() - 1] != '\'') {return false;}
+        if (macroValue.length() == 1 || (macroValue[1] == '/' && macroValue.length() == 2))
+        {
+            return true;
+        }
+        return false;
+    }
+    // a macro can hold a different macro
+    if (checkMacroKeyValidity(macroValue)) { return true;}
+    return false;
+}
+
+bool Preprocess::isNumber(const std::string &number)
+{
+    return !number.empty() && std::all_of(number.begin(), number.end(), ::isdigit);
+}
+
+std::string Preprocess::getFinalValue(std::string key)
+{
+    if (_macroTable.find(_macroTable.find(key)->second) == _macroTable.end())
+    {
+        return _macroTable.find(key)->second;
+    }
+    else
+    {
+        return getFinalValue(_macroTable.find(key)->second);
+    }
+}
