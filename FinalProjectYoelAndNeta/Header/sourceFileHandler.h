@@ -10,7 +10,7 @@ class SourceFileHandler
 {
 public:
 
-    SourceFileHandler(char *argv[]): _sourceFile(argv[1]), _fileName(argv[2]){};
+    SourceFileHandler(char* argv[], int argc);
     void handleFile();
     std::string getSrcFileContent();
 

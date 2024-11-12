@@ -1,12 +1,25 @@
 #include "../Header/sourceFileHandler.h"
+#include "../Header/SyntexError.h"
+
+SourceFileHandler::SourceFileHandler(char* argv[], int argc)
+{
+    if (argc == 2) {
+        _fileName = argv[1];
+    }
+    else
+    {
+        _fileName = "../testFiles/main.c";
+    }
+    _sourceFile.open(_fileName);
+
+}
 
 void SourceFileHandler::handleFile()
 {
     // Check if file opens
     if(!_sourceFile.is_open())
     {
-        std::cerr << "[PREPROCESSOR ERROR]  Unable to open source file" << std::endl;
-        return;
+        throw SyntaxError("File cant open", 0);
     }
     // Check for correct file type 
     if(isFileTypeCorrect())
