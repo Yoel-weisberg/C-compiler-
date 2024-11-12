@@ -36,7 +36,7 @@ void Preprocess::removeComments()
         }
         else
         {
-            updatedStream[currentPlaceInUpdated++] = _fileRawContent[pos];
+            updatedStream.push_back(_fileRawContent[pos++]);
         }
     }
 }
