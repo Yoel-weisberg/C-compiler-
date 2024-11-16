@@ -2,6 +2,7 @@
 #include <cctype>
 #include <algorithm>
 #include "../Header/SyntexError.h"
+#include <sstream>
 
 Preprocess::Preprocess(const std::string &fileContent) : _fileRawContent(fileContent)
 {
@@ -42,8 +43,17 @@ void Preprocess::removeComments()
     _fileRawContent = updatedStream;
 }
 
-void Preprocess::manageIncludes() {
-    // Implement include management logic.
+std::string Preprocess::manageIncludes(std::string fileName) {
+    std::ifstream file(fileName);
+    if (!file.is_open())
+    {
+        throw SyntaxError("File in include isnt good", 0);
+    }
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    std::string fileContents = buffer.str();
+    file.close();
+    return fileContents;
 }
 
 void Preprocess::handleMacroVariables() {
@@ -110,7 +120,16 @@ void Preprocess::handleMacroVariables() {
             }
             else if (macroName == "include ")
             {
-                // TODO - manage includes
+                std::string file_name, file_content;
+                // Skip spaces before file name
+                while (pos < _fileRawContent.size() && (ch = _fileRawContent[pos]) == ' ') pos++;
+
+                // Get file name
+                while (pos < _fileRawContent.size() && (ch = _fileRawContent[pos++]) != ' ' && ch != '\n') {
+                    file_name += ch;
+                }
+                file_content = manageIncludes(file_name);
+                _fileRawContent.insert(pos, " " + file_content);
             }
         }
         else

@@ -16,7 +16,7 @@ private:
     void removeComments ();
 
     // Handle Includes
-    void manageIncludes();
+    std::string manageIncludes(std::string fileName);
 
     // Handle Macros
     void handleMacroVariables();
