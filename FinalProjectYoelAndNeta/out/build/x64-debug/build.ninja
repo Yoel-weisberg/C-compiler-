@@ -50,28 +50,36 @@ cmake_ninja_workdir = D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAnd
 build cmake_object_order_depends_target_FinalProjectYoelAndNeta: phony || CMakeFiles\FinalProjectYoelAndNeta.dir
 
 build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\FinalProjectYoelAndNeta.cpp.obj: CXX_COMPILER__FinalProjectYoelAndNeta_unscanned_Debug D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\cpp\FinalProjectYoelAndNeta.cpp || cmake_object_order_depends_target_FinalProjectYoelAndNeta
-  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++20 -ZI
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++20
   INCLUDES = -I"D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\Header"
   OBJECT_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir
   OBJECT_FILE_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir\cpp
   TARGET_COMPILE_PDB = CMakeFiles\FinalProjectYoelAndNeta.dir\
-  TARGET_PDB = "D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\FinalProjectYoelAndNeta.pdb"
+  TARGET_PDB = "D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\bin\FinalProjectYoelAndNeta.pdb"
 
 build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\Preprocess.cpp.obj: CXX_COMPILER__FinalProjectYoelAndNeta_unscanned_Debug D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\cpp\Preprocess.cpp || cmake_object_order_depends_target_FinalProjectYoelAndNeta
-  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++20 -ZI
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++20
   INCLUDES = -I"D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\Header"
   OBJECT_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir
   OBJECT_FILE_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir\cpp
   TARGET_COMPILE_PDB = CMakeFiles\FinalProjectYoelAndNeta.dir\
-  TARGET_PDB = "D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\FinalProjectYoelAndNeta.pdb"
+  TARGET_PDB = "D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\bin\FinalProjectYoelAndNeta.pdb"
+
+build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\Tokeniser.cpp.obj: CXX_COMPILER__FinalProjectYoelAndNeta_unscanned_Debug D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\cpp\Tokeniser.cpp || cmake_object_order_depends_target_FinalProjectYoelAndNeta
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++20
+  INCLUDES = -I"D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\Header"
+  OBJECT_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir
+  OBJECT_FILE_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir\cpp
+  TARGET_COMPILE_PDB = CMakeFiles\FinalProjectYoelAndNeta.dir\
+  TARGET_PDB = "D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\bin\FinalProjectYoelAndNeta.pdb"
 
 build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\sourceFileHandler.cpp.obj: CXX_COMPILER__FinalProjectYoelAndNeta_unscanned_Debug D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\cpp\sourceFileHandler.cpp || cmake_object_order_depends_target_FinalProjectYoelAndNeta
-  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++20 -ZI
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++20
   INCLUDES = -I"D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\Header"
   OBJECT_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir
   OBJECT_FILE_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir\cpp
   TARGET_COMPILE_PDB = CMakeFiles\FinalProjectYoelAndNeta.dir\
-  TARGET_PDB = "D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\FinalProjectYoelAndNeta.pdb"
+  TARGET_PDB = "D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\bin\FinalProjectYoelAndNeta.pdb"
 
 
 # =============================================================================
@@ -79,19 +87,19 @@ build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\sourceFileHandler.cpp.obj: CXX_
 
 
 #############################################
-# Link the executable D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\FinalProjectYoelAndNeta.exe
+# Link the executable D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\bin\FinalProjectYoelAndNeta.exe
 
-build D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\FinalProjectYoelAndNeta.exe: CXX_EXECUTABLE_LINKER__FinalProjectYoelAndNeta_Debug CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\FinalProjectYoelAndNeta.cpp.obj CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\Preprocess.cpp.obj CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\sourceFileHandler.cpp.obj
-  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -ZI
+build D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\bin\FinalProjectYoelAndNeta.exe: CXX_EXECUTABLE_LINKER__FinalProjectYoelAndNeta_Debug CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\FinalProjectYoelAndNeta.cpp.obj CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\Preprocess.cpp.obj CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\Tokeniser.cpp.obj CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\sourceFileHandler.cpp.obj
+  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
   LINK_LIBRARIES = kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
   OBJECT_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
   TARGET_COMPILE_PDB = CMakeFiles\FinalProjectYoelAndNeta.dir\
-  TARGET_FILE = "D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\FinalProjectYoelAndNeta.exe"
+  TARGET_FILE = "D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\bin\FinalProjectYoelAndNeta.exe"
   TARGET_IMPLIB = FinalProjectYoelAndNeta.lib
-  TARGET_PDB = "D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\FinalProjectYoelAndNeta.pdb"
+  TARGET_PDB = "D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\bin\FinalProjectYoelAndNeta.pdb"
 
 
 #############################################
@@ -119,9 +127,9 @@ build rebuild_cache: phony CMakeFiles\rebuild_cache.util
 # =============================================================================
 # Target aliases.
 
-build FinalProjectYoelAndNeta: phony D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\FinalProjectYoelAndNeta.exe
+build FinalProjectYoelAndNeta: phony D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\bin\FinalProjectYoelAndNeta.exe
 
-build FinalProjectYoelAndNeta.exe: phony D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\FinalProjectYoelAndNeta.exe
+build FinalProjectYoelAndNeta.exe: phony D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\bin\FinalProjectYoelAndNeta.exe
 
 # =============================================================================
 # Folder targets.
@@ -131,7 +139,7 @@ build FinalProjectYoelAndNeta.exe: phony D$:\Yoel-Stuff\Maghimim\Final$ Project\
 #############################################
 # Folder: D:/Yoel-Stuff/Maghimim/Final Project/FinalProjectYoelAndNeta/out/build/x64-debug
 
-build all: phony D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\FinalProjectYoelAndNeta.exe
+build all: phony D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\bin\FinalProjectYoelAndNeta.exe
 
 # =============================================================================
 # Built-in targets
