@@ -67,7 +67,7 @@ Tokens_type Tokeniser::categoriseLiteral(const std::string& literal)
     }
     else
     {
-        throw SyntaxError("Token not defined");
+        return IDENTIFIER; // returning identifier without error handeling which would happen in the syntex analysis phrase
     }
   
 }

@@ -108,7 +108,7 @@ void Preprocess::handleMacroVariables() {
                 }
 
                 // Check key and value validity
-                if (!checkMacroKeyValidity(macroKey)) {
+                if (!Helper::checkIdentifier(macroKey)) {
                     throw SyntaxError("Macro key not valid", currentLine);
                 }
                 if (!checkMacroValueValidity(macroValue)) {
@@ -172,28 +172,6 @@ std::string Preprocess::replaceMacro() {
     return codeStream;
 }
 
-// The rest of your functions remain the same
-bool Preprocess::checkMacroKeyValidity(const std::string &macroKey)
-{
-    if (macroKey.empty()) {
-        return false; // Empty strings are not valid identifiers
-    }
-
-    // Check the first character: it must be a letter or underscore
-    if (!(std::isalpha(macroKey[0]) || macroKey[0] == '_')) {
-        return false;
-    }
-
-    // Check the rest of the characters: they must be letters, digits, or underscores
-    for (size_t i = 1; i < macroKey.length(); ++i) {
-        if (!(std::isalnum(macroKey[i]) || macroKey[i] == '_')) {
-            return false;
-        }
-    }
-
-    return true;  
-}
-
 bool Preprocess::checkMacroValueValidity(const std::string &macroValue)
 {
     if (macroValue.empty()) { return false; }
@@ -239,7 +217,7 @@ bool Preprocess::checkMacroValueValidity(const std::string &macroValue)
         return false;
     }
     // a macro can hold a different macro
-    if (checkMacroKeyValidity(macroValue)) { return true;}
+    if (_macroTable.find(macroValue) != _macroTable.end()) { return true; }
     return false;
 }
 

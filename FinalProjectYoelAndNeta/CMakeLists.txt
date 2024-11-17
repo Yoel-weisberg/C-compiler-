@@ -18,7 +18,7 @@ if(NOT HEADERS)
 endif()
 
 # Create the executable
-add_executable(FinalProjectYoelAndNeta ${SOURCES} ${HEADERS})
+add_executable(FinalProjectYoelAndNeta ${SOURCES} ${HEADERS} "Header/SyntexAnalysis.h" "cpp/SyntexAnalysis.cpp" "Header/Helper.h")
 
 # Organize files in the IDE for better visibility
 source_group("Source Files" FILES ${SOURCES})
