@@ -3,6 +3,7 @@
 #include <iostream>
 #include <limits.h>
 
+
 SourceFileHandler::SourceFileHandler(char* argv[], int argc)
 {
 
@@ -11,7 +12,7 @@ SourceFileHandler::SourceFileHandler(char* argv[], int argc)
 	}
 	else
 	{
-		_fileName = "testFiles/testFile.c";
+		_fileName = "../testFiles/testFile.c";
 	}
 	_sourceFile.open(_fileName);
 	// Check if file opens

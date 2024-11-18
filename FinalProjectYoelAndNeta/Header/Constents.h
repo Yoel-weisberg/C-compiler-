@@ -24,5 +24,3 @@ enum Tokens_type {
 #define SUBSTRICTION_LITERAL '-'
 #define EQUEL_SIGN_LITERAL '='
 #define SEMICOLUMN_LITERSL ';'
-
-std::vector<std::string> definedTypes = { "float" };

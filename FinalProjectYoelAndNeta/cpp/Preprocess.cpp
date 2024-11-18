@@ -118,7 +118,7 @@ void Preprocess::handleMacroVariables() {
                 // Add to macro table
                 _macroTable[macroKey] = macroValue;
             }
-            else if (macroName == "include ")
+            else if (macroName == "include")
             {
                 std::string file_name, file_content;
                 // Skip spaces before file name
@@ -155,7 +155,7 @@ std::string Preprocess::replaceMacro() {
         (ch == '"' && !singleQuote) ? isThereQuotes = !isThereQuotes : true;
         (ch == '\'' && !isThereQuotes) ? singleQuote = !singleQuote : true;
 
-        if ((ch == ' ' || ch == '\n') && !isThereQuotes) {
+        if (((ch == ' ' || ch == '\n') && !isThereQuotes)) {
             if (currentBlock.empty()) continue;
 
             auto it = _macroTable.find(currentBlock);
@@ -165,7 +165,13 @@ std::string Preprocess::replaceMacro() {
                 codeStream += currentBlock + ' ';
             }
             currentBlock.clear();
-        } else {
+        }
+        else if (pos == _fileRawContent.size() - 1)
+        {
+            currentBlock += ch;
+            codeStream += currentBlock;
+        }
+        else {
             currentBlock += ch;
         }
     }

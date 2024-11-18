@@ -7,6 +7,7 @@
 #include "Constents.h"
 #include "Token.h"
 #include "SyntexError.h"
+#include "Helper.h"
 
 class Tokeniser {
 public:

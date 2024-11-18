@@ -5,7 +5,9 @@
 #include "../Header/SyntexError.h"
 #include "../Header/Tokenizer.h"
 
+
 int main(int argc, char* argv[]) {
+
 	try
 	{
 		std::cout << "----      Compiler for C :)       ----" << std::endl;
@@ -19,7 +21,7 @@ int main(int argc, char* argv[]) {
 
 		// ----     Lexical Analyzer               ----
 		Tokeniser tokeniser = Tokeniser(preprocessFile.getFinalStream());
-
+		std::cout << "After tokeniser " << std::endl;
 		// ----     Syntax Analyzer                ----
 		// ----     Semantic Analyzer              ----
 		// ----     To LLVM IR                     ----

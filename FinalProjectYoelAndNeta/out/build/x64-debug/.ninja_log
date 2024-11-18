@@ -1,8 +1,39 @@
 # ninja log v5
+1273	1587	7536494051280397	D:/Yoel-Stuff/Maghimim/Final Project/FinalProjectYoelAndNeta/bin/FinalProjectYoelAndNeta.exe	ad7ac4b9ed4e3adb
 2	1468	7531355846991319	CMakeFiles/FinalProjectYoelAndNeta.dir/main.cpp.obj	f54f0ec91f998445
 15	1441	7531360055851932	CMakeFiles/FinalProjectYoelAndNeta.dir/cpp/main.cpp.obj	aacafadab9c9fed
-16	1405	7531406815114301	CMakeFiles/FinalProjectYoelAndNeta.dir/cpp/sourceFileHandler.cpp.obj	da59a3d843543b93
-12	1484	7531464756104795	CMakeFiles/FinalProjectYoelAndNeta.dir/cpp/FinalProjectYoelAndNeta.cpp.obj	cdf8c41794830275
-12	713	7531466948947202	CMakeFiles/FinalProjectYoelAndNeta.dir/cpp/Preprocess.cpp.obj	d2d9db6f9cfc0202
+29	1455	7536492471403977	CMakeFiles/FinalProjectYoelAndNeta.dir/cpp/sourceFileHandler.cpp.obj	4e89d33befdd8657
+1	1273	7536494049435067	CMakeFiles/FinalProjectYoelAndNeta.dir/cpp/FinalProjectYoelAndNeta.cpp.obj	9d6ee051f5cb10b9
+24	778	7536492464632703	CMakeFiles/FinalProjectYoelAndNeta.dir/cpp/Tokeniser.cpp.obj	dddf3968af8937c5
+15	828	7536492465137871	CMakeFiles/FinalProjectYoelAndNeta.dir/cpp/Preprocess.cpp.obj	8553c41413539f15
 1439	1714	7531398065819257	FinalProjectYoelAndNeta.exe	80adaa7706e4abcd
 713	929	7531466950457063	D:/Yoel-Stuff/Maghimim/Final Project/FinalProjectYoelAndNeta/FinalProjectYoelAndNeta.exe	85870304d9dfd6b6
+16	26	0	clean	9064569f19be7b9
+19	1054	7536492467388664	CMakeFiles/FinalProjectYoelAndNeta.dir/cpp/SyntexAnalysis.cpp.obj	ac556e594095743d
+11	639	7536492463227466	CMakeFiles/FinalProjectYoelAndNeta.dir/cpp/Helper.cpp.obj	cd989de837ec37a3
+2	118	7536530564182324	build.ninja	eb2c13645c80cc07
+19	1076	7536530786581304	CMakeFiles/FinalProjectYoelAndNeta.dir/cpp/Helper.cpp.obj	f528da74f4d455c5
+33	1181	7536530787607436	CMakeFiles/FinalProjectYoelAndNeta.dir/cpp/Tokeniser.cpp.obj	e9162d56d1d78570
+23	1249	7536530788277139	CMakeFiles/FinalProjectYoelAndNeta.dir/cpp/Preprocess.cpp.obj	d2d9db6f9cfc0202
+28	1550	7536530791283863	CMakeFiles/FinalProjectYoelAndNeta.dir/cpp/SyntexAnalysis.cpp.obj	ecd1e65328c5541f
+37	1956	7536530795324491	CMakeFiles/FinalProjectYoelAndNeta.dir/cpp/sourceFileHandler.cpp.obj	da59a3d843543b93
+14	1995	7536530795679692	CMakeFiles/FinalProjectYoelAndNeta.dir/cpp/FinalProjectYoelAndNeta.cpp.obj	cdf8c41794830275
+1995	2509	7536530799962857	D:/Yoel-Stuff/Maghimim/Final Project/FinalProjectYoelAndNeta/FinalProjectYoelAndNeta.exe	cdacdd33775ea793
+2	728	7536532072628366	CMakeFiles/FinalProjectYoelAndNeta.dir/cpp/Preprocess.cpp.obj	d2d9db6f9cfc0202
+728	1492	7536532078415491	D:/Yoel-Stuff/Maghimim/Final Project/FinalProjectYoelAndNeta/FinalProjectYoelAndNeta.exe	cdacdd33775ea793
+2	1438	7536533872806844	CMakeFiles/FinalProjectYoelAndNeta.dir/cpp/FinalProjectYoelAndNeta.cpp.obj	cdf8c41794830275
+1438	2055	7536533877613752	D:/Yoel-Stuff/Maghimim/Final Project/FinalProjectYoelAndNeta/FinalProjectYoelAndNeta.exe	cdacdd33775ea793
+6	967	7536541610869466	CMakeFiles/FinalProjectYoelAndNeta.dir/cpp/Helper.cpp.obj	f528da74f4d455c5
+21	1144	7536541612616122	CMakeFiles/FinalProjectYoelAndNeta.dir/cpp/Tokeniser.cpp.obj	e9162d56d1d78570
+11	1165	7536541612876098	CMakeFiles/FinalProjectYoelAndNeta.dir/cpp/Preprocess.cpp.obj	d2d9db6f9cfc0202
+16	1396	7536541615171709	CMakeFiles/FinalProjectYoelAndNeta.dir/cpp/SyntexAnalysis.cpp.obj	ecd1e65328c5541f
+1	1795	7536541619153637	CMakeFiles/FinalProjectYoelAndNeta.dir/cpp/FinalProjectYoelAndNeta.cpp.obj	cdf8c41794830275
+1795	2336	7536541622148259	D:/Yoel-Stuff/Maghimim/Final Project/FinalProjectYoelAndNeta/FinalProjectYoelAndNeta.exe	cdacdd33775ea793
+14	790	7536542236037520	CMakeFiles/FinalProjectYoelAndNeta.dir/cpp/Tokeniser.cpp.obj	e9162d56d1d78570
+790	1099	7536542237997986	D:/Yoel-Stuff/Maghimim/Final Project/FinalProjectYoelAndNeta/FinalProjectYoelAndNeta.exe	cdacdd33775ea793
+2	804	7536547735083563	CMakeFiles/FinalProjectYoelAndNeta.dir/cpp/Preprocess.cpp.obj	d2d9db6f9cfc0202
+805	1126	7536547737114610	D:/Yoel-Stuff/Maghimim/Final Project/FinalProjectYoelAndNeta/FinalProjectYoelAndNeta.exe	cdacdd33775ea793
+12	805	7536547928652706	CMakeFiles/FinalProjectYoelAndNeta.dir/cpp/Preprocess.cpp.obj	d2d9db6f9cfc0202
+806	1137	7536547930914386	D:/Yoel-Stuff/Maghimim/Final Project/FinalProjectYoelAndNeta/FinalProjectYoelAndNeta.exe	cdacdd33775ea793
+11	730	7536549214799646	CMakeFiles/FinalProjectYoelAndNeta.dir/cpp/Preprocess.cpp.obj	d2d9db6f9cfc0202
+730	1112	7536549217558608	D:/Yoel-Stuff/Maghimim/Final Project/FinalProjectYoelAndNeta/FinalProjectYoelAndNeta.exe	cdacdd33775ea793

@@ -7,7 +7,7 @@ Tokeniser::Tokeniser(const std::string& string)
 
     for (int i = 0; i < string.size(); i++)
     {
-        if (string[i] == ' ') // If it's a blank space
+        if (string[i] == ' ') // If it's a seperater 
         {
             if (currentLiteral.size() != 0)
             {
@@ -15,9 +15,10 @@ Tokeniser::Tokeniser(const std::string& string)
                 currentLiteral = "";
             }
         } // Any other valid char exept for a digit
-        else
+        else if (std::find(Helper::separeters.begin(), Helper::separeters.end(), string[i]) != Helper::separeters.end())
         {
-            currentLiteral += string[i];
+            this->tokens.push_back({ currentLiteral, categoriseLiteral(currentLiteral) });
+            this->tokens.push_back({ std::string(1, string[i]), categoriseLiteral(std::string(1, string[i]))});
         }
     }
 
@@ -61,7 +62,15 @@ Tokens_type Tokeniser::categoriseLiteral(const std::string& literal)
         // Assuming INT is the default case for literals that aren't operators or parentheses
         return INT;
     }
-    else if (std::find(definedTypes.begin(), definedTypes.end(), literal) != definedTypes.end())
+    else if (literal[0] == EQUEL_SIGN_LITERAL)
+    {
+        return EQUEL_SIGN;
+    }
+    else if (literal[0] == SEMICOLUMN)
+    {
+        return SEMICOLUMN;
+    }
+    else if (std::find(Helper::definedTypes.begin(), Helper::definedTypes.end(), literal) != Helper::definedTypes.end())
     {
         return TYPE_DECLERATION;
     }
