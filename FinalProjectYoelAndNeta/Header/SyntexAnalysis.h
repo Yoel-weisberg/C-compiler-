@@ -14,7 +14,7 @@ public:
 
 private:
 	void checkPernthesis();
-	void noTwoOperationAfterEachOther();
+	void checkAlgebricStructure();
 	int variebleDefinitionStructure( int pos);
 	bool doesVariebleFitType(const std::string& type, std::string value);
 	void validSentences(); // a function to check that the code is made from a list of leagel sentences 

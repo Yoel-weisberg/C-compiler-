@@ -4,6 +4,7 @@
 #include "../Header/Preprocess.h"
 #include "../Header/SyntexError.h"
 #include "../Header/Tokenizer.h"
+#include "../Header/SyntexAnalysis.h"	
 
 
 int main(int argc, char* argv[]) {
@@ -22,6 +23,10 @@ int main(int argc, char* argv[]) {
 		// ----     Lexical Analyzer               ----
 		Tokeniser tokeniser = Tokeniser(preprocessFile.getFinalStream());
 		std::cout << "After tokeniser " << std::endl;
+
+		SyntexAnalysis syntaxAnalysis = SyntexAnalysis(tokeniser.getTokens());
+		std::cout << "Syntax analysed" << std::endl;
+
 		// ----     Syntax Analyzer                ----
 		// ----     Semantic Analyzer              ----
 		// ----     To LLVM IR                     ----

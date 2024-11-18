@@ -24,7 +24,7 @@ file(GLOB_RECURSE HEADERS "${CMAKE_SOURCE_DIR}/Header/*.h")
 file(GLOB TEST_FILES "${CMAKE_SOURCE_DIR}/testFiles/*")
 
 # Create an executable from the source files
-add_executable(FinalProjectYoelAndNeta ${SOURCES} ${HEADERS})
+add_executable(FinalProjectYoelAndNeta ${SOURCES} ${HEADERS} "Header/SymbalTable.h")
 
 # Include header files in the project structure
 source_group("Source Files" FILES ${SOURCES})

@@ -24,3 +24,9 @@ bool Helper::checkIdentifier(const std::string& id)
 
     return true;
 }
+
+bool Helper::isFloat(const std::string& num)
+{
+    std::regex decimalPattern(R"(^[-+]?[0-9]*\.[0-9]+$)");
+    return std::regex_match(num, decimalPattern);
+}

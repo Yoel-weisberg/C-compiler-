@@ -17,7 +17,7 @@ void Preprocess::removeComments()
 {
     size_t pos = 0, currentPlaceInUpdated = 0;
     std::string updatedStream;
-    while (pos < _fileRawContent.size() - 1)
+    while (pos < _fileRawContent.size())
     {
         // single line comment
         if (_fileRawContent[pos] == '/' && _fileRawContent[pos + 1] == '/')

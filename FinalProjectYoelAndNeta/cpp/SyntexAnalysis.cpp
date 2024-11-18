@@ -5,7 +5,7 @@ SyntexAnalysis::SyntexAnalysis(const std::vector<Token>& _tokens) :
 	_tokens(_tokens)
 {
 	checkPernthesis();
-	noTwoOperationAfterEachOther();
+	validSentences();
 }
 
 void SyntexAnalysis::checkPernthesis()
@@ -41,7 +41,7 @@ void SyntexAnalysis::checkPernthesis()
 	}
 }
 
-void SyntexAnalysis::noTwoOperationAfterEachOther()
+void SyntexAnalysis::checkAlgebricStructure()
 {
 	bool isThereSign = true; // indicates if there is * or / signs in the current session
 	int chrIndex = 0;
@@ -91,6 +91,10 @@ void SyntexAnalysis::noTwoOperationAfterEachOther()
 
 int SyntexAnalysis::variebleDefinitionStructure(int pos)
 {
+	if (pos + 1 >= _tokens.size())
+	{
+		throw SyntaxError("missing Identifier");
+	}
 	if (_tokens[pos + 1].getType() != IDENTIFIER)
 	{
 		throw SyntaxError("missing Identifier");
@@ -99,13 +103,25 @@ int SyntexAnalysis::variebleDefinitionStructure(int pos)
 	{
 		throw SyntaxError("Identifier not valid");
 	}
+
+	// Check if there are enough tokens for the next set of operations
+	if (pos + 2 >= _tokens.size())
+	{
+		throw SyntaxError("unexpected end of input");
+	}
 	if (_tokens[pos + 2].getType() == EQUEL_SIGN)
 	{
+		// Check for additional tokens needed for this branch
+		if (pos + 3 >= _tokens.size())
+		{
+			throw SyntaxError("missing value after equal sign");
+		}
 		if (!doesVariebleFitType(_tokens[pos].getLiteral(), _tokens[pos + 3].getLiteral()))
 		{
 			throw SyntaxError("Varieble type dosent fit decleration");
 		}
-		else if (!_tokens[pos + 4].getType() == SEMICOLUMN)
+		pos + 4 >= _tokens.size() ? throw SyntaxError("excepted a semicolumn") : true;
+		if (!_tokens[pos + 4].getType() == SEMICOLUMN)
 		{
 			throw SyntaxError("excepted a semicolumn");
 		}
@@ -127,9 +143,7 @@ bool SyntexAnalysis::doesVariebleFitType(const std::string& type, std::string va
 {
 	if (type == "float")
 	{
-		std::regex decimalPattern(R"(^[-+]?[0-9]*\.[0-9]+$)");
-		return std::regex_match(value, decimalPattern);
-
+		return Helper::isFloat(value);
 	}
 }
 
@@ -142,7 +156,16 @@ void SyntexAnalysis::validSentences()
 		{
 			if (_tokens[pos].getType() == TYPE_DECLERATION)
 			{
-				pos = variebleDefinitionStructure(pos);
+				// adding 1 because funtion is returning the last location the sentence ends in
+				pos = variebleDefinitionStructure(pos) + 1;
+			}
+			// T0DO - checking if the sentence just a defined identifier (like just 3; or somthing like that)
+			// TODO - need to check if its a redefinition of t a symbol 
+			// TODO - need to check if the sentnce is an algebric sentnece 
+			// there is no suppert for other sentence structure
+			else
+			{
+				throw SyntaxError("Not defined sentence", pos);
 			}
 		}
 	}
