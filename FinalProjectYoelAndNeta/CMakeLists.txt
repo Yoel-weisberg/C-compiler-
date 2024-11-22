@@ -24,7 +24,7 @@ file(GLOB_RECURSE HEADERS "${CMAKE_SOURCE_DIR}/Header/*.h")
 file(GLOB TEST_FILES "${CMAKE_SOURCE_DIR}/testFiles/*")
 
 # Create an executable from the source files
-add_executable(FinalProjectYoelAndNeta ${SOURCES} ${HEADERS} "Header/SymbalTable.h")
+add_executable(FinalProjectYoelAndNeta ${SOURCES} ${HEADERS} "Header/SymbalTable.h" "Header/ParseToAst.h")
 
 # Include header files in the project structure
 source_group("Source Files" FILES ${SOURCES})
@@ -38,6 +38,18 @@ set_target_properties(FinalProjectYoelAndNeta PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}")
 
 
-# Add additional settings or logic if needed here (e.g., link libraries, etc.)
+set(LLVM_DIR "I:/llvm-project/llvm")  # Adjust this to match your actual path
 
-# Optional: Tests and install targets (to be added as needed)
+# Find the LLVM package
+find_package(LLVM REQUIRED CONFIG PATHS "I:/llvm-project/llvm/cmake/modules")
+
+# Print LLVM details (optional)
+message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
+message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+
+# Include LLVM headers and link libraries
+include_directories(${LLVM_INCLUDE_DIRS})
+add_definitions(${LLVM_DEFINITIONS})
+
+llvm_map_components_to_libnames(LLVM_LIBS core irreader)
+target_link_libraries(FinalProjectYoelAndNeta PRIVATE ${LLVM_LIBS})

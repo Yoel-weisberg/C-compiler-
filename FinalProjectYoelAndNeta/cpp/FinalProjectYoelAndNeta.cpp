@@ -24,10 +24,10 @@ int main(int argc, char* argv[]) {
 		Tokeniser tokeniser = Tokeniser(preprocessFile.getFinalStream());
 		std::cout << "After tokeniser " << std::endl;
 
+		// ----     Syntax Analyzer                ----
 		SyntexAnalysis syntaxAnalysis = SyntexAnalysis(tokeniser.getTokens());
 		std::cout << "Syntax analysed" << std::endl;
 
-		// ----     Syntax Analyzer                ----
 		// ----     Semantic Analyzer              ----
 		// ----     To LLVM IR                     ----
 		// ----     Rest of compilation process    ----
