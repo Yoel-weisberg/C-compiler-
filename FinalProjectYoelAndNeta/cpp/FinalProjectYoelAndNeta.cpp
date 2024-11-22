@@ -5,7 +5,7 @@
 #include "../Header/SyntexError.h"
 #include "../Header/Tokenizer.h"
 #include "../Header/SyntexAnalysis.h"	
-
+#include "../Header/Parser.h"
 
 int main(int argc, char* argv[]) {
 
@@ -28,7 +28,10 @@ int main(int argc, char* argv[]) {
 		SyntexAnalysis syntaxAnalysis = SyntexAnalysis(tokeniser.getTokens());
 		std::cout << "Syntax analysed" << std::endl;
 
-		// ----     Semantic Analyzer              ----
+		// ----     Parser                         ----
+		Parser parser = Parser(tokeniser.getTokens());
+		auto ast = parser.parse();
+
 		// ----     To LLVM IR                     ----
 		// ----     Rest of compilation process    ----
 	}

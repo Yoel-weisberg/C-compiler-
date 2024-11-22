@@ -1,3 +1,6 @@
+#pragma once
+#include "Constents.h"
+
 class Token {
 private:
 	std::string _literal;

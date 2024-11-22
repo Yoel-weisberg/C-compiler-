@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 
 /// ExprAST - Base class for all expression nodes.
@@ -36,3 +37,14 @@ public:
 	VariableExprAST(const std::string& Name) : Name(Name) {}
 };
 
+
+class AssignExprAST : public ExprAST {
+    std::string VarName;
+    std::unique_ptr<ExprAST> Value;
+public:
+    AssignExprAST(const std::string &VarName, std::unique_ptr<ExprAST> Value)
+        : VarName(VarName), Value(std::move(Value)) {}
+
+    const std::string &getVarName() const { return VarName; }
+    ExprAST *getValue() const { return Value.get(); }
+};

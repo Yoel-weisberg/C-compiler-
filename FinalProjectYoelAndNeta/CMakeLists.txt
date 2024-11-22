@@ -24,7 +24,7 @@ file(GLOB_RECURSE HEADERS "${CMAKE_SOURCE_DIR}/Header/*.h")
 file(GLOB TEST_FILES "${CMAKE_SOURCE_DIR}/testFiles/*")
 
 # Create an executable from the source files
-add_executable(FinalProjectYoelAndNeta ${SOURCES} ${HEADERS} "Header/SymbalTable.h" "Header/ParseToAst.h")
+add_executable(FinalProjectYoelAndNeta ${SOURCES} ${HEADERS} "Header/SymbalTable.h" "Header/Parser.h" "cpp/ExprAST.cpp" "cpp/ParseToAst.cpp" "cpp/Parser.cpp")
 
 # Include header files in the project structure
 source_group("Source Files" FILES ${SOURCES})
@@ -37,7 +37,7 @@ target_include_directories(FinalProjectYoelAndNeta PRIVATE "${CMAKE_SOURCE_DIR}/
 set_target_properties(FinalProjectYoelAndNeta PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}")
 
-
+# Specify the LLVM installation directory
 set(LLVM_DIR "I:/llvm-project/llvm")  # Adjust this to match your actual path
 
 # Find the LLVM package
@@ -51,5 +51,19 @@ message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
 include_directories(${LLVM_INCLUDE_DIRS})
 add_definitions(${LLVM_DEFINITIONS})
 
-llvm_map_components_to_libnames(LLVM_LIBS core irreader)
-target_link_libraries(FinalProjectYoelAndNeta PRIVATE ${LLVM_LIBS})
+# Add the directory where the LLVM libraries are located to the link directories
+link_directories("I:/llvm-project/build/lib")
+
+
+# Link the required LLVM libraries to your project
+target_link_libraries(FinalProjectYoelAndNeta PRIVATE ${LLVM_LIBS} LLVMCore LLVMirreader)
+
+target_link_libraries(FinalProjectYoelAndNeta PRIVATE
+  "I:/llvm-project/build/lib/LLVMCore.lib"
+  "I:/llvm-project/build/lib/LLVMirreader.lib"
+)
+
+
+message(STATUS "LLVM libraries directory: I:/llvm-project/build/lib")
+message(STATUS "LLVM libraries: ${LLVM_LIBS}")
+    
