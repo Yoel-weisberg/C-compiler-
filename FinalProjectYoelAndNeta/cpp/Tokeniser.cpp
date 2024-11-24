@@ -21,8 +21,11 @@ Tokeniser::Tokeniser(const std::string& string)
 		else if ((i == string.size() - 1))
 		{
 			currentLiteral += string[i];
-			this->tokens.push_back({ currentLiteral, categoriseLiteral(currentLiteral) });
-			currentLiteral = "";
+			if (!(currentLiteral.empty() || currentLiteral[0] == ' '))
+			{
+				this->tokens.push_back({ currentLiteral, categoriseLiteral(currentLiteral) });
+				currentLiteral = "";
+			}
 		}
 		else
 		{

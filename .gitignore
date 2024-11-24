@@ -449,13 +449,11 @@ FodyWeavers.xsd
 *.sln.iml
 
 
-**/.vscode/
+.vscode/
+
+
 **/out/
-out/
-
-
-
-
+out
 ### VisualStudio Patch ###
 # Additional files built by Visual Studio
 

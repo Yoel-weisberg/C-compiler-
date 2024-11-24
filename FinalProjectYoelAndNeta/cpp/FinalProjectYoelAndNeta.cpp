@@ -32,6 +32,7 @@ int main(int argc, char* argv[]) {
 		Parser parser = Parser(tokeniser.getTokens());
 		auto ast = parser.parse();
 
+		std::cout << "Ast created" << std::endl;
 		// ----     To LLVM IR                     ----
 		// ----     Rest of compilation process    ----
 	}

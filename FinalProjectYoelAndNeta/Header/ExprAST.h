@@ -39,12 +39,14 @@ public:
 
 
 class AssignExprAST : public ExprAST {
-    std::string VarName;
-    std::unique_ptr<ExprAST> Value;
+    std::string _VarName;
+    std::unique_ptr<ExprAST> _Value;
+	std::string _varType;
 public:
-    AssignExprAST(const std::string &VarName, std::unique_ptr<ExprAST> Value)
-        : VarName(VarName), Value(std::move(Value)) {}
+    AssignExprAST(const std::string &VarName, std::unique_ptr<ExprAST> Value, std::string type)
+        : _VarName(VarName), _Value(std::move(Value)), _varType(type) {}
 
-    const std::string &getVarName() const { return VarName; }
-    ExprAST *getValue() const { return Value.get(); }
+    const std::string &getVarName() const { return _VarName; }
+    ExprAST *getValue() const { return _Value.get(); }
+	const std::string getType() { return _varType; }
 };

@@ -38,32 +38,32 @@ set_target_properties(FinalProjectYoelAndNeta PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}")
 
 # Specify the LLVM installation directory
-set(LLVM_DIR "I:/llvm-project/llvm")  # Adjust this to match your actual path
+#set(LLVM_DIR "I:/llvm-project/llvm")  # Adjust this to match your actual path
 
 # Find the LLVM package
-find_package(LLVM REQUIRED CONFIG PATHS "I:/llvm-project/llvm/cmake/modules")
+#find_package(LLVM REQUIRED CONFIG PATHS "I:/llvm-project/llvm/cmake/modules")
 
 # Print LLVM details (optional)
-message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
-message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+#message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
+#message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
 
 # Include LLVM headers and link libraries
-include_directories(${LLVM_INCLUDE_DIRS})
-add_definitions(${LLVM_DEFINITIONS})
+#include_directories(${LLVM_INCLUDE_DIRS})
+#add_definitions(${LLVM_DEFINITIONS})
 
 # Add the directory where the LLVM libraries are located to the link directories
-link_directories("I:/llvm-project/build/lib")
+#link_directories("I:/llvm-project/build/lib")
 
 
 # Link the required LLVM libraries to your project
-target_link_libraries(FinalProjectYoelAndNeta PRIVATE ${LLVM_LIBS} LLVMCore LLVMirreader)
+#target_link_libraries(FinalProjectYoelAndNeta PRIVATE ${LLVM_LIBS} LLVMCore LLVMirreader)
 
-target_link_libraries(FinalProjectYoelAndNeta PRIVATE
-  "I:/llvm-project/build/lib/LLVMCore.lib"
-  "I:/llvm-project/build/lib/LLVMirreader.lib"
-)
+# target_link_libraries(FinalProjectYoelAndNeta PRIVATE
+#  "I:/llvm-project/build/lib/LLVMCore.lib"
+#  "I:/llvm-project/build/lib/LLVMirreader.lib"
+#)
 
 
-message(STATUS "LLVM libraries directory: I:/llvm-project/build/lib")
-message(STATUS "LLVM libraries: ${LLVM_LIBS}")
+#message(STATUS "LLVM libraries directory: I:/llvm-project/build/lib")
+#message(STATUS "LLVM libraries: ${LLVM_LIBS}")
     
