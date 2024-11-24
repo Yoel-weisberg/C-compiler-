@@ -1,8 +1,30 @@
 #include "../Header/Helper.h"
 
+// Define static members
 std::vector<std::string> Helper::definedTypes = { "float" };
-
 std::vector<char> Helper::separeters = { SEMICOLUMN_LITERSL, LPAREN_LITERAL, RPAREN_LITERAL, EQUEL_SIGN_LITERAL };
+SymbolTable Helper::symbolTable;
+
+std::unique_ptr<llvm::LLVMContext> Helper::TheContext = nullptr;
+std::unique_ptr<llvm::IRBuilder<>> Helper::Builder = nullptr;
+std::unique_ptr<llvm::Module> Helper::TheModule = nullptr;
+
+// Define the initialization method
+void Helper::initializeModule()
+{
+    // Create the LLVM context and module
+    TheContext = std::make_unique<llvm::LLVMContext>();
+    TheModule = std::make_unique<llvm::Module>("Yoel and neta JIT", *TheContext);
+
+    // Create the IRBuilder for the module
+    Builder = std::make_unique<llvm::IRBuilder<>>(*TheContext);
+}
+
+
+void Helper::HandleTopLevelExpression()
+{
+
+}
 
 bool Helper::checkIdentifier(const std::string& id)
 {

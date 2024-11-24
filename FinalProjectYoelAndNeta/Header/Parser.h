@@ -30,9 +30,9 @@ public:
     // Parse methods
     std::unique_ptr<ExprAST> parse();
     std::unique_ptr<ExprAST> parseAssignment();
-    std::unique_ptr<ExprAST> parseExpression();
-    std::unique_ptr<ExprAST> parseTerm();
-    std::unique_ptr<ExprAST> parseFactor();
+    //std::unique_ptr<ExprAST> parseExpression();
+    //std::unique_ptr<ExprAST> parseTerm();
+    //std::unique_ptr<ExprAST> parseFactor();
 };
 
 #endif // PARSER_H
