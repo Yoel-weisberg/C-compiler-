@@ -35,6 +35,7 @@ public:
 
 	virtual ~ExprAST() = default;
 	virtual Value* codegen() = 0;
+	ExprAST* kid = nullptr;
 };
 
 ///// BinaryExprAST - Expression class for a binary operator.

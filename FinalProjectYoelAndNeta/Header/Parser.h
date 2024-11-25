@@ -23,6 +23,8 @@ private:
     void consume();
     bool isAtEnd();
 
+    std::unique_ptr<ExprAST> head;
+
 public:
     // Constructor
     Parser(const std::vector<Token>& tokens);
@@ -30,6 +32,10 @@ public:
     // Parse methods
     std::unique_ptr<ExprAST> parse();
     std::unique_ptr<ExprAST> parseAssignment();
+    
+    // Getter for the root AST
+    ExprAST* getAst();
+
     //std::unique_ptr<ExprAST> parseExpression();
     //std::unique_ptr<ExprAST> parseTerm();
     //std::unique_ptr<ExprAST> parseFactor();

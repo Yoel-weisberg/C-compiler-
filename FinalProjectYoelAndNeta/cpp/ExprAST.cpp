@@ -36,8 +36,20 @@ Value* AssignExprAST::codegen() {
             return nullptr;
         }
 
-        // Allocate memory for the variable
-        llvm::Value* varAddress = Builder.CreateAlloca(llvmType, nullptr, _VarName.c_str());
+        // Ensure we are in the context of a function
+        llvm::Function* currentFunction = Builder.GetInsertBlock()->getParent();
+        if (!currentFunction) {
+            std::cerr << "Error: Attempting to allocate variable outside of a function.\n";
+            return nullptr;
+        }
+
+        // Move the builder's insertion point to the function's entry block
+        llvm::IRBuilder<> tempBuilder(&currentFunction->getEntryBlock(),
+            currentFunction->getEntryBlock().begin());
+
+        // Allocate memory for the variable at the entry block
+        llvm::Value* varAddress = tempBuilder.CreateAlloca(llvmType, nullptr, _VarName.c_str());
+
 
         // Add the variable to the symbol table
         Helper::symbolTable.addSymbol(_VarName, _varType, varAddress);

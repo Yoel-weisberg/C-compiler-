@@ -33,11 +33,11 @@ int main(int argc, char* argv[]) {
 
 		// ----     Parser                         ----
 		Parser parser = Parser(tokeniser.getTokens());
-		auto ast = parser.parse();
+		auto head = parser.getAst();
 
 		std::cout << "Ast created" << std::endl;
 
-		llvm::Value* generatedValue = ast->codegen();
+		llvm::Value* generatedValue = head->codegen();
 		generatedValue->print(llvm::errs());  // Prints the LLVM IR for the value
 
 

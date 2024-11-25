@@ -9,6 +9,7 @@
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Module.h>
+#include <llvm/IR/Verifier.h>
 #include <memory>
 
 class Helper
@@ -27,6 +28,7 @@ public:
     static llvm::IRBuilder<>& getBuilder() { return *Builder; }
     static llvm::Module& getModule() { return *TheModule; }
     static void HandleTopLevelExpression();
+    static void createAnonymousFunction();
 
     // Utility methods
     static bool checkIdentifier(const std::string& id);

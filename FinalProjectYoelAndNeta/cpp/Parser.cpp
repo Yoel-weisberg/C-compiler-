@@ -7,7 +7,14 @@
 
 // Constructor for Parser
 Parser::Parser(const std::vector<Token>& tokens)
-	: tokens(tokens), currentTokenIndex(0) {}
+	: tokens(tokens), currentTokenIndex(0) {
+	head =  parse();
+}
+
+ExprAST* Parser::getAst()
+{
+	return head.get();
+}
 
 // Current token getter
 Token& Parser::currentToken() {
@@ -40,9 +47,9 @@ std::unique_ptr<ExprAST> Parser::parseAssignment() {
 
 		if (currentToken().getType() == Tokens_type::EQUEL_SIGN) {
 			consume(); // Move past '='
-			// TODO - connect to a parse expression 
-			auto rhs = FloatNumberExprAST(std::stod(currentToken().getLiteral()));
-			return nullptr /*std::make_unique<AssignExprAST>(varName, std::move(rhs), type)*/;
+			auto rhs = std::make_unique<FloatNumberExprAST>(std::stod(currentToken().getLiteral()));
+			consume(); // Move past the number
+			return std::make_unique<AssignExprAST>(varName, std::move(rhs), type);
 		}
 	}
 	return nullptr;

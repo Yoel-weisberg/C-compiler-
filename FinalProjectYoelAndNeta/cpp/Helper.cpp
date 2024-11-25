@@ -18,12 +18,40 @@ void Helper::initializeModule()
 
     // Create the IRBuilder for the module
     Builder = std::make_unique<llvm::IRBuilder<>>(*TheContext);
+
+    createAnonymousFunction();
 }
 
 
 void Helper::HandleTopLevelExpression()
 {
 
+}
+
+void Helper::createAnonymousFunction()
+{
+    // Create the function type (void function with no arguments)
+    llvm::FunctionType* funcType = llvm::FunctionType::get(llvm::Type::getVoidTy(getContext()), false);
+
+    // Create the function in the module
+    llvm::Function* anonFunc = llvm::Function::Create(
+        funcType,
+        llvm::Function::ExternalLinkage,
+        "", // No name, makes it anonymous
+        getModule()
+    );
+
+    // Add an entry block to the function
+    llvm::BasicBlock* entryBlock = llvm::BasicBlock::Create(getContext(), "entry", anonFunc);
+
+    // Set the builder's insertion point to the entry block
+    getBuilder().SetInsertPoint(entryBlock);
+
+
+    // Verify the function
+    if (llvm::verifyFunction(*anonFunc, &llvm::errs())) {
+        std::cerr << "Error: Invalid LLVM function generated.\n";
+    }
 }
 
 bool Helper::checkIdentifier(const std::string& id)
