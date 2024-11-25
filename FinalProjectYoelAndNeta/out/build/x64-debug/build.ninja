@@ -50,7 +50,7 @@ cmake_ninja_workdir = D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAnd
 build cmake_object_order_depends_target_FinalProjectYoelAndNeta: phony || CMakeFiles\FinalProjectYoelAndNeta.dir
 
 build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\ExprAST.cpp.obj: CXX_COMPILER__FinalProjectYoelAndNeta_unscanned_Debug D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\cpp\ExprAST.cpp || cmake_object_order_depends_target_FinalProjectYoelAndNeta
-  FLAGS = /D_ITERATOR_DEBUG_LEVEL=0 /MDd /Ob0 /Od /RTC1 /MD_DynamicRelease -std:c++20 -ZI
+  FLAGS = /MD /MDd /Ob0 /Od /RTC1 /D_ITERATOR_DEBUG_LEVEL=0 -std:c++20 -ZI /MD
   INCLUDES = -I"D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\Header" -II:\llvm-project\install\include
   OBJECT_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir
   OBJECT_FILE_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir\cpp
@@ -58,7 +58,7 @@ build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\ExprAST.cpp.obj: CXX_COMPILER__
   TARGET_PDB = "D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\FinalProjectYoelAndNeta.pdb"
 
 build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\FinalProjectYoelAndNeta.cpp.obj: CXX_COMPILER__FinalProjectYoelAndNeta_unscanned_Debug D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\cpp\FinalProjectYoelAndNeta.cpp || cmake_object_order_depends_target_FinalProjectYoelAndNeta
-  FLAGS = /D_ITERATOR_DEBUG_LEVEL=0 /MDd /Ob0 /Od /RTC1 /MD_DynamicRelease -std:c++20 -ZI
+  FLAGS = /MD /MDd /Ob0 /Od /RTC1 /D_ITERATOR_DEBUG_LEVEL=0 -std:c++20 -ZI /MD
   INCLUDES = -I"D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\Header" -II:\llvm-project\install\include
   OBJECT_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir
   OBJECT_FILE_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir\cpp
@@ -66,7 +66,7 @@ build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\FinalProjectYoelAndNeta.cpp.obj
   TARGET_PDB = "D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\FinalProjectYoelAndNeta.pdb"
 
 build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\Helper.cpp.obj: CXX_COMPILER__FinalProjectYoelAndNeta_unscanned_Debug D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\cpp\Helper.cpp || cmake_object_order_depends_target_FinalProjectYoelAndNeta
-  FLAGS = /D_ITERATOR_DEBUG_LEVEL=0 /MDd /Ob0 /Od /RTC1 /MD_DynamicRelease -std:c++20 -ZI
+  FLAGS = /MD /MDd /Ob0 /Od /RTC1 /D_ITERATOR_DEBUG_LEVEL=0 -std:c++20 -ZI /MD
   INCLUDES = -I"D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\Header" -II:\llvm-project\install\include
   OBJECT_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir
   OBJECT_FILE_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir\cpp
@@ -74,7 +74,7 @@ build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\Helper.cpp.obj: CXX_COMPILER__F
   TARGET_PDB = "D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\FinalProjectYoelAndNeta.pdb"
 
 build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\ParseToAst.cpp.obj: CXX_COMPILER__FinalProjectYoelAndNeta_unscanned_Debug D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\cpp\ParseToAst.cpp || cmake_object_order_depends_target_FinalProjectYoelAndNeta
-  FLAGS = /D_ITERATOR_DEBUG_LEVEL=0 /MDd /Ob0 /Od /RTC1 /MD_DynamicRelease -std:c++20 -ZI
+  FLAGS = /MD /MDd /Ob0 /Od /RTC1 /D_ITERATOR_DEBUG_LEVEL=0 -std:c++20 -ZI /MD
   INCLUDES = -I"D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\Header" -II:\llvm-project\install\include
   OBJECT_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir
   OBJECT_FILE_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir\cpp
@@ -82,7 +82,7 @@ build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\ParseToAst.cpp.obj: CXX_COMPILE
   TARGET_PDB = "D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\FinalProjectYoelAndNeta.pdb"
 
 build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\Parser.cpp.obj: CXX_COMPILER__FinalProjectYoelAndNeta_unscanned_Debug D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\cpp\Parser.cpp || cmake_object_order_depends_target_FinalProjectYoelAndNeta
-  FLAGS = /D_ITERATOR_DEBUG_LEVEL=0 /MDd /Ob0 /Od /RTC1 /MD_DynamicRelease -std:c++20 -ZI
+  FLAGS = /MD /MDd /Ob0 /Od /RTC1 /D_ITERATOR_DEBUG_LEVEL=0 -std:c++20 -ZI /MD
   INCLUDES = -I"D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\Header" -II:\llvm-project\install\include
   OBJECT_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir
   OBJECT_FILE_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir\cpp
@@ -90,7 +90,7 @@ build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\Parser.cpp.obj: CXX_COMPILER__F
   TARGET_PDB = "D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\FinalProjectYoelAndNeta.pdb"
 
 build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\Preprocess.cpp.obj: CXX_COMPILER__FinalProjectYoelAndNeta_unscanned_Debug D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\cpp\Preprocess.cpp || cmake_object_order_depends_target_FinalProjectYoelAndNeta
-  FLAGS = /D_ITERATOR_DEBUG_LEVEL=0 /MDd /Ob0 /Od /RTC1 /MD_DynamicRelease -std:c++20 -ZI
+  FLAGS = /MD /MDd /Ob0 /Od /RTC1 /D_ITERATOR_DEBUG_LEVEL=0 -std:c++20 -ZI /MD
   INCLUDES = -I"D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\Header" -II:\llvm-project\install\include
   OBJECT_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir
   OBJECT_FILE_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir\cpp
@@ -98,7 +98,7 @@ build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\Preprocess.cpp.obj: CXX_COMPILE
   TARGET_PDB = "D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\FinalProjectYoelAndNeta.pdb"
 
 build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\SymbalTable.cpp.obj: CXX_COMPILER__FinalProjectYoelAndNeta_unscanned_Debug D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\cpp\SymbalTable.cpp || cmake_object_order_depends_target_FinalProjectYoelAndNeta
-  FLAGS = /D_ITERATOR_DEBUG_LEVEL=0 /MDd /Ob0 /Od /RTC1 /MD_DynamicRelease -std:c++20 -ZI
+  FLAGS = /MD /MDd /Ob0 /Od /RTC1 /D_ITERATOR_DEBUG_LEVEL=0 -std:c++20 -ZI /MD
   INCLUDES = -I"D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\Header" -II:\llvm-project\install\include
   OBJECT_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir
   OBJECT_FILE_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir\cpp
@@ -106,7 +106,7 @@ build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\SymbalTable.cpp.obj: CXX_COMPIL
   TARGET_PDB = "D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\FinalProjectYoelAndNeta.pdb"
 
 build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\SyntexAnalysis.cpp.obj: CXX_COMPILER__FinalProjectYoelAndNeta_unscanned_Debug D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\cpp\SyntexAnalysis.cpp || cmake_object_order_depends_target_FinalProjectYoelAndNeta
-  FLAGS = /D_ITERATOR_DEBUG_LEVEL=0 /MDd /Ob0 /Od /RTC1 /MD_DynamicRelease -std:c++20 -ZI
+  FLAGS = /MD /MDd /Ob0 /Od /RTC1 /D_ITERATOR_DEBUG_LEVEL=0 -std:c++20 -ZI /MD
   INCLUDES = -I"D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\Header" -II:\llvm-project\install\include
   OBJECT_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir
   OBJECT_FILE_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir\cpp
@@ -114,7 +114,7 @@ build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\SyntexAnalysis.cpp.obj: CXX_COM
   TARGET_PDB = "D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\FinalProjectYoelAndNeta.pdb"
 
 build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\Tokeniser.cpp.obj: CXX_COMPILER__FinalProjectYoelAndNeta_unscanned_Debug D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\cpp\Tokeniser.cpp || cmake_object_order_depends_target_FinalProjectYoelAndNeta
-  FLAGS = /D_ITERATOR_DEBUG_LEVEL=0 /MDd /Ob0 /Od /RTC1 /MD_DynamicRelease -std:c++20 -ZI
+  FLAGS = /MD /MDd /Ob0 /Od /RTC1 /D_ITERATOR_DEBUG_LEVEL=0 -std:c++20 -ZI /MD
   INCLUDES = -I"D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\Header" -II:\llvm-project\install\include
   OBJECT_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir
   OBJECT_FILE_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir\cpp
@@ -122,7 +122,7 @@ build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\Tokeniser.cpp.obj: CXX_COMPILER
   TARGET_PDB = "D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\FinalProjectYoelAndNeta.pdb"
 
 build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\sourceFileHandler.cpp.obj: CXX_COMPILER__FinalProjectYoelAndNeta_unscanned_Debug D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\cpp\sourceFileHandler.cpp || cmake_object_order_depends_target_FinalProjectYoelAndNeta
-  FLAGS = /D_ITERATOR_DEBUG_LEVEL=0 /MDd /Ob0 /Od /RTC1 /MD_DynamicRelease -std:c++20 -ZI
+  FLAGS = /MD /MDd /Ob0 /Od /RTC1 /D_ITERATOR_DEBUG_LEVEL=0 -std:c++20 -ZI /MD
   INCLUDES = -I"D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\Header" -II:\llvm-project\install\include
   OBJECT_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir
   OBJECT_FILE_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir\cpp
@@ -138,7 +138,7 @@ build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\sourceFileHandler.cpp.obj: CXX_
 # Link the executable D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\FinalProjectYoelAndNeta.exe
 
 build D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\FinalProjectYoelAndNeta.exe: CXX_EXECUTABLE_LINKER__FinalProjectYoelAndNeta_Debug CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\ExprAST.cpp.obj CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\FinalProjectYoelAndNeta.cpp.obj CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\Helper.cpp.obj CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\ParseToAst.cpp.obj CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\Parser.cpp.obj CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\Preprocess.cpp.obj CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\SymbalTable.cpp.obj CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\SyntexAnalysis.cpp.obj CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\Tokeniser.cpp.obj CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\sourceFileHandler.cpp.obj | I$:\llvm-project\install\lib\LLVMCore.lib I$:\llvm-project\install\lib\LLVMBitWriter.lib I$:\llvm-project\install\lib\LLVMSupport.lib I$:\llvm-project\install\lib\LLVMAnalysis.lib I$:\llvm-project\install\lib\LLVMIRPrinter.lib I$:\llvm-project\install\lib\LLVMTarget.lib I$:\llvm-project\install\lib\LLVMAnalysis.lib I$:\llvm-project\install\lib\LLVMProfileData.lib I$:\llvm-project\install\lib\LLVMSymbolize.lib I$:\llvm-project\install\lib\LLVMDebugInfoPDB.lib C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\DIA$ SDK\lib\amd64\diaguids.lib I$:\llvm-project\install\lib\LLVMDebugInfoMSF.lib I$:\llvm-project\install\lib\LLVMDebugInfoBTF.lib I$:\llvm-project\install\lib\LLVMDebugInfoDWARF.lib I$:\llvm-project\install\lib\LLVMObject.lib I$:\llvm-project\install\lib\LLVMIRReader.lib I$:\llvm-project\install\lib\LLVMBitReader.lib I$:\llvm-project\install\lib\LLVMAsmParser.lib I$:\llvm-project\install\lib\LLVMCore.lib I$:\llvm-project\install\lib\LLVMRemarks.lib I$:\llvm-project\install\lib\LLVMBitstreamReader.lib I$:\llvm-project\install\lib\LLVMMCParser.lib I$:\llvm-project\install\lib\LLVMTextAPI.lib I$:\llvm-project\install\lib\LLVMMC.lib I$:\llvm-project\install\lib\LLVMBinaryFormat.lib I$:\llvm-project\install\lib\LLVMTargetParser.lib I$:\llvm-project\install\lib\LLVMDebugInfoCodeView.lib I$:\llvm-project\install\lib\LLVMSupport.lib I$:\llvm-project\install\lib\LLVMDemangle.lib
-  FLAGS = /D_ITERATOR_DEBUG_LEVEL=0 /MDd /Ob0 /Od /RTC1 /MD_DynamicRelease -ZI
+  FLAGS = /MD /MDd /Ob0 /Od /RTC1 /D_ITERATOR_DEBUG_LEVEL=0 -ZI
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
   LINK_LIBRARIES = I:\llvm-project\install\lib\LLVMCore.lib  I:\llvm-project\install\lib\LLVMBitWriter.lib  I:\llvm-project\install\lib\LLVMSupport.lib  I:\llvm-project\install\lib\LLVMAnalysis.lib  I:\llvm-project\install\lib\LLVMIRPrinter.lib  I:\llvm-project\install\lib\LLVMTarget.lib  I:\llvm-project\install\lib\LLVMAnalysis.lib  I:\llvm-project\install\lib\LLVMProfileData.lib  I:\llvm-project\install\lib\LLVMSymbolize.lib  I:\llvm-project\install\lib\LLVMDebugInfoPDB.lib  "C:\Program Files\Microsoft Visual Studio\2022\Community\DIA SDK\lib\amd64\diaguids.lib"  I:\llvm-project\install\lib\LLVMDebugInfoMSF.lib  I:\llvm-project\install\lib\LLVMDebugInfoBTF.lib  I:\llvm-project\install\lib\LLVMDebugInfoDWARF.lib  I:\llvm-project\install\lib\LLVMObject.lib  I:\llvm-project\install\lib\LLVMIRReader.lib  I:\llvm-project\install\lib\LLVMBitReader.lib  I:\llvm-project\install\lib\LLVMAsmParser.lib  I:\llvm-project\install\lib\LLVMCore.lib  I:\llvm-project\install\lib\LLVMRemarks.lib  I:\llvm-project\install\lib\LLVMBitstreamReader.lib  I:\llvm-project\install\lib\LLVMMCParser.lib  I:\llvm-project\install\lib\LLVMTextAPI.lib  I:\llvm-project\install\lib\LLVMMC.lib  I:\llvm-project\install\lib\LLVMBinaryFormat.lib  I:\llvm-project\install\lib\LLVMTargetParser.lib  I:\llvm-project\install\lib\LLVMDebugInfoCodeView.lib  I:\llvm-project\install\lib\LLVMSupport.lib  I:\llvm-project\install\lib\LLVMDemangle.lib  psapi.lib  shell32.lib  ole32.lib  uuid.lib  advapi32.lib  ws2_32.lib  ntdll.lib  delayimp.lib  -delayload:shell32.dll  -delayload:ole32.dll  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
   OBJECT_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir

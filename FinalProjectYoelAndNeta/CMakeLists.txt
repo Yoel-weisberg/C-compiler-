@@ -12,6 +12,13 @@ project("FinalProjectYoelAndNeta")
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 20)
 
+
+
+# Add this line to ensure compatibility with LLVM's iterator debug level
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /D_ITERATOR_DEBUG_LEVEL=0")
+
+add_compile_options("$<$<CONFIG:Debug>:/MD>")
+
 # Collect all .cpp files in the cpp directory
 file(GLOB_RECURSE SOURCES "${CMAKE_SOURCE_DIR}/cpp/*.cpp")
 
@@ -31,11 +38,6 @@ target_include_directories(FinalProjectYoelAndNeta PRIVATE "${CMAKE_SOURCE_DIR}/
 # Set output directories for the executable
 set_target_properties(FinalProjectYoelAndNeta PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}")
-
-
-set(CMAKE_CXX_FLAGS "/D_ITERATOR_DEBUG_LEVEL=0")
-
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MD_DynamicRelease")
 
 
 # Specify the LLVM installation directory
@@ -64,8 +66,7 @@ llvm_map_components_to_libnames(LLVM_LIBS
 # Link LLVM libraries to the project
 target_link_libraries(FinalProjectYoelAndNeta PRIVATE ${LLVM_LIBS})
 
-# Optional: Specify the library directory explicitly (for linker)
-link_directories("${LLVM_DIR}/lib")
+
 
 # Message for debugging
 message(STATUS "LLVM libraries directory: ${LLVM_DIR}/lib")
