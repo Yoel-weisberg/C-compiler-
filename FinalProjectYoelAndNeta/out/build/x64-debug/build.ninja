@@ -49,25 +49,81 @@ cmake_ninja_workdir = D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAnd
 
 build cmake_object_order_depends_target_FinalProjectYoelAndNeta: phony || CMakeFiles\FinalProjectYoelAndNeta.dir
 
+build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\ExprAST.cpp.obj: CXX_COMPILER__FinalProjectYoelAndNeta_unscanned_Debug D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\cpp\ExprAST.cpp || cmake_object_order_depends_target_FinalProjectYoelAndNeta
+  FLAGS = /MD /MDd /Ob0 /Od /RTC1 /D_ITERATOR_DEBUG_LEVEL=0 -std:c++20 -ZI /MD
+  INCLUDES = -I"D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\Header" -II:\llvm-project\install\include
+  OBJECT_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir
+  OBJECT_FILE_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir\cpp
+  TARGET_COMPILE_PDB = CMakeFiles\FinalProjectYoelAndNeta.dir\
+  TARGET_PDB = "D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\FinalProjectYoelAndNeta.pdb"
+
 build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\FinalProjectYoelAndNeta.cpp.obj: CXX_COMPILER__FinalProjectYoelAndNeta_unscanned_Debug D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\cpp\FinalProjectYoelAndNeta.cpp || cmake_object_order_depends_target_FinalProjectYoelAndNeta
-  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++20 -ZI
-  INCLUDES = -I"D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\Header"
+  FLAGS = /MD /MDd /Ob0 /Od /RTC1 /D_ITERATOR_DEBUG_LEVEL=0 -std:c++20 -ZI /MD
+  INCLUDES = -I"D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\Header" -II:\llvm-project\install\include
+  OBJECT_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir
+  OBJECT_FILE_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir\cpp
+  TARGET_COMPILE_PDB = CMakeFiles\FinalProjectYoelAndNeta.dir\
+  TARGET_PDB = "D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\FinalProjectYoelAndNeta.pdb"
+
+build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\Helper.cpp.obj: CXX_COMPILER__FinalProjectYoelAndNeta_unscanned_Debug D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\cpp\Helper.cpp || cmake_object_order_depends_target_FinalProjectYoelAndNeta
+  FLAGS = /MD /MDd /Ob0 /Od /RTC1 /D_ITERATOR_DEBUG_LEVEL=0 -std:c++20 -ZI /MD
+  INCLUDES = -I"D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\Header" -II:\llvm-project\install\include
+  OBJECT_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir
+  OBJECT_FILE_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir\cpp
+  TARGET_COMPILE_PDB = CMakeFiles\FinalProjectYoelAndNeta.dir\
+  TARGET_PDB = "D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\FinalProjectYoelAndNeta.pdb"
+
+build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\ParseToAst.cpp.obj: CXX_COMPILER__FinalProjectYoelAndNeta_unscanned_Debug D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\cpp\ParseToAst.cpp || cmake_object_order_depends_target_FinalProjectYoelAndNeta
+  FLAGS = /MD /MDd /Ob0 /Od /RTC1 /D_ITERATOR_DEBUG_LEVEL=0 -std:c++20 -ZI /MD
+  INCLUDES = -I"D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\Header" -II:\llvm-project\install\include
+  OBJECT_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir
+  OBJECT_FILE_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir\cpp
+  TARGET_COMPILE_PDB = CMakeFiles\FinalProjectYoelAndNeta.dir\
+  TARGET_PDB = "D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\FinalProjectYoelAndNeta.pdb"
+
+build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\Parser.cpp.obj: CXX_COMPILER__FinalProjectYoelAndNeta_unscanned_Debug D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\cpp\Parser.cpp || cmake_object_order_depends_target_FinalProjectYoelAndNeta
+  FLAGS = /MD /MDd /Ob0 /Od /RTC1 /D_ITERATOR_DEBUG_LEVEL=0 -std:c++20 -ZI /MD
+  INCLUDES = -I"D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\Header" -II:\llvm-project\install\include
   OBJECT_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir
   OBJECT_FILE_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir\cpp
   TARGET_COMPILE_PDB = CMakeFiles\FinalProjectYoelAndNeta.dir\
   TARGET_PDB = "D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\FinalProjectYoelAndNeta.pdb"
 
 build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\Preprocess.cpp.obj: CXX_COMPILER__FinalProjectYoelAndNeta_unscanned_Debug D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\cpp\Preprocess.cpp || cmake_object_order_depends_target_FinalProjectYoelAndNeta
-  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++20 -ZI
-  INCLUDES = -I"D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\Header"
+  FLAGS = /MD /MDd /Ob0 /Od /RTC1 /D_ITERATOR_DEBUG_LEVEL=0 -std:c++20 -ZI /MD
+  INCLUDES = -I"D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\Header" -II:\llvm-project\install\include
+  OBJECT_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir
+  OBJECT_FILE_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir\cpp
+  TARGET_COMPILE_PDB = CMakeFiles\FinalProjectYoelAndNeta.dir\
+  TARGET_PDB = "D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\FinalProjectYoelAndNeta.pdb"
+
+build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\SymbalTable.cpp.obj: CXX_COMPILER__FinalProjectYoelAndNeta_unscanned_Debug D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\cpp\SymbalTable.cpp || cmake_object_order_depends_target_FinalProjectYoelAndNeta
+  FLAGS = /MD /MDd /Ob0 /Od /RTC1 /D_ITERATOR_DEBUG_LEVEL=0 -std:c++20 -ZI /MD
+  INCLUDES = -I"D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\Header" -II:\llvm-project\install\include
+  OBJECT_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir
+  OBJECT_FILE_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir\cpp
+  TARGET_COMPILE_PDB = CMakeFiles\FinalProjectYoelAndNeta.dir\
+  TARGET_PDB = "D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\FinalProjectYoelAndNeta.pdb"
+
+build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\SyntexAnalysis.cpp.obj: CXX_COMPILER__FinalProjectYoelAndNeta_unscanned_Debug D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\cpp\SyntexAnalysis.cpp || cmake_object_order_depends_target_FinalProjectYoelAndNeta
+  FLAGS = /MD /MDd /Ob0 /Od /RTC1 /D_ITERATOR_DEBUG_LEVEL=0 -std:c++20 -ZI /MD
+  INCLUDES = -I"D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\Header" -II:\llvm-project\install\include
+  OBJECT_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir
+  OBJECT_FILE_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir\cpp
+  TARGET_COMPILE_PDB = CMakeFiles\FinalProjectYoelAndNeta.dir\
+  TARGET_PDB = "D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\FinalProjectYoelAndNeta.pdb"
+
+build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\Tokeniser.cpp.obj: CXX_COMPILER__FinalProjectYoelAndNeta_unscanned_Debug D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\cpp\Tokeniser.cpp || cmake_object_order_depends_target_FinalProjectYoelAndNeta
+  FLAGS = /MD /MDd /Ob0 /Od /RTC1 /D_ITERATOR_DEBUG_LEVEL=0 -std:c++20 -ZI /MD
+  INCLUDES = -I"D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\Header" -II:\llvm-project\install\include
   OBJECT_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir
   OBJECT_FILE_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir\cpp
   TARGET_COMPILE_PDB = CMakeFiles\FinalProjectYoelAndNeta.dir\
   TARGET_PDB = "D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\FinalProjectYoelAndNeta.pdb"
 
 build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\sourceFileHandler.cpp.obj: CXX_COMPILER__FinalProjectYoelAndNeta_unscanned_Debug D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\cpp\sourceFileHandler.cpp || cmake_object_order_depends_target_FinalProjectYoelAndNeta
-  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -std:c++20 -ZI
-  INCLUDES = -I"D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\Header"
+  FLAGS = /MD /MDd /Ob0 /Od /RTC1 /D_ITERATOR_DEBUG_LEVEL=0 -std:c++20 -ZI /MD
+  INCLUDES = -I"D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\Header" -II:\llvm-project\install\include
   OBJECT_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir
   OBJECT_FILE_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir\cpp
   TARGET_COMPILE_PDB = CMakeFiles\FinalProjectYoelAndNeta.dir\
@@ -81,10 +137,10 @@ build CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\sourceFileHandler.cpp.obj: CXX_
 #############################################
 # Link the executable D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\FinalProjectYoelAndNeta.exe
 
-build D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\FinalProjectYoelAndNeta.exe: CXX_EXECUTABLE_LINKER__FinalProjectYoelAndNeta_Debug CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\FinalProjectYoelAndNeta.cpp.obj CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\Preprocess.cpp.obj CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\sourceFileHandler.cpp.obj
-  FLAGS = /DWIN32 /D_WINDOWS /W3 /GR /EHsc /MDd /Ob0 /Od /RTC1 -ZI
+build D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\FinalProjectYoelAndNeta.exe: CXX_EXECUTABLE_LINKER__FinalProjectYoelAndNeta_Debug CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\ExprAST.cpp.obj CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\FinalProjectYoelAndNeta.cpp.obj CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\Helper.cpp.obj CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\ParseToAst.cpp.obj CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\Parser.cpp.obj CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\Preprocess.cpp.obj CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\SymbalTable.cpp.obj CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\SyntexAnalysis.cpp.obj CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\Tokeniser.cpp.obj CMakeFiles\FinalProjectYoelAndNeta.dir\cpp\sourceFileHandler.cpp.obj | I$:\llvm-project\install\lib\LLVMCore.lib I$:\llvm-project\install\lib\LLVMBitWriter.lib I$:\llvm-project\install\lib\LLVMSupport.lib I$:\llvm-project\install\lib\LLVMAnalysis.lib I$:\llvm-project\install\lib\LLVMIRPrinter.lib I$:\llvm-project\install\lib\LLVMTarget.lib I$:\llvm-project\install\lib\LLVMAnalysis.lib I$:\llvm-project\install\lib\LLVMProfileData.lib I$:\llvm-project\install\lib\LLVMSymbolize.lib I$:\llvm-project\install\lib\LLVMDebugInfoPDB.lib C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\DIA$ SDK\lib\amd64\diaguids.lib I$:\llvm-project\install\lib\LLVMDebugInfoMSF.lib I$:\llvm-project\install\lib\LLVMDebugInfoBTF.lib I$:\llvm-project\install\lib\LLVMDebugInfoDWARF.lib I$:\llvm-project\install\lib\LLVMObject.lib I$:\llvm-project\install\lib\LLVMIRReader.lib I$:\llvm-project\install\lib\LLVMBitReader.lib I$:\llvm-project\install\lib\LLVMAsmParser.lib I$:\llvm-project\install\lib\LLVMCore.lib I$:\llvm-project\install\lib\LLVMRemarks.lib I$:\llvm-project\install\lib\LLVMBitstreamReader.lib I$:\llvm-project\install\lib\LLVMMCParser.lib I$:\llvm-project\install\lib\LLVMTextAPI.lib I$:\llvm-project\install\lib\LLVMMC.lib I$:\llvm-project\install\lib\LLVMBinaryFormat.lib I$:\llvm-project\install\lib\LLVMTargetParser.lib I$:\llvm-project\install\lib\LLVMDebugInfoCodeView.lib I$:\llvm-project\install\lib\LLVMSupport.lib I$:\llvm-project\install\lib\LLVMDemangle.lib
+  FLAGS = /MD /MDd /Ob0 /Od /RTC1 /D_ITERATOR_DEBUG_LEVEL=0 -ZI
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
-  LINK_LIBRARIES = kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
+  LINK_LIBRARIES = I:\llvm-project\install\lib\LLVMCore.lib  I:\llvm-project\install\lib\LLVMBitWriter.lib  I:\llvm-project\install\lib\LLVMSupport.lib  I:\llvm-project\install\lib\LLVMAnalysis.lib  I:\llvm-project\install\lib\LLVMIRPrinter.lib  I:\llvm-project\install\lib\LLVMTarget.lib  I:\llvm-project\install\lib\LLVMAnalysis.lib  I:\llvm-project\install\lib\LLVMProfileData.lib  I:\llvm-project\install\lib\LLVMSymbolize.lib  I:\llvm-project\install\lib\LLVMDebugInfoPDB.lib  "C:\Program Files\Microsoft Visual Studio\2022\Community\DIA SDK\lib\amd64\diaguids.lib"  I:\llvm-project\install\lib\LLVMDebugInfoMSF.lib  I:\llvm-project\install\lib\LLVMDebugInfoBTF.lib  I:\llvm-project\install\lib\LLVMDebugInfoDWARF.lib  I:\llvm-project\install\lib\LLVMObject.lib  I:\llvm-project\install\lib\LLVMIRReader.lib  I:\llvm-project\install\lib\LLVMBitReader.lib  I:\llvm-project\install\lib\LLVMAsmParser.lib  I:\llvm-project\install\lib\LLVMCore.lib  I:\llvm-project\install\lib\LLVMRemarks.lib  I:\llvm-project\install\lib\LLVMBitstreamReader.lib  I:\llvm-project\install\lib\LLVMMCParser.lib  I:\llvm-project\install\lib\LLVMTextAPI.lib  I:\llvm-project\install\lib\LLVMMC.lib  I:\llvm-project\install\lib\LLVMBinaryFormat.lib  I:\llvm-project\install\lib\LLVMTargetParser.lib  I:\llvm-project\install\lib\LLVMDebugInfoCodeView.lib  I:\llvm-project\install\lib\LLVMSupport.lib  I:\llvm-project\install\lib\LLVMDemangle.lib  psapi.lib  shell32.lib  ole32.lib  uuid.lib  advapi32.lib  ws2_32.lib  ntdll.lib  delayimp.lib  -delayload:shell32.dll  -delayload:ole32.dll  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
   OBJECT_DIR = CMakeFiles\FinalProjectYoelAndNeta.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
@@ -92,6 +148,48 @@ build D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\FinalProjec
   TARGET_FILE = "D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\FinalProjectYoelAndNeta.exe"
   TARGET_IMPLIB = FinalProjectYoelAndNeta.lib
   TARGET_PDB = "D:\Yoel-Stuff\Maghimim\Final Project\FinalProjectYoelAndNeta\FinalProjectYoelAndNeta.pdb"
+
+
+#############################################
+# Utility command for intrinsics_gen
+
+build intrinsics_gen: phony
+
+
+#############################################
+# Utility command for vt_gen
+
+build vt_gen: phony
+
+
+#############################################
+# Utility command for omp_gen
+
+build omp_gen: phony
+
+
+#############################################
+# Utility command for acc_gen
+
+build acc_gen: phony
+
+
+#############################################
+# Utility command for ARMTargetParserTableGen
+
+build ARMTargetParserTableGen: phony
+
+
+#############################################
+# Utility command for AArch64TargetParserTableGen
+
+build AArch64TargetParserTableGen: phony
+
+
+#############################################
+# Utility command for RISCVTargetParserTableGen
+
+build RISCVTargetParserTableGen: phony
 
 
 #############################################
@@ -140,14 +238,14 @@ build all: phony D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\
 #############################################
 # Re-run CMake if any of its inputs changed.
 
-build build.ninja: RERUN_CMAKE | C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeCInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeCXXInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeCommonLanguageInclude.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeGenericSystem.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeInitializeConfigs.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeLanguageInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeRCInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeSystemSpecificInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeSystemSpecificInitialize.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Compiler\CMakeCommonCompilerMacros.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Compiler\MSVC-C.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Compiler\MSVC-CXX.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Compiler\MSVC.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Platform\Windows-Initialize.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Platform\Windows-MSVC-C.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Platform\Windows-MSVC-CXX.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Platform\Windows-MSVC.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Platform\Windows.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Platform\WindowsPaths.cmake CMakeCache.txt CMakeFiles\3.28.0-msvc1\CMakeCCompiler.cmake CMakeFiles\3.28.0-msvc1\CMakeCXXCompiler.cmake CMakeFiles\3.28.0-msvc1\CMakeRCCompiler.cmake CMakeFiles\3.28.0-msvc1\CMakeSystem.cmake D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\CMakeLists.txt
+build build.ninja: RERUN_CMAKE | C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeCInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeCXXInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeCommonLanguageInclude.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeGenericSystem.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeInitializeConfigs.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeLanguageInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeRCInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeSystemSpecificInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeSystemSpecificInitialize.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Compiler\CMakeCommonCompilerMacros.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Compiler\MSVC-C.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Compiler\MSVC-CXX.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Compiler\MSVC.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Platform\Windows-Initialize.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Platform\Windows-MSVC-C.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Platform\Windows-MSVC-CXX.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Platform\Windows-MSVC.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Platform\Windows.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Platform\WindowsPaths.cmake CMakeCache.txt CMakeFiles\3.28.0-msvc1\CMakeCCompiler.cmake CMakeFiles\3.28.0-msvc1\CMakeCXXCompiler.cmake CMakeFiles\3.28.0-msvc1\CMakeRCCompiler.cmake CMakeFiles\3.28.0-msvc1\CMakeSystem.cmake D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\CMakeLists.txt I$:\llvm-project\install\lib\cmake\llvm\LLVM-Config.cmake I$:\llvm-project\install\lib\cmake\llvm\LLVMConfig.cmake I$:\llvm-project\install\lib\cmake\llvm\LLVMConfigVersion.cmake I$:\llvm-project\install\lib\cmake\llvm\LLVMExports-release.cmake I$:\llvm-project\install\lib\cmake\llvm\LLVMExports.cmake
   pool = console
 
 
 #############################################
 # A missing CMake input file is not an error.
 
-build C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeCInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeCXXInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeCommonLanguageInclude.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeGenericSystem.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeInitializeConfigs.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeLanguageInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeRCInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeSystemSpecificInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeSystemSpecificInitialize.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Compiler\CMakeCommonCompilerMacros.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Compiler\MSVC-C.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Compiler\MSVC-CXX.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Compiler\MSVC.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Platform\Windows-Initialize.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Platform\Windows-MSVC-C.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Platform\Windows-MSVC-CXX.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Platform\Windows-MSVC.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Platform\Windows.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Platform\WindowsPaths.cmake CMakeCache.txt CMakeFiles\3.28.0-msvc1\CMakeCCompiler.cmake CMakeFiles\3.28.0-msvc1\CMakeCXXCompiler.cmake CMakeFiles\3.28.0-msvc1\CMakeRCCompiler.cmake CMakeFiles\3.28.0-msvc1\CMakeSystem.cmake D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\CMakeLists.txt: phony
+build C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeCInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeCXXInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeCommonLanguageInclude.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeGenericSystem.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeInitializeConfigs.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeLanguageInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeRCInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeSystemSpecificInformation.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\CMakeSystemSpecificInitialize.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Compiler\CMakeCommonCompilerMacros.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Compiler\MSVC-C.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Compiler\MSVC-CXX.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Compiler\MSVC.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Platform\Windows-Initialize.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Platform\Windows-MSVC-C.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Platform\Windows-MSVC-CXX.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Platform\Windows-MSVC.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Platform\Windows.cmake C$:\Program$ Files\Microsoft$ Visual$ Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\share\cmake-3.28\Modules\Platform\WindowsPaths.cmake CMakeCache.txt CMakeFiles\3.28.0-msvc1\CMakeCCompiler.cmake CMakeFiles\3.28.0-msvc1\CMakeCXXCompiler.cmake CMakeFiles\3.28.0-msvc1\CMakeRCCompiler.cmake CMakeFiles\3.28.0-msvc1\CMakeSystem.cmake D$:\Yoel-Stuff\Maghimim\Final$ Project\FinalProjectYoelAndNeta\CMakeLists.txt I$:\llvm-project\install\lib\cmake\llvm\LLVM-Config.cmake I$:\llvm-project\install\lib\cmake\llvm\LLVMConfig.cmake I$:\llvm-project\install\lib\cmake\llvm\LLVMConfigVersion.cmake I$:\llvm-project\install\lib\cmake\llvm\LLVMExports-release.cmake I$:\llvm-project\install\lib\cmake\llvm\LLVMExports.cmake: phony
 
 
 #############################################
