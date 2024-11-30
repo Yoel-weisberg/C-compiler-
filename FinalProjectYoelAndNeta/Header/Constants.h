@@ -23,5 +23,5 @@ enum Tokens_type {
 #define DIVISION_LITERAL '/'
 #define SUBSTRICTION_LITERAL '-'
 #define EQUEL_SIGN_LITERAL '='
-#define SEMICOLUMN_LITERSL ';'
+#define SEMICOLUMN_LITERAL ';'
 

@@ -2,7 +2,7 @@
 
 // Define static members
 std::vector<std::string> Helper::definedTypes = { "float" , "int"};
-std::vector<char> Helper::separetors = { SEMICOLUMN_LITERSL, LPAREN_LITERAL, RPAREN_LITERAL, EQUEL_SIGN_LITERAL };
+std::vector<char> Helper::separetors = { SEMICOLUMN_LITERAL, LPAREN_LITERAL, RPAREN_LITERAL, EQUEL_SIGN_LITERAL };
 SymbolTable Helper::symbolTable;
 
 std::unique_ptr<llvm::LLVMContext> Helper::TheContext = nullptr;

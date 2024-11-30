@@ -81,7 +81,7 @@ Tokens_type Tokeniser::categoriseLiteral(const std::string& literal)
 	{
 		return EQUEL_SIGN;
 	}
-	else if (literal[0] == SEMICOLUMN)
+	else if (literal[0] == SEMICOLUMN_LITERAL)
 	{
 		std::cout << "Semicolon!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
 		return SEMICOLUMN;
