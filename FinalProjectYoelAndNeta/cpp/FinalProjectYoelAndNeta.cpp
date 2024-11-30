@@ -25,6 +25,7 @@ int main(int argc, char* argv[]) {
 
 		// ----     Lexical Analyzer               ----
 		Tokeniser tokeniser = Tokeniser(preprocessFile.getFinalStream());
+		std::cout << tokeniser << std::endl;
 		std::cout << "After tokeniser " << std::endl;
 
 		// ----     Syntax Analyzer                ----

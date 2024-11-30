@@ -36,6 +36,6 @@ public:
 
     // Data members
     static std::vector<std::string> definedTypes;
-    static std::vector<char> separeters;
+    static std::vector<char> separetors;
     static SymbolTable symbolTable;
 };
