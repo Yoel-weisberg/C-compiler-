@@ -2,15 +2,19 @@
 
 #include <iostream>
 #include <vector>
-#include "Constants.h"
+#include <memory>
 #include <regex>
-#include "SymbolTable.h"
+#include <algorithm>
 
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Module.h>
 #include <llvm/IR/Verifier.h>
-#include <memory>
+
+#include "Constants.h"
+#include "SymbolTable.h"
+
+
 
 class Helper
 {
@@ -33,6 +37,7 @@ public:
     // Utility methods
     static bool checkIdentifier(const std::string& id);
     static bool isFloat(const std::string& num);
+    static bool isInteger(const std::string& num);
 
     // Data members
     static std::vector<std::string> definedTypes;

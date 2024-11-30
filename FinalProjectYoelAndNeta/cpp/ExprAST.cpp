@@ -1,5 +1,5 @@
 #include "ExprAST.h"
-#include "SyntexError.h"
+#include "SyntaxError.h"
 Value* FloatNumberExprAST::codegen()
 {
 	return ConstantFP::get(Helper::getContext(), APFloat(Val));

@@ -12,7 +12,7 @@ enum Tokens_type {
 	SUBTRACTION,
 	TYPE_DECLERATION,
 	EQUEL_SIGN,
-	SEMICOLUMN,
+	SEMICOLON,
 	IDENTIFIER
 };
 
@@ -23,5 +23,9 @@ enum Tokens_type {
 #define DIVISION_LITERAL '/'
 #define SUBSTRICTION_LITERAL '-'
 #define EQUEL_SIGN_LITERAL '='
-#define SEMICOLUMN_LITERAL ';'
+#define SEMICOLON_LITERAL ';'
 
+// ------ Keywords ------
+// -- variable types --
+#define	FLOAT "float"
+#define INTEGER "int"

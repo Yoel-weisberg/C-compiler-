@@ -2,7 +2,7 @@
 
 // Define static members
 std::vector<std::string> Helper::definedTypes = { "float" , "int"};
-std::vector<char> Helper::separetors = { SEMICOLUMN_LITERAL, LPAREN_LITERAL, RPAREN_LITERAL, EQUEL_SIGN_LITERAL };
+std::vector<char> Helper::separetors = { SEMICOLON_LITERAL, LPAREN_LITERAL, RPAREN_LITERAL, EQUEL_SIGN_LITERAL };
 SymbolTable Helper::symbolTable;
 
 std::unique_ptr<llvm::LLVMContext> Helper::TheContext = nullptr;
@@ -79,4 +79,9 @@ bool Helper::isFloat(const std::string& num)
 {
     std::regex decimalPattern(R"(^[-+]?[0-9]*\.[0-9]+$)");
     return std::regex_match(num, decimalPattern);
+}
+
+bool Helper::isInteger(const std::string& num)
+{
+    return std::all_of(num.begin(), num.end(), ::isdigit);
 }

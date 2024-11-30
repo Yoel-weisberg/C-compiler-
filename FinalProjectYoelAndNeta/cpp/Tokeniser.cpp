@@ -7,23 +7,19 @@ Tokeniser::Tokeniser(const std::string& raw_code_str)
 
 	for (int i = 0; i < raw_code_str.size(); i++)
 	{
-		std::cout << i << "\tCurrent Literal --> \t" << currentLiteral << std::endl;
 		if (raw_code_str[i] == BLANK && !currentLiteral.empty()) // If it's a seperator 
 		{
-			std::cout << raw_code_str[i] << "\tIs a seperator" << std::endl;
 			this->_tokens.push_back({ currentLiteral, categoriseLiteral(currentLiteral) });
 			currentLiteral = "";
 		} // Any other valid char except for a digit
 		else if ((std::find(Helper::separetors.begin(), Helper::separetors.end(), raw_code_str[i]) != Helper::separetors.end()) && !currentLiteral.empty())
 		{
-			std::cout << raw_code_str[i] << "\tIs not a digit" << std::endl;
 			this->_tokens.push_back({ currentLiteral, categoriseLiteral(currentLiteral) });
 			this->_tokens.push_back({ std::string(1, raw_code_str[i]), categoriseLiteral(std::string(1, raw_code_str[i])) });
 			currentLiteral = "";
 		}
 		else if ((i == raw_code_str.size() - 1)) // Check if end is reached
 		{
-			std::cout << raw_code_str[i] << "\tIs the end" << std::endl;
 			currentLiteral += raw_code_str[i];
 			if (!(currentLiteral.empty() || currentLiteral[0] == BLANK)) // If not empty
 			{
@@ -33,7 +29,6 @@ Tokeniser::Tokeniser(const std::string& raw_code_str)
 		}
 		else
 		{
-			std::cout << raw_code_str[i] << "\tIs something else" << std::endl;
 			currentLiteral += raw_code_str[i];
 		}
 	}
@@ -47,7 +42,6 @@ std::vector<Token> Tokeniser::getTokens() const
 
 Tokens_type Tokeniser::categoriseLiteral(const std::string& literal)
 {
-	std::cout << "\t\tCtegorise: " << literal << std::endl;
 	if (literal == std::string(1, LPAREN_LITERAL))
 	{
 		return LPAREN;
@@ -81,10 +75,9 @@ Tokens_type Tokeniser::categoriseLiteral(const std::string& literal)
 	{
 		return EQUEL_SIGN;
 	}
-	else if (literal[0] == SEMICOLUMN_LITERAL)
+	else if (literal[0] == SEMICOLON_LITERAL)
 	{
-		std::cout << "Semicolon!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
-		return SEMICOLUMN;
+		return SEMICOLON;
 	}
 	else if (std::find(Helper::definedTypes.begin(), Helper::definedTypes.end(), literal) != Helper::definedTypes.end())
 	{

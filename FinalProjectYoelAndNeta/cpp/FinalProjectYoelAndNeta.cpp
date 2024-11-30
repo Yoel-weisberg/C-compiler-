@@ -2,9 +2,9 @@
 #include <fstream>
 #include "../Header/sourceFileHandler.h"
 #include "../Header/Preprocess.h"
-#include "../Header/SyntexError.h"
+#include "../Header/SyntaxError.h"
 #include "../Header/Tokenizer.h"
-#include "../Header/SyntexAnalysis.h"	
+#include "../Header/SyntaxAnalysis.h"	
 #include "../Header/Parser.h"
 #include "Helper.h"
 
@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
 		std::cout << "After tokeniser " << std::endl;
 
 		// ----     Syntax Analyzer                ----
-		SyntexAnalysis syntaxAnalysis = SyntexAnalysis(tokeniser.getTokens());
+		SyntaxAnalysis syntaxAnalysis = SyntaxAnalysis(tokeniser.getTokens());
 		std::cout << "Syntax analysed" << std::endl;
 
 		// ----     Parser                         ----

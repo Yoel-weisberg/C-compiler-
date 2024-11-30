@@ -6,7 +6,7 @@
 #include <cctype>
 #include "Constants.h"
 #include "Token.h"
-#include "SyntexError.h"
+#include "SyntaxError.h"
 #include "Helper.h"
 
 #define BLANK ' ' // Empty space
