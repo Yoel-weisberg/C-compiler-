@@ -23,7 +23,7 @@
 #include <string>
 #include <vector>
 
-#include "SymbalTable.h"
+#include "SymbolTable.h"
 #include "Helper.h"
 
 using namespace llvm;

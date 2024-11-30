@@ -2,9 +2,9 @@
 
 #include <iostream>
 #include <vector>
-#include "Constents.h"
+#include "Constants.h"
 #include <regex>
-#include "SymbalTable.h"
+#include "SymbolTable.h"
 
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/IRBuilder.h>
