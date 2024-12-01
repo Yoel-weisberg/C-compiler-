@@ -87,15 +87,15 @@ public:
 // code like int a = 5;
 class AssignExprAST : public ExprAST
 {
-    std::string _VarName;
-    std::unique_ptr<ExprAST> _Value;
+    std::string _varName;
+    std::unique_ptr<ExprAST> _value;
 	std::string _varType;
 public:
     AssignExprAST(const std::string &VarName, std::unique_ptr<ExprAST> Value, std::string type)
-        : _VarName(VarName), _Value(std::move(Value)), _varType(type) {}
+        : _varName(VarName), _value(std::move(Value)), _varType(type) {}
 
-    const std::string &getVarName() const { return _VarName; }
-    ExprAST *getValue() const { return _Value.get(); }
+    const std::string &getVarName() const { return _varName; }
+    ExprAST *getValue() const { return _value.get(); }
 	const std::string getType() { return _varType; }
 	virtual Value* codegen() override;
 };

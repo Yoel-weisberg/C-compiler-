@@ -47,17 +47,19 @@ std::unique_ptr<ExprAST> Parser::parseAssignment() {
 
 		if (currentToken().getType() == Tokens_type::EQUEL_SIGN) {
 			consume(); // Move past '='
-			auto value_literal = nullptr;
 			if (type == FLOAT)
 			{
 				auto value_literal = std::make_unique<FloatNumberExprAST>(std::stod(currentToken().getLiteral()));
+				consume(); // Move past value
+				return std::make_unique<AssignExprAST>(varName, std::move(value_literal), type);
 			}
 			if (type == INTEGER)
 			{
 				auto value_literal = std::make_unique<IntegerNumberExprAST>(std::stod(currentToken().getLiteral()));
+				consume(); // Move past value
+				return std::make_unique<AssignExprAST>(varName, std::move(value_literal), type);
 			}
-			consume(); // Move past value
-			return std::make_unique<AssignExprAST>(varName, std::move(value_literal), type);
+
 		}
 	}
 	return nullptr;

@@ -22,7 +22,7 @@ Value* VariableExprAST::codegen()
 // code like int a = 5;
 Value* AssignExprAST::codegen() {
     // Check if the variable already exists in the symbol table
-    auto symbolOpt = Helper::symbolTable.findSymbol(_VarName);
+    auto symbolOpt = Helper::symbolTable.findSymbol(_varName);
     if (!symbolOpt) {
         // Variable is not declared, allocate and add it to the symbol table
         llvm::IRBuilder<>& Builder = Helper::getBuilder(); // Using the Builder from Helper
@@ -30,10 +30,10 @@ Value* AssignExprAST::codegen() {
         llvm::Type* llvmType;
 
         // Map the variable type to LLVM types
-        if (_varType == "int") {
+        if (_varType == INTEGER) {
             llvmType = llvm::Type::getInt32Ty(Context);
         }
-        else if (_varType == "float") {
+        else if (_varType == FLOAT) {
             llvmType = llvm::Type::getFloatTy(Context);
         }
         else {
@@ -53,25 +53,25 @@ Value* AssignExprAST::codegen() {
             currentFunction->getEntryBlock().begin());
 
         // Allocate memory for the variable at the entry block
-        llvm::Value* varAddress = tempBuilder.CreateAlloca(llvmType, nullptr, _VarName.c_str());
+        llvm::Value* varAddress = tempBuilder.CreateAlloca(llvmType, nullptr, _varName.c_str());
 
 
         // Add the variable to the symbol table
-        Helper::symbolTable.addSymbol(_VarName, _varType, varAddress);
+        Helper::symbolTable.addSymbol(_varName, _varType, varAddress);
 
         // Re-fetch the symbol from the symbol table
-        symbolOpt = Helper::symbolTable.findSymbol(_VarName);
+        symbolOpt = Helper::symbolTable.findSymbol(_varName);
     }
 
     if (!symbolOpt) {
-        std::cerr << "Error: Failed to retrieve the variable '" << _VarName << "' after adding it.\n";
+        std::cerr << "Error: Failed to retrieve the variable '" << _varName << "' after adding it.\n";
         return nullptr;
     }
 
     Symbol& symbol = symbolOpt->get();
 
     // Generate code for the right-hand side expression (only once)
-    llvm::Value* rhsValue = _Value->codegen();
+    llvm::Value* rhsValue = _value->codegen();
     if (!rhsValue) {
         std::cerr << "Error: Failed to generate code for the assigned value.\n";
         return nullptr;
@@ -80,7 +80,7 @@ Value* AssignExprAST::codegen() {
     // Retrieve the LLVM value (address) of the variable
     llvm::Value* varAddress = symbol.getLLVMValue();
     if (!varAddress) {
-        std::cerr << "Error: Variable '" << _VarName << "' has no allocated memory.\n";
+        std::cerr << "Error: Variable '" << _varName << "' has no allocated memory.\n";
         return nullptr;
     }
 

@@ -3,4 +3,4 @@
 #define HEY 3
 
 
-float hey = 312.31120;    
+int hey = 3231120;    
