@@ -7,33 +7,33 @@
 
 // Constructor for Parser
 Parser::Parser(const std::vector<Token>& tokens)
-	: tokens(tokens), currentTokenIndex(0) {
-	head =  parse();
+	: _tokens(tokens), _currentTokenIndex(0) {
+	_head =  parse();
 }
 
 ExprAST* Parser::getAst()
 {
-	return head.get();
+	return _head.get();
 }
 
 // Current token getter
 Token& Parser::currentToken() {
-	return tokens[currentTokenIndex];
+	return _tokens[_currentTokenIndex];
 }
 
 // Move to the next token
 void Parser::consume() {
-	currentTokenIndex++;
+	_currentTokenIndex++;
 }
 
 // Check if we've reached the end of the token vector
 bool Parser::isAtEnd() {
-	return currentTokenIndex >= tokens.size();
+	return _currentTokenIndex >= _tokens.size();
 }
 
 // Main entry point to parse tokens and build an AST
 std::unique_ptr<ExprAST> Parser::parse() {
-	return parseAssignment();
+	return parseAssignment(); // This is the only possibility for now
 }
 
 // Parse assignment statements (e.g., "int a = 5;")
@@ -47,9 +47,17 @@ std::unique_ptr<ExprAST> Parser::parseAssignment() {
 
 		if (currentToken().getType() == Tokens_type::EQUEL_SIGN) {
 			consume(); // Move past '='
-			auto rhs = std::make_unique<FloatNumberExprAST>(std::stod(currentToken().getLiteral()));
-			consume(); // Move past the number
-			return std::make_unique<AssignExprAST>(varName, std::move(rhs), type);
+			auto value_literal = nullptr;
+			if (type == FLOAT)
+			{
+				auto value_literal = std::make_unique<FloatNumberExprAST>(std::stod(currentToken().getLiteral()));
+			}
+			if (type == INTEGER)
+			{
+				auto value_literal = std::make_unique<IntegerNumberExprAST>(std::stod(currentToken().getLiteral()));
+			}
+			consume(); // Move past value
+			return std::make_unique<AssignExprAST>(varName, std::move(value_literal), type);
 		}
 	}
 	return nullptr;

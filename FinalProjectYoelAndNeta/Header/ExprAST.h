@@ -52,26 +52,41 @@ public:
 
 
 /// NumberExprAST - Expression class for numeric literals like "1.0".
-class	FloatNumberExprAST : public ExprAST {
-	double Val;
+class	FloatNumberExprAST : public ExprAST
+{
+private: 
+	double _val;
 
 public:
-	FloatNumberExprAST(double Val) : Val(Val) {}
+	FloatNumberExprAST(double val) : _val(val) {}
 	virtual Value* codegen() override;
 };
 
 
+// IntegerNumberExprAST - class for numerical integers
+class IntegerNumberExprAST : public ExprAST
+{
+private:
+	int _val;
+	int _size;
+public: 
+	IntegerNumberExprAST(int val) :_val(val), _size(32) {}
+	virtual Value* codegen() override;
+};
+
 /// VariableExprAST - Expression class for referencing a variable, like "a".
-class VariableExprAST : public ExprAST {
-	std::string Name;
+class VariableExprAST : public ExprAST
+{
+	std::string _name;
 
 public:
-	VariableExprAST(const std::string& Name) : Name(Name) {}
+	VariableExprAST(const std::string& Name) : _name(Name) {}
 	virtual Value* codegen() override;
 };
 
 // code like int a = 5;
-class AssignExprAST : public ExprAST {
+class AssignExprAST : public ExprAST
+{
     std::string _VarName;
     std::unique_ptr<ExprAST> _Value;
 	std::string _varType;

@@ -2,15 +2,20 @@
 #include "SyntaxError.h"
 Value* FloatNumberExprAST::codegen()
 {
-	return ConstantFP::get(Helper::getContext(), APFloat(Val));
+	return ConstantFP::get(Helper::getContext(), APFloat(_val));
+}
+
+Value* IntegerNumberExprAST::codegen()
+{
+    return ConstantInt::get(Helper::getContext(), APInt(_size, _val));
 }
 
 Value* VariableExprAST::codegen()
 {
 	// Look this variable up in the function.
-    Value* V = Helper::symbolTable.findSymbol(Name)->get().getLLVMValue();
+    Value* V = Helper::symbolTable.findSymbol(_name)->get().getLLVMValue();
 	if (!V)
-		throw SyntaxError("Not defined varieble");
+		throw SyntaxError("Not defined variable");
 	return V;
 }
 
@@ -85,3 +90,5 @@ Value* AssignExprAST::codegen() {
 
     return rhsValue; // Return the RHS value for chaining if needed
 }
+
+

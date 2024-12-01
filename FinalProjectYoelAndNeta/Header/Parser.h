@@ -16,14 +16,14 @@ class NumberExprAST;
 
 class Parser {
 private:
-    std::vector<Token> tokens;
-    size_t currentTokenIndex;
+    std::vector<Token> _tokens;
+    size_t _currentTokenIndex;
 
     Token& currentToken();
     void consume();
     bool isAtEnd();
 
-    std::unique_ptr<ExprAST> head;
+    std::unique_ptr<ExprAST> _head;
 
 public:
     // Constructor
