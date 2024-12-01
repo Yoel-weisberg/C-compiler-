@@ -12,7 +12,7 @@ private:
 
 public:
     // Constructor to initialize the exception message and character index
-    SyntaxError(const std::string& msg, int chrIndex)
+    SyntaxError(const std::string& msg, int chrIndex = 0)
         : message(msg), chrIndex(chrIndex)
     {
         // Construct the full message here, so it persists

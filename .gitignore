@@ -450,6 +450,10 @@ FodyWeavers.xsd
 
 
 .vscode/
+
+
+**/out/
+out
 ### VisualStudio Patch ###
 # Additional files built by Visual Studio
 
@@ -457,3 +461,4 @@ FodyWeavers.xsd
 
 .\out\build
 **\out\build
+/FinalProjectYoelAndNeta/out/build/x64-debug/build.ninja

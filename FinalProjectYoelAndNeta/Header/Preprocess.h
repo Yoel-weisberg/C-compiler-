@@ -4,6 +4,7 @@
 #include <fstream>
 #include <map>
 #include "SyntexError.h"
+#include "../Header/Helper.h"
 
 #define INCLUDE_IDENTIFIER "#include"
 
@@ -22,7 +23,6 @@ private:
     void handleMacroVariables();
     std::string replaceMacro();
     // void handleFunctinMacro(); - sprint2
-    bool checkMacroKeyValidity (const std::string& macroKey);
     bool checkMacroValueValidity (const std::string& macroValue);
     bool isNumber(const std::string& number);
     std::string getFinalValue(std::string key);

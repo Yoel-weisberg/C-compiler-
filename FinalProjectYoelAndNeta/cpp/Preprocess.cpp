@@ -17,7 +17,7 @@ void Preprocess::removeComments()
 {
     size_t pos = 0, currentPlaceInUpdated = 0;
     std::string updatedStream;
-    while (pos < _fileRawContent.size() - 1)
+    while (pos < _fileRawContent.size())
     {
         // single line comment
         if (_fileRawContent[pos] == '/' && _fileRawContent[pos + 1] == '/')
@@ -108,7 +108,7 @@ void Preprocess::handleMacroVariables() {
                 }
 
                 // Check key and value validity
-                if (!checkMacroKeyValidity(macroKey)) {
+                if (!Helper::checkIdentifier(macroKey)) {
                     throw SyntaxError("Macro key not valid", currentLine);
                 }
                 if (!checkMacroValueValidity(macroValue)) {
@@ -118,7 +118,7 @@ void Preprocess::handleMacroVariables() {
                 // Add to macro table
                 _macroTable[macroKey] = macroValue;
             }
-            else if (macroName == "include ")
+            else if (macroName == "include")
             {
                 std::string file_name, file_content;
                 // Skip spaces before file name
@@ -155,7 +155,7 @@ std::string Preprocess::replaceMacro() {
         (ch == '"' && !singleQuote) ? isThereQuotes = !isThereQuotes : true;
         (ch == '\'' && !isThereQuotes) ? singleQuote = !singleQuote : true;
 
-        if ((ch == ' ' || ch == '\n') && !isThereQuotes) {
+        if (((ch == ' ' || ch == '\n') && !isThereQuotes)) {
             if (currentBlock.empty()) continue;
 
             auto it = _macroTable.find(currentBlock);
@@ -165,33 +165,17 @@ std::string Preprocess::replaceMacro() {
                 codeStream += currentBlock + ' ';
             }
             currentBlock.clear();
-        } else {
+        }
+        else if (pos == _fileRawContent.size() - 1)
+        {
+            currentBlock += ch;
+            codeStream += currentBlock;
+        }
+        else {
             currentBlock += ch;
         }
     }
     return codeStream;
-}
-
-// The rest of your functions remain the same
-bool Preprocess::checkMacroKeyValidity(const std::string &macroKey)
-{
-    if (macroKey.empty()) {
-        return false; // Empty strings are not valid identifiers
-    }
-
-    // Check the first character: it must be a letter or underscore
-    if (!(std::isalpha(macroKey[0]) || macroKey[0] == '_')) {
-        return false;
-    }
-
-    // Check the rest of the characters: they must be letters, digits, or underscores
-    for (size_t i = 1; i < macroKey.length(); ++i) {
-        if (!(std::isalnum(macroKey[i]) || macroKey[i] == '_')) {
-            return false;
-        }
-    }
-
-    return true;  
 }
 
 bool Preprocess::checkMacroValueValidity(const std::string &macroValue)
@@ -239,7 +223,7 @@ bool Preprocess::checkMacroValueValidity(const std::string &macroValue)
         return false;
     }
     // a macro can hold a different macro
-    if (checkMacroKeyValidity(macroValue)) { return true;}
+    if (_macroTable.find(macroValue) != _macroTable.end()) { return true; }
     return false;
 }
 
