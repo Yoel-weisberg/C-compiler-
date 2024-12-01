@@ -38,9 +38,11 @@ public:
     static bool checkIdentifier(const std::string& id);
     static bool isFloat(const std::string& num);
     static bool isInteger(const std::string& num);
+    static bool isChar(const std::string& ch);
 
     // Data members
     static std::vector<std::string> definedTypes;
     static std::vector<char> separetors;
+    static std::vector<char> quotes;
     static SymbolTable symbolTable;
 };

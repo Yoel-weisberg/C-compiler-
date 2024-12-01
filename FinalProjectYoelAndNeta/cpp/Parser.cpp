@@ -59,6 +59,12 @@ std::unique_ptr<ExprAST> Parser::parseAssignment() {
 				consume(); // Move past value
 				return std::make_unique<AssignExprAST>(varName, std::move(value_literal), type);
 			}
+			if (type == CHAR)
+			{
+				auto value_literal = std::make_unique<CharExprAST>(currentToken().getLiteral()[1]);
+				consume(); // Move past value
+				return std::make_unique<AssignExprAST>(varName, std::move(value_literal), type);
+			}
 
 		}
 	}

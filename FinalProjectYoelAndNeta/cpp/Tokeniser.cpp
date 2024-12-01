@@ -17,6 +17,13 @@ Tokeniser::Tokeniser(const std::string& raw_code_str)
 			this->_tokens.push_back({ currentLiteral, categoriseLiteral(currentLiteral) });
 			this->_tokens.push_back({ std::string(1, raw_code_str[i]), categoriseLiteral(std::string(1, raw_code_str[i])) });
 			currentLiteral = "";
+		} // Check for char initilization
+		else if (raw_code_str[i] == SINGLE_QUOTE_LITERAL && raw_code_str[i + DIS_BETWEEN_SINGLE_QOUTES] == SINGLE_QUOTE_LITERAL)
+		{
+			currentLiteral = raw_code_str.substr(i, DIS_BETWEEN_SINGLE_QOUTES + 1);
+			this->_tokens.push_back({ currentLiteral, categoriseLiteral(currentLiteral) });
+			i += DIS_BETWEEN_SINGLE_QOUTES; // Skip char initilization 
+			currentLiteral = "";
 		}
 		else if ((i == raw_code_str.size() - 1)) // Check if end is reached
 		{
@@ -42,6 +49,7 @@ std::vector<Token> Tokeniser::getTokens() const
 
 Tokens_type Tokeniser::categoriseLiteral(const std::string& literal)
 {
+	//std::cout << literal << "is Char --<\t" << Helper::isChar(literal) << " result" << std::endl;
 	if (literal == std::string(1, LPAREN_LITERAL))
 	{
 		return LPAREN;
@@ -78,6 +86,10 @@ Tokens_type Tokeniser::categoriseLiteral(const std::string& literal)
 	else if (literal[0] == SEMICOLON_LITERAL)
 	{
 		return SEMICOLON;
+	}
+	else if (Helper::isChar(literal))
+	{
+		return CHAR_LITERAL;
 	}
 	else if (std::find(Helper::definedTypes.begin(), Helper::definedTypes.end(), literal) != Helper::definedTypes.end())
 	{

@@ -3,4 +3,4 @@
 #define HEY 3
 
 
-int hey = 3231120;    
+char hey = 's';

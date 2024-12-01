@@ -149,6 +149,10 @@ bool SyntaxAnalysis::doesVariableFitType(const std::string& type, std::string va
 	{
 		return Helper::isInteger(value);
 	}
+	else if (type == CHAR)
+	{
+		return Helper::isChar(value);
+	}
 }
 
 void SyntaxAnalysis::validSentences()

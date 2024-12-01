@@ -1,8 +1,9 @@
 #include "../Header/Helper.h"
 
 // Define static members
-std::vector<std::string> Helper::definedTypes = { "float" , "int"};
+std::vector<std::string> Helper::definedTypes = { FLOAT , INTEGER, CHAR};
 std::vector<char> Helper::separetors = { SEMICOLON_LITERAL, LPAREN_LITERAL, RPAREN_LITERAL, EQUEL_SIGN_LITERAL };
+std::vector<char> Helper::quotes = {SINGLE_QUOTE_LITERAL, DOUBLE_QUOTE_LITERAL};
 SymbolTable Helper::symbolTable;
 
 std::unique_ptr<llvm::LLVMContext> Helper::TheContext = nullptr;
@@ -85,3 +86,11 @@ bool Helper::isInteger(const std::string& num)
 {
     return std::all_of(num.begin(), num.end(), ::isdigit);
 }
+
+bool Helper::isChar(const std::string& ch)
+{
+    return (ch.length() == 3 && ch.front() == '\'' && ch.back() == '\'');
+}
+
+
+

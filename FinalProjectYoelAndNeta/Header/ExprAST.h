@@ -28,6 +28,8 @@
 
 using namespace llvm;
 
+#define INTEGER_SIZE 32
+#define CHAR_SIZE 8
 
 /// ExprAST - Base class for all expression nodes.
 class ExprAST {
@@ -70,7 +72,17 @@ private:
 	int _val;
 	int _size;
 public: 
-	IntegerNumberExprAST(int val) :_val(val), _size(32) {}
+	IntegerNumberExprAST(int val) :_val(val), _size(INTEGER_SIZE) {}
+	virtual Value* codegen() override;
+};
+
+class CharExprAST : public ExprAST
+{
+private:
+	char _val;
+	int _size;
+public:
+	CharExprAST(char val) : _val(val), _size(CHAR_SIZE) {}
 	virtual Value* codegen() override;
 };
 

@@ -10,6 +10,11 @@ Value* IntegerNumberExprAST::codegen()
     return ConstantInt::get(Helper::getContext(), APInt(_size, _val));
 }
 
+Value* CharExprAST::codegen()
+{
+    return ConstantInt::get(Helper::getContext(), APInt(_size, _val));
+}
+
 Value* VariableExprAST::codegen()
 {
 	// Look this variable up in the function.
@@ -18,6 +23,8 @@ Value* VariableExprAST::codegen()
 		throw SyntaxError("Not defined variable");
 	return V;
 }
+
+
 
 // code like int a = 5;
 Value* AssignExprAST::codegen() {
@@ -35,6 +42,10 @@ Value* AssignExprAST::codegen() {
         }
         else if (_varType == FLOAT) {
             llvmType = llvm::Type::getFloatTy(Context);
+        }
+        else if (_varType == CHAR)
+        {
+            llvmType = llvm::Type::getInt8Ty(Context);
         }
         else {
             std::cerr << "Error: Unsupported variable type '" << _varType << "'.\n";

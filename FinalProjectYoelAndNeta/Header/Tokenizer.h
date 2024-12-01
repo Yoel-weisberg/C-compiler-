@@ -10,6 +10,7 @@
 #include "Helper.h"
 
 #define BLANK ' ' // Empty space
+#define DIS_BETWEEN_SINGLE_QOUTES 2
 
 class Tokeniser {
 public:
