@@ -30,3 +30,7 @@ enum Tokens_type {
 #define SUBSTRICTION_LITERAL '-'
 #define EQUEL_SIGN_LITERAL '='
 #define SEMICOLUMN_LITERSL ';'
+#define AND_LITERAL "&&"
+#define OR_ITERAL "||"
+#define L_CURLY_PRAN_LITERAL "{"
+#define R_CURLY_PRAN_LITERAL "}"

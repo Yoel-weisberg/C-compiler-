@@ -5,7 +5,7 @@ SyntexAnalysis::SyntexAnalysis(const std::vector<Token>& _tokens) :
 	_tokens(_tokens)
 {
 	checkPernthesis();
-	validSentences();
+	validSentences(0);
 }
 
 void SyntexAnalysis::checkPernthesis()
@@ -21,7 +21,7 @@ void SyntexAnalysis::checkPernthesis()
 		{
 			LPARENCount++;
 		}
-		else if(pr.getType() == L_CURLY_PRAN)
+		else if (pr.getType() == L_CURLY_PRAN)
 		{
 			curlyLPRENCount++;
 		}
@@ -157,6 +157,15 @@ int SyntexAnalysis::variebleDefinitionStructure(int pos)
 	}
 }
 
+int SyntexAnalysis::checkConditionStructure(int& pos)
+{
+	// 
+	while (_tokens[pos].getType() != SEMICOLUMN)
+	{
+
+	}
+}
+
 
 bool SyntexAnalysis::doesVariebleFitType(const std::string& type, std::string value)
 {
@@ -166,9 +175,12 @@ bool SyntexAnalysis::doesVariebleFitType(const std::string& type, std::string va
 	}
 }
 
-void SyntexAnalysis::validSentences()
+/*
+this function checks the sentences in a certein scope
+so it ends in the first time it encounteres a }
+*/
+int SyntexAnalysis::validSentences(int pos)
 {
-	int pos = 0;
 	try
 	{
 		while (pos < _tokens.size())
@@ -181,7 +193,14 @@ void SyntexAnalysis::validSentences()
 			// T0DO - checking if the sentence just a defined identifier (like just 3; or somthing like that)
 			// TODO - need to check if its a redefinition of t a symbol 
 			// TODO - need to check if the sentnce is an algebric sentnece 
-			// there is no suppert for other sentence structure
+			else if (_tokens[pos].getType() == IF_WORD)
+			{
+
+			}
+			else if (_tokens[pos].getType() == L_CURLY_PRAN)
+			{
+				return pos;
+			}
 			else
 			{
 				throw SyntaxError("Not defined sentence", pos);
@@ -192,4 +211,22 @@ void SyntexAnalysis::validSentences()
 	{
 		throw SyntaxError("Got to end of token stream without a semicolumn");
 	}
+}
+
+int SyntexAnalysis::checkIfStructure(int& pos)
+{
+	int chrIndex = 0;
+	bool isThereIf = false;
+
+	if (_tokens[pos].getType() == IF_WORD)
+	{
+		isThereIf = true;
+
+		if (_tokens)
+	}
+	if (_tokens[pos].getType() == ELSE && !isThereIf)
+	{
+		throw SyntaxError("Else without a previous if", chrIndex);
+	}
+
 }
