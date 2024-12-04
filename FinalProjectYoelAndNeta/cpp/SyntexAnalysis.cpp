@@ -11,6 +11,7 @@ SyntexAnalysis::SyntexAnalysis(const std::vector<Token>& _tokens) :
 void SyntexAnalysis::checkPernthesis()
 {
 	int LPARENCount = 0;
+	int curlyLPRENCount = 0;
 	int chrIndex = 0;
 	for (auto pr : _tokens)
 	{
@@ -19,6 +20,10 @@ void SyntexAnalysis::checkPernthesis()
 		if (pr.getType() == LPAREN)
 		{
 			LPARENCount++;
+		}
+		else if(pr.getType() == L_CURLY_PRAN)
+		{
+			curlyLPRENCount++;
 		}
 		// Check for right parenthesis and decrement the counter
 
@@ -32,12 +37,26 @@ void SyntexAnalysis::checkPernthesis()
 				throw SyntaxError("Unmatched right parenthesis", chrIndex);
 			}
 		}
+		else if (pr.getType() == R_CURLY_PRAN)
+		{
+			curlyLPRENCount--;
+
+			// If count goes negative, there's an unmatched right parenthesis
+			if (curlyLPRENCount < 0)
+			{
+				throw SyntaxError("Unmatched right curly parenthesis", chrIndex);
+			}
+		}
 	}
 
 	// After loop, if count is positive, there are unmatched left parentheses
 	if (LPARENCount > 0)
 	{
 		throw SyntaxError("Unmatched left parenthesis", chrIndex);
+	}
+	if (curlyLPRENCount > 0)
+	{
+		throw SyntaxError("Unmatched left curly parenthesis", chrIndex);
 	}
 }
 
