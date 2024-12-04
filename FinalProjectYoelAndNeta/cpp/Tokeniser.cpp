@@ -83,6 +83,30 @@ Tokens_type Tokeniser::categoriseLiteral(const std::string& literal)
 	{
 		return TYPE_DECLERATION;
 	}
+	else if (literal == "IF")
+	{
+		return IF_WORD;
+	}
+	else if (literal == "&&")
+	{
+		return AND;
+	}
+	else if (literal == "||")
+	{
+		return OR;
+	}
+	else if (literal == "{")
+	{
+		return L_CURLY_PRAN;
+	}
+	else if (literal == "}")
+	{
+		return R_CURLY_PRAN;
+	}
+	else if (literal == "else")
+	{
+		return ELSE;
+	}
 	else if (!literal.empty())
 	{
 		return IDENTIFIER; // returning identifier without error handeling which would happen in the syntex analysis phrase
