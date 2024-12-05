@@ -4,4 +4,4 @@
 
 
 char hey = 's';
-int &bla = h&ey;
+int* bla = &wer;

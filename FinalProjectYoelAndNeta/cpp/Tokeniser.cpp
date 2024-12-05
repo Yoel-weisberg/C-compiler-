@@ -79,9 +79,9 @@ Tokens_type Tokeniser::categoriseLiteral(const std::string& literal)
 		// Assuming INT is the default case for literals that aren't operators or parentheses
 		return INT;
 	}
-	else if (literal[0] == EQUEL_SIGN_LITERAL)
+	else if (literal[0] == EQUAL_SIGN_LITERAL)
 	{
-		return EQUEL_SIGN;
+		return EQUAL_SIGN;
 	}
 	else if (literal[0] == SEMICOLON_LITERAL)
 	{

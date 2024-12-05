@@ -45,7 +45,7 @@ std::unique_ptr<ExprAST> Parser::parseAssignment() {
 		std::string varName = currentToken().getLiteral();
 		consume(); // Move past IDENTIFIER
 
-		if (currentToken().getType() == Tokens_type::EQUEL_SIGN) {
+		if (currentToken().getType() == Tokens_type::EQUAL_SIGN) {
 			consume(); // Move past '='
 			if (type == FLOAT)
 			{

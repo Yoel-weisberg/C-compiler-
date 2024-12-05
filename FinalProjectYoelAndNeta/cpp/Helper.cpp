@@ -2,7 +2,7 @@
 
 // Define static members
 std::vector<std::string> Helper::definedTypes = { FLOAT , INTEGER, CHAR};
-std::vector<char> Helper::separetors = { SEMICOLON_LITERAL, LPAREN_LITERAL, RPAREN_LITERAL, EQUEL_SIGN_LITERAL };
+std::vector<char> Helper::separetors = { SEMICOLON_LITERAL, LPAREN_LITERAL, RPAREN_LITERAL, EQUAL_SIGN_LITERAL };
 std::vector<char> Helper::quotes = {SINGLE_QUOTE_LITERAL, DOUBLE_QUOTE_LITERAL};
 SymbolTable Helper::symbolTable;
 
