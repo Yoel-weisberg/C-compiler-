@@ -68,7 +68,15 @@ std::unique_ptr<ExprAST> Parser::parseAssignment() {
 
 		}
 	}
+	if (currentToken().getType() == PTR_TYPE_DELERATION)
+	{
+		return ptrParseAssignment();
+	}
 	return nullptr;
+}
+std::unique_ptr<ExprAST> Parser::ptrParseAssignment()
+{
+	return std::unique_ptr<ExprAST>();
 }
 //
 // Parse general expressions (addition, subtraction, etc.)

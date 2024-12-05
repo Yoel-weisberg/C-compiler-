@@ -32,6 +32,7 @@ public:
     // Parse methods
     std::unique_ptr<ExprAST> parse();
     std::unique_ptr<ExprAST> parseAssignment();
+    std::unique_ptr<ExprAST> ptrParseAssignment();
     
     // Getter for the root AST
     ExprAST* getAst();

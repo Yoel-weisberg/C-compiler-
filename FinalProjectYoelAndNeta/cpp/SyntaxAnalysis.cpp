@@ -171,7 +171,7 @@ void SyntaxAnalysis::validSentences()
 			{
 				pos = ptrVariableDefenitionStructure(pos + 1) + 1;
 			}
-			// T0DO - checking if the sentence just a defined identifier (like just 3; or somthing like that)
+			// TODO - checking if the sentence just a defined identifier (like just 3; or somthing like that)
 			// TODO - need to check if its a redefinition of t a symbol 
 			// TODO - need to check if the sentnce is an algebric sentnece 
 			// there is no suppert for other sentence structure
