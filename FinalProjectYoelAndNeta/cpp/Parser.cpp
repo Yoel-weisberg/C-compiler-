@@ -78,39 +78,3 @@ std::unique_ptr<ExprAST> Parser::ptrParseAssignment()
 {
 	return std::unique_ptr<ExprAST>();
 }
-//
-// Parse general expressions (addition, subtraction, etc.)
-//std::unique_ptr<ExprAST> Parser::parseExpression() {
-//	if ()
-//}
-
-//// Parse terms (handling multiplication, division, etc.)
-//std::unique_ptr<ExprAST> Parser::parseTerm() {
-//	auto lhs = parseFactor();
-//	while (currentToken().getType() == Tokens_type::ADDITION ||
-//		currentToken().getType() == Tokens_type::SUBTRACTION) {
-//		char op = currentToken().getLiteral()[0];
-//		consume(); // Move past the operator
-//		auto rhs = parseFactor();
-//		lhs = std::make_unique<BinaryExprAST>(op, std::move(lhs), std::move(rhs));
-//	}
-//	return lhs;
-//}
-//
-//// Parse factors (numbers, parentheses)
-//std::unique_ptr<ExprAST> Parser::parseFactor() {
-//	if (currentToken().getType() == Tokens_type::LPAREN) {
-//		consume(); // Move past '('
-//		auto expr = parseExpression();
-//		if (currentToken().getType() == Tokens_type::RPAREN) {
-//			consume(); // Move past ')'
-//		}
-//		return expr;
-//	}
-//
-//	double value = std::stod(currentToken().getLiteral());
-//	consume(); // Move past the integer
-//	return std::make_unique<FloatNumberExprAST>(value);
-//
-//	return nullptr; // Handle errors
-//}

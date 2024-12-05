@@ -41,54 +41,6 @@ void SyntaxAnalysis::checkParentheses() // !For now! check only regular parenthe
 	}
 }
 
-void SyntaxAnalysis::checkAlgebricStructure()
-{
-	bool isThereSign = true; // indicates if there is "*" or "/" signs in the current session
-	int chrIndex = 0;
-	bool isTherelPren = false;
-	bool isThereANumber = false;
-	for (auto pr : _tokens)
-	{
-		chrIndex += pr.getLiteral().size();
-		if (pr.getType() == MULTIPLICATION || pr.getType() == DIVISION)
-		{
-			if (isThereSign || isTherelPren)
-			{
-				throw SyntaxError("There are  too many operaters ", chrIndex);
-			}
-
-			isThereSign = true;
-		}
-		else if (pr.getType() == LPAREN)
-		{
-			isTherelPren = true;
-		}
-		else if (pr.getType() == RPAREN)
-		{
-			if (!isThereANumber)  throw SyntaxError("There is nothing in the pernthesis", chrIndex);
-			isTherelPren = false;
-		}
-		else if (pr.getType() == INT)
-		{
-			isThereSign = false;
-			isThereANumber = true;
-			isTherelPren = false;
-		}
-		else if (pr.getType() == ADDITION || pr.getType() == SUBTRACTION)
-		{
-			if (isTherelPren)
-			{
-				throw SyntaxError("There are  too many operaters ", chrIndex);
-			}
-			isThereSign = true;
-		}
-	}
-	if (!isThereANumber)
-	{
-		throw SyntaxError("There is no integer in the expression", chrIndex);
-	}
-}
-
 int SyntaxAnalysis::variableDefinitionStructure(int pos)
 {
 	if (pos + 1 >= _tokens.size())

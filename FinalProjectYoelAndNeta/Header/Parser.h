@@ -36,10 +36,6 @@ public:
     
     // Getter for the root AST
     ExprAST* getAst();
-
-    //std::unique_ptr<ExprAST> parseExpression();
-    //std::unique_ptr<ExprAST> parseTerm();
-    //std::unique_ptr<ExprAST> parseFactor();
 };
 
 #endif // PARSER_H
