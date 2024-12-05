@@ -95,8 +95,19 @@ Tokens_type Tokeniser::categoriseLiteral(const std::string& literal)
 	{
 		return TYPE_DECLERATION;
 	}
+	//	Check for pointer declerations
+	else if (literal[literal.size() - 1] == MULTIPLICATION_LITERAL && std::find(Helper::definedTypes.begin(), Helper::definedTypes.end(), literal.substr(0, literal.size() - 1)) != Helper::definedTypes.end())
+	{
+		return PTR_TYPE_DELERATION;
+	}
+	// Check for address referance
+	else if (literal[0] == AMPERSEND_LITERAL && literal.size() > 1)
+	{
+		return ADDR_REFERENCE;
+	}
 	else if (!literal.empty())
 	{
+		
 		return IDENTIFIER; // Returning identifier without error handeling which would happen in the syntax analysis phase
 	}
 

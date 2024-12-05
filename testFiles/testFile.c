@@ -4,3 +4,4 @@
 
 
 char hey = 's';
+int &bla = h&ey;
