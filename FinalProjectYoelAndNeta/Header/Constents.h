@@ -19,18 +19,8 @@ enum Tokens_type {
 	OR,
 	L_CURLY_PRAN,
 	R_CURLY_PRAN,
-	ELSE
+	ELSE, 
+	LOWER_THEN,
+	HIGHER_THEN,
+	EQUELS_CMP
 };
-
-#define RPAREN_LITERAL ')'
-#define LPAREN_LITERAL '('
-#define ADDITION_LITERAL '+'
-#define MULTIPLICATION_LITERAL '*'
-#define DIVISION_LITERAL '/'
-#define SUBSTRICTION_LITERAL '-'
-#define EQUEL_SIGN_LITERAL '='
-#define SEMICOLUMN_LITERSL ';'
-#define AND_LITERAL "&&"
-#define OR_ITERAL "||"
-#define L_CURLY_PRAN_LITERAL "{"
-#define R_CURLY_PRAN_LITERAL "}"

@@ -2,7 +2,24 @@
 
 // Define static members
 std::vector<std::string> Helper::definedTypes = { "float" };
-std::vector<char> Helper::separeters = { SEMICOLUMN_LITERSL, LPAREN_LITERAL, RPAREN_LITERAL, EQUEL_SIGN_LITERAL, AND_LITERAL, OR_ITERAL, L_CURLY_PRAN_LITERAL, R_CURLY_PRAN_LITERAL};
+std::map<std::string, Tokens_type> Helper::literalToType = {
+    {"RPAREN_LITERAL", RPAREN},
+    {"LPAREN_LITERAL", LPAREN},
+    {"ADDITION_LITERAL", ADDITION},
+    {"MULTIPLICATION_LITERAL", MULTIPLICATION},
+    {"DIVISION_LITERAL", DIVISION},
+    {"SUBSTRICTION_LITERAL", SUBTRACTION},
+    {"EQUEL_SIGN_LITERAL", EQUEL_SIGN},
+    {"SEMICOLUMN_LITERSL", SEMICOLUMN},
+    {"AND_LITERAL", AND},
+    {"OR_ITERAL", OR},
+    {"L_CURLY_PRAN_LITERAL", L_CURLY_PRAN},
+    {"R_CURLY_PRAN_LITERAL", R_CURLY_PRAN},
+    {">", HIGHER_THEN},
+    {"<", LOWER_THEN},
+    {"==", EQUELS_CMP}
+};
+
 SymbolTable Helper::symbolTable;
 
 std::unique_ptr<llvm::LLVMContext> Helper::TheContext = nullptr;

@@ -5,6 +5,8 @@
 #include "Constents.h"
 #include <regex>
 #include "SymbalTable.h"
+#include <map>
+#include "Constents.h"
 
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/IRBuilder.h>
@@ -36,6 +38,6 @@ public:
 
     // Data members
     static std::vector<std::string> definedTypes;
-    static std::vector<char> separeters;
+    static std::map<std::string, Tokens_type> literalToType;
     static SymbolTable symbolTable;
 };

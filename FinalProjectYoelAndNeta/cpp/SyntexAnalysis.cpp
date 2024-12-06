@@ -159,10 +159,40 @@ int SyntexAnalysis::variebleDefinitionStructure(int pos)
 
 int SyntexAnalysis::checkConditionStructure(int& pos)
 {
-	// 
-	while (_tokens[pos].getType() != SEMICOLUMN)
+	int numPran = 1;
+	enum currentState {
+		OPERAND,
+		VALUE
+	};
+	currentState currentType = OPERAND;
+	while (numPran != 0)
 	{
-
+		// if its a value to campare to and not a opreand
+		if (_tokens[pos].getType() == INT || _tokens[pos].getType() == IDENTIFIER)
+		{
+			if (currentType != OPERAND)
+			{
+				throw SyntaxError("cant give a number after a number in an if statement", pos);
+			}
+			currentType = VALUE;
+		}
+		else if (_tokens[pos].getType() == AND || _tokens[pos].getType() == OR || _tokens[pos].getType() == EQUELS_CMP || _tokens[pos].getType() == LPAREN || _tokens[pos].getType() == RPAREN)
+		{
+			if (_tokens[pos].getType() == LPAREN)
+			{
+				numPran++;
+			}
+			else if (_tokens[pos].getType() == RPAREN)
+			{
+				numPran--;
+			}
+			if (currentType != VALUE)
+			{
+				throw SyntaxError("cant give an operand after an operand in an if statement", pos);
+			}
+			currentType = OPERAND;
+		}
+		pos++;
 	}
 }
 
@@ -218,15 +248,81 @@ int SyntexAnalysis::checkIfStructure(int& pos)
 	int chrIndex = 0;
 	bool isThereIf = false;
 
+	// Check if the current token is "if"
 	if (_tokens[pos].getType() == IF_WORD)
 	{
 		isThereIf = true;
+		pos++; // Move to the next token
 
-		if (_tokens)
+		// Ensure the next token is a left parenthesis "("
+		if (_tokens[pos].getType() != LPAREN)
+		{
+			throw SyntaxError("Expected '(' after 'if'", chrIndex);
+		}
+		pos++;
+
+		// Check the actual condition
+		checkConditionStructure(pos);
+
+		// Ensure the next token is a left curly brace "{"
+		if (_tokens[pos].getType() != L_CURLY_PRAN)
+		{
+			throw SyntaxError("Expected '{' after 'if' condition", chrIndex);
+		}
+		pos++;
+
+		// Find the matching right curly brace "}"
+		int braceCount = 1;
+		while (pos < _tokens.size() && braceCount > 0)
+		{
+			if (_tokens[pos].getType() == L_CURLY_PRAN)
+				braceCount++;
+			else if (_tokens[pos].getType() == R_CURLY_PRAN)
+				braceCount--;
+
+			pos++;
+		}
+
+		if (braceCount > 0)
+		{
+			throw SyntaxError("Unmatched '{' in 'if' block", chrIndex);
+		}
 	}
-	if (_tokens[pos].getType() == ELSE && !isThereIf)
+
+	// Check for "else" without a preceding "if"
+	if (_tokens[pos].getType() == ELSE)
 	{
-		throw SyntaxError("Else without a previous if", chrIndex);
+		if (!isThereIf)
+		{
+			throw SyntaxError("'else' without a previous 'if'", chrIndex);
+		}
+
+		pos++; // Move to the next token
+
+		// Ensure the next token is a left curly brace "{"
+		if (_tokens[pos].getType() != L_CURLY_PRAN)
+		{
+			throw SyntaxError("Expected '{' after 'else'", chrIndex);
+		}
+		pos++;
+
+		// Find the matching right curly brace "}"
+		int braceCount = 1;
+		while (pos < _tokens.size() && braceCount > 0)
+		{
+			if (_tokens[pos].getType() == L_CURLY_PRAN)
+				braceCount++;
+			else if (_tokens[pos].getType() == R_CURLY_PRAN)
+				braceCount--;
+
+			pos++;
+		}
+
+		if (braceCount > 0)
+		{
+			throw SyntaxError("Unmatched '{' in 'else' block", chrIndex);
+		}
 	}
 
+	return pos; // Return the updated position
 }
