@@ -88,7 +88,9 @@ std::unique_ptr<ExprAST> Parser::ptrAssignmentParsing()
 		Helper::addSymbol(var_name, type, str_stream.str());
 
 		consume();
-		return nullptr;
+		// Return
+		auto value_literal = std::make_unique<ptrExprAST>(str_stream.str());
+		return std::make_unique<AssignExprAST>(var_name, std::move(value_literal), type);
 
 	}
 	catch (const std::exception& error)

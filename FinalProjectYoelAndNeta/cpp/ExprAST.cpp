@@ -15,6 +15,30 @@ Value* CharExprAST::codegen()
     return ConstantInt::get(Helper::getContext(), APInt(_size, _val));
 }
 
+Value* ptrExprAST::codegen()
+{
+    ////return ConstantInt::get(Helper::getContext(), )
+    //const int addr = std::stoi(_valAsStr);
+    //llvm::Type* = 
+    ////return ConstantExpr::getIntToPtr(, llvm::PointerType::getUnqual(Type::getInt32Ty));
+    //llvm::ConstantInt * beg = ConstantInt::get(llvm::Type::getInt32Ty, (uint64_t)&addr);
+    //ConstantInt::get()
+    //return ConstantInt::get(Helper::getContext(), APInt(_size, std::stoi(_valAsStr)));
+    ////return ConstantPointerNull::get(llvm::PointerType::getInt32Ty);
+    //uint64_t value;
+    //_valAsStr >> value;
+    //iss >> value;
+    //std::hex(_valAsStr);
+    //auto s = reinterpret_cast<uintptr_t>(_valAsStr);
+    std::cout << " " << _valAsStr << " String to int --> " << std::stoi(_valAsStr) << std::endl;
+    Constant* b = ConstantInt::get(Type::getInt64Ty(Helper::getContext()), (uint64_t)std::stoi(_valAsStr)); 
+    //Constant* Sb = ConstantInt::get(Type::getInt64Ty(Helper::getContext()),value);
+
+    return ConstantExpr::getIntToPtr(b, PointerType::getUnqual(Type::getInt64Ty(Helper::getContext())));
+    //return PointerType::get(Helper::getContext(), Type::getPointerAddressSpace());
+}
+
+
 Value* VariableExprAST::codegen()
 {
 	// Look this variable up in the function.

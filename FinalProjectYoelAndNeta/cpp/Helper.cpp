@@ -93,6 +93,22 @@ bool Helper::isChar(const std::string& ch)
     return (ch.length() == 3 && ch.front() == '\'' && ch.back() == '\'');
 }
 
+//uint64_t Helper::hexToDec(std::string& str)
+//{
+//    int stringLenght = str.length();
+//
+//    uint64_t uint64Value = 0x0;
+//    for (int i = 0; i <= stringLenght - 1; i++)
+//    {
+//        char charValue = value.charAt(i);
+//
+//        uint64Value = 0x10 * uint64Value;
+//        uint64Value += stringToHexInt(charValue);
+//    }
+//
+//    return uint64Value;
+//}
+
 llvm::Type* Helper::getLLVMptrType(std::string var_type, llvm::LLVMContext& Context, std::string var_name)
 {
     llvm::PointerType* llvm_type;
@@ -123,7 +139,7 @@ llvm::Type* Helper::getLLVMptrType(std::string var_type, llvm::LLVMContext& Cont
     }
 }
 
-llvm::Value* Helper::allocForNewSymbol(std::string var_name, std::string var_type, std::string val)
+llvm::Value* Helper::allocForNewSymbol(std::string var_name, std::string var_type)
 {
     llvm::IRBuilder<>& Builder = Helper::getBuilder(); // Using the Builder from Helper
     llvm::LLVMContext& Context = Helper::getContext(); // Using the Context from Helper
@@ -178,7 +194,7 @@ bool Helper::addSymbol(std::string var_name, std::string var_type, std::string v
         std::cerr << "Error: Symbol '" << var_name << "' already exists.\n";
         return false; // Symbol already exists
     }
-    llvm::Value* var_address = allocForNewSymbol(var_name, var_type, val); 
+    llvm::Value* var_address = allocForNewSymbol(var_name, var_type); 
     symbolTable.add(var_name, var_type, var_address, val);
     symbolTable.printSymbols();
     // Get the value of the variable

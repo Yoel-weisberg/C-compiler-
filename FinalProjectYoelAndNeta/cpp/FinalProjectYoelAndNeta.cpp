@@ -40,9 +40,12 @@ int main(int argc, char* argv[]) {
 		std::vector<std::unique_ptr<ExprAST>>::iterator it;
 		for (it = allAST.begin(); it != allAST.end(); ++it)
 		{
+			// ----     To LLVM IR                     ----
+
+			std::cout << "\nCurr Line -->\t" << std::endl;
 			llvm::Value* generatedValue = (*it)->codegen();
 			generatedValue->print(llvm::errs());  // Prints the LLVM IR for the value
-			std::cout << "Ast created" << std::endl;
+			//std::cout << "Ast created" << std::endl;
 		}
 
 
@@ -55,7 +58,6 @@ int main(int argc, char* argv[]) {
 		//generatedValue->print(llvm::errs());  // Prints the LLVM IR for the value
 
 
-		// ----     To LLVM IR                     ----
 		// ----     Rest of compilation process    ----
 	}
 	catch (const SyntaxError& err)

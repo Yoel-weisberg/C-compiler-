@@ -7,7 +7,6 @@
 #include <regex>
 #include <algorithm>
 #include <sstream>
-//#include <bits/stdc++.h>
 
 
 #include <llvm/IR/LLVMContext.h>
@@ -38,7 +37,7 @@ public:
     static llvm::Module& getModule() { return *TheModule; }
     static void HandleTopLevelExpression();
     static void createAnonymousFunction();
-    static llvm::Value* allocForNewSymbol(std::string var_name, std::string var_type, std::string val);
+    static llvm::Value* allocForNewSymbol(std::string var_name, std::string var_type);
     static bool addSymbol(std::string var_name, std::string var_type, std::string val);
     
 
@@ -48,6 +47,7 @@ public:
     static bool isInteger(const std::string& num);
     static bool isChar(const std::string& ch);
 
+    static uint64_t hexToDec(std::string& str);
     static llvm::Type* getLLVMptrType(std::string var_type, llvm::LLVMContext& Context, std::string var_name);
 
     // Data members
