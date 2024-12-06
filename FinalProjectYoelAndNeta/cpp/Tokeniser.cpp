@@ -49,7 +49,6 @@ std::vector<Token> Tokeniser::getTokens() const
 
 Tokens_type Tokeniser::categoriseLiteral(const std::string& literal)
 {
-	//std::cout << literal << "is Char --<\t" << Helper::isChar(literal) << " result" << std::endl;
 	if (literal == std::string(1, LPAREN_LITERAL))
 	{
 		return LPAREN;
@@ -96,7 +95,7 @@ Tokens_type Tokeniser::categoriseLiteral(const std::string& literal)
 		return TYPE_DECLERATION;
 	}
 	//	Check for pointer declerations
-	else if (literal[literal.size() - 1] == MULTIPLICATION_LITERAL && std::find(Helper::definedTypes.begin(), Helper::definedTypes.end(), literal.substr(0, literal.size() - 1)) != Helper::definedTypes.end())
+	if (literal[literal.size() - 1] == MULTIPLICATION_LITERAL && (std::find(Helper::definedTypes.begin(), Helper::definedTypes.end(), removeSpecialCharacter(literal)) != Helper::definedTypes.end()))
 	{
 		return PTR_TYPE_DELERATION;
 	}
@@ -107,7 +106,7 @@ Tokens_type Tokeniser::categoriseLiteral(const std::string& literal)
 	}
 	else if (!literal.empty())
 	{
-		
+
 		return IDENTIFIER; // Returning identifier without error handeling which would happen in the syntax analysis phase
 	}
 
@@ -124,6 +123,24 @@ bool Tokeniser::isNumber(const std::string& literal)
 		}
 	}
 	return true;
+}
+
+std::string Tokeniser::removeSpecialCharacter(std::string str)
+{
+	for (int i = 0; i < str.size(); i++) {
+
+		// Finding the character whose
+		// ASCII value fall under this
+		// range
+		if (str[i] < 'A' || str[i] > 'Z' && str[i] < 'a'
+			|| str[i] > 'z') {
+			// erase function to erase
+			// the character
+			str.erase(i, 1);
+			i--;
+		}
+	}
+	return str;
 }
 
 std::ostream& operator<<(std::ostream& os, const Tokeniser& tokeniser)

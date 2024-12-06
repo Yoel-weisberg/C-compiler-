@@ -3,5 +3,5 @@
 #define HEY 3
 
 
-char hey = 's';
-int* bla = &wer;
+int hey = 3;
+int* bla = &hey;

@@ -1,7 +1,6 @@
 #include "../Header/Preprocess.h"
 #include <cctype>
 #include <algorithm>
-#include "../Header/SyntaxError.h"
 #include <sstream>
 
 Preprocess::Preprocess(const std::string &fileContent) : _fileRawContent(fileContent)

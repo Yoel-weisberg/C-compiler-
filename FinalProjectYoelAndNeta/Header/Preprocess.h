@@ -3,8 +3,9 @@
 #include <iostream>
 #include <fstream>
 #include <map>
-#include "SyntaxError.h"
+//#include "CompilationErrors.h"
 #include "../Header/Helper.h"
+#include "../Header/CompilationErrors.h"
 
 #define INCLUDE_IDENTIFIER "#include"
 

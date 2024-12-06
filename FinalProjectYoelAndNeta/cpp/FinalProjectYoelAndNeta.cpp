@@ -2,7 +2,7 @@
 #include <fstream>
 #include "../Header/sourceFileHandler.h"
 #include "../Header/Preprocess.h"
-#include "../Header/SyntaxError.h"
+#include "../Header/CompilationErrors.h"
 #include "../Header/Tokenizer.h"
 #include "../Header/SyntaxAnalysis.h"	
 #include "../Header/Parser.h"
@@ -34,12 +34,25 @@ int main(int argc, char* argv[]) {
 
 		// ----     Parser                         ----
 		Parser parser = Parser(tokeniser.getTokens());
-		auto head = parser.getAst();
 
-		std::cout << "Ast created" << std::endl;
 
-		llvm::Value* generatedValue = head->codegen();
-		generatedValue->print(llvm::errs());  // Prints the LLVM IR for the value
+		std::vector<std::unique_ptr<ExprAST>>& allAST = parser.getMainHead();
+		std::vector<std::unique_ptr<ExprAST>>::iterator it;
+		for (it = allAST.begin(); it != allAST.end(); ++it)
+		{
+			llvm::Value* generatedValue = (*it)->codegen();
+			generatedValue->print(llvm::errs());  // Prints the LLVM IR for the value
+			std::cout << "Ast created" << std::endl;
+		}
+
+
+
+		//auto head = parser.getAst();
+
+		//std::cout << "Ast created" << std::endl;
+
+		//llvm::Value* generatedValue = head->codegen();
+		//generatedValue->print(llvm::errs());  // Prints the LLVM IR for the value
 
 
 		// ----     To LLVM IR                     ----

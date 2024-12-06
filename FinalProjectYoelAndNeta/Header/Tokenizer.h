@@ -6,7 +6,7 @@
 #include <cctype>
 #include "Constants.h"
 #include "Token.h"
-#include "SyntaxError.h"
+#include "CompilationErrors.h"
 #include "Helper.h"
 
 #define BLANK ' ' // Empty space
@@ -22,4 +22,6 @@ private:
 	std::vector<Token> _tokens;
 	Tokens_type categoriseLiteral(const std::string& literal);
 	bool isNumber(const std::string& literal);
+	std::string removeSpecialCharacter(std::string s);
+
 };

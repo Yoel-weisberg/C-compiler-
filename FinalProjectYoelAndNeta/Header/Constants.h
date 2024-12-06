@@ -35,10 +35,15 @@ enum Tokens_type {
 
 // ------ Keywords ------
 // -- variable types --
-#define	FLOAT "float"
+#define FLOAT "float"
 #define INTEGER "int"
 #define CHAR "char"
+#define POINTER "ptr"
 
 
 // Other
 #define CHAR_DEC_LEN 3
+
+// Variable Sizes
+#define INTEGER_AND_FLOAT_SIZE 32
+#define CHAR_SIZE 8

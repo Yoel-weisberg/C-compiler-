@@ -129,6 +129,8 @@ void SyntaxAnalysis::validSentences()
 			// there is no suppert for other sentence structure
 			else
 			{
+				std::cout << " Noooooooo ->> " << _tokens[pos].getLiteral() << std::endl;
+				std::cout << " Noooooooo ->> " << _tokens[pos].getType() << std::endl;
 				throw SyntaxError("Not defined sentence", pos);
 			}
 		}

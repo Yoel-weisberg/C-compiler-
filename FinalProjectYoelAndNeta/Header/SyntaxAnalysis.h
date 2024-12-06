@@ -3,7 +3,7 @@
 #include <vector>
 #include <iostream>
 #include <string>
-#include "SyntaxError.h"
+#include "CompilationErrors.h"
 #include "Tokenizer.h"
 #include "Helper.h"
 

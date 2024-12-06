@@ -25,6 +25,8 @@
 
 #include "SymbolTable.h"
 #include "Helper.h"
+#include "CompilationErrors.h"
+
 
 using namespace llvm;
 
@@ -42,13 +44,12 @@ public:
 
 
 
-
 /// NumberExprAST - Expression class for numeric literals like "1.0".
 class	FloatNumberExprAST : public ExprAST
 {
 private: 
 	double _val;
-
+	std::string _valAsStr;
 public:
 	FloatNumberExprAST(double val) : _val(val) {}
 	virtual Value* codegen() override;
@@ -61,6 +62,7 @@ class IntegerNumberExprAST : public ExprAST
 private:
 	int _val;
 	int _size;
+	std::string _valAsStr;
 public: 
 	IntegerNumberExprAST(int val) :_val(val), _size(INTEGER_SIZE) {}
 	virtual Value* codegen() override;
@@ -71,10 +73,24 @@ class CharExprAST : public ExprAST
 private:
 	char _val;
 	int _size;
+	std::string _valAsStr;
 public:
 	CharExprAST(char val) : _val(val), _size(CHAR_SIZE) {}
 	virtual Value* codegen() override;
 };
+
+
+class ptrExprAST : public ExprAST
+{
+private:
+	int _addr; // Address of the "pointed to" variable
+	int _size;
+	std::string _valAsStr;
+public:
+	ptrExprAST(int _addr); 
+	virtual Value* codegen() override;
+};
+
 
 /// VariableExprAST - Expression class for referencing a variable, like "a".
 class VariableExprAST : public ExprAST

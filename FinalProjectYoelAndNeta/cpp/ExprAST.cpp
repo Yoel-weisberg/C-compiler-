@@ -1,5 +1,5 @@
 #include "ExprAST.h"
-#include "SyntaxError.h"
+
 Value* FloatNumberExprAST::codegen()
 {
 	return ConstantFP::get(Helper::getContext(), APFloat(_val));
@@ -30,49 +30,18 @@ Value* VariableExprAST::codegen()
 Value* AssignExprAST::codegen() {
     // Check if the variable already exists in the symbol table
     auto symbolOpt = Helper::symbolTable.findSymbol(_varName);
-    if (!symbolOpt) {
-        // Variable is not declared, allocate and add it to the symbol table
-        llvm::IRBuilder<>& Builder = Helper::getBuilder(); // Using the Builder from Helper
-        llvm::LLVMContext& Context = Helper::getContext(); // Using the Context from Helper
-        llvm::Type* llvmType;
+    //if (!symbolOpt) {
+    //    //// Variable is not declared, allocate and add it to the symbol table
+    //    //Value* varAddress = Helper::allocForNewSymbol(_varName, _varType);
 
-        // Map the variable type to LLVM types
-        if (_varType == INTEGER) {
-            llvmType = llvm::Type::getInt32Ty(Context);
-        }
-        else if (_varType == FLOAT) {
-            llvmType = llvm::Type::getFloatTy(Context);
-        }
-        else if (_varType == CHAR)
-        {
-            llvmType = llvm::Type::getInt8Ty(Context);
-        }
-        else {
-            std::cerr << "Error: Unsupported variable type '" << _varType << "'.\n";
-            return nullptr;
-        }
+    //    //// Add the variable to the symbol table
+    //    //Helper::symbolTable.add(_varName, _varType, varAddress);
+    //    //AssignExprAST* x = std::make_unique<AssignExprAST>(_value)->getValue();
+    //    //Helper::addSymbol(_varName, _varType);
 
-        // Ensure we are in the context of a function
-        llvm::Function* currentFunction = Builder.GetInsertBlock()->getParent();
-        if (!currentFunction) {
-            std::cerr << "Error: Attempting to allocate variable outside of a function.\n";
-            return nullptr;
-        }
-
-        // Move the builder's insertion point to the function's entry block
-        llvm::IRBuilder<> tempBuilder(&currentFunction->getEntryBlock(),
-            currentFunction->getEntryBlock().begin());
-
-        // Allocate memory for the variable at the entry block
-        llvm::Value* varAddress = tempBuilder.CreateAlloca(llvmType, nullptr, _varName.c_str());
-
-
-        // Add the variable to the symbol table
-        Helper::symbolTable.addSymbol(_varName, _varType, varAddress);
-
-        // Re-fetch the symbol from the symbol table
-        symbolOpt = Helper::symbolTable.findSymbol(_varName);
-    }
+    //    // Re-fetch the symbol from the symbol table
+    //    symbolOpt = Helper::symbolTable.findSymbol(_varName);
+    //}
 
     if (!symbolOpt) {
         std::cerr << "Error: Failed to retrieve the variable '" << _varName << "' after adding it.\n";

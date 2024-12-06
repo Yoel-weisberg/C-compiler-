@@ -8,12 +8,22 @@
 // Constructor for Parser
 Parser::Parser(const std::vector<Token>& tokens)
 	: _tokens(tokens), _currentTokenIndex(0) {
-	_head =  parse();
+	// Create Head node (more details in )
+	while (find(_tokens.begin(), _tokens.end(), currentToken()) != _tokens.end())
+	{
+		_head.push_back(parse());
+		consume(); // Go to the next line 
+	}
 }
 
-ExprAST* Parser::getAst()
+//ExprAST* Parser::getAst()
+//{
+//	return _head.get();
+//}
+
+std::vector<std::unique_ptr<ExprAST>>& Parser::getMainHead()
 {
-	return _head.get();
+	return _head;
 }
 
 // Current token getter
@@ -36,45 +46,86 @@ std::unique_ptr<ExprAST> Parser::parse() {
 	return parseAssignment(); // This is the only possibility for now
 }
 
-// Parse assignment statements (e.g., "int a = 5;")
+
 std::unique_ptr<ExprAST> Parser::parseAssignment() {
-	if (currentToken().getType() == Tokens_type::TYPE_DECLERATION) {
-		std::string type = currentToken().getLiteral();
-		consume();
-
-		std::string varName = currentToken().getLiteral();
-		consume(); // Move past IDENTIFIER
-
-		if (currentToken().getType() == Tokens_type::EQUAL_SIGN) {
-			consume(); // Move past '='
-			if (type == FLOAT)
-			{
-				auto value_literal = std::make_unique<FloatNumberExprAST>(std::stod(currentToken().getLiteral()));
-				consume(); // Move past value
-				return std::make_unique<AssignExprAST>(varName, std::move(value_literal), type);
-			}
-			if (type == INTEGER)
-			{
-				auto value_literal = std::make_unique<IntegerNumberExprAST>(std::stod(currentToken().getLiteral()));
-				consume(); // Move past value
-				return std::make_unique<AssignExprAST>(varName, std::move(value_literal), type);
-			}
-			if (type == CHAR)
-			{
-				auto value_literal = std::make_unique<CharExprAST>(currentToken().getLiteral()[1]);
-				consume(); // Move past value
-				return std::make_unique<AssignExprAST>(varName, std::move(value_literal), type);
-			}
-
-		}
+	if (currentToken().getType() == TYPE_DECLERATION)
+	{
+		return regularAssignmentParsing();
 	}
 	if (currentToken().getType() == PTR_TYPE_DELERATION)
 	{
-		return ptrParseAssignment();
+		return ptrAssignmentParsing();
 	}
 	return nullptr;
 }
-std::unique_ptr<ExprAST> Parser::ptrParseAssignment()
+
+// Parse pointer assignment statement (e.g "int* ptr = &point_to;")
+std::unique_ptr<ExprAST> Parser::ptrAssignmentParsing()
 {
-	return std::unique_ptr<ExprAST>();
+	try
+	{
+		// Regular parsing
+		std::string type = currentToken().getLiteral().substr(1, currentToken().getLiteral().size() - 1);
+		consume();
+
+		std::string var_name = currentToken().getLiteral();
+		consume();
+		consume(); // Skip equal sign
+
+		// Check if "pointed to" variable is valid
+		// Does it exists in the symbol table
+		auto symbolWrapped = Helper::symbolTable.findSymbol(currentToken().getLiteral().substr(1, currentToken().getLiteral().size() - 1));
+
+		if (!symbolWrapped)
+		{
+			throw ParserError("can't point to non-existing variable");
+		}
+		// Add pointer to symbol table
+		Symbol& pointed_to_var = symbolWrapped->get();
+		std::stringstream str_stream;
+		str_stream << pointed_to_var.getLLVMValue();
+
+		Helper::addSymbol(var_name, type, str_stream.str());
+
+		consume();
+		return nullptr;
+
+	}
+	catch (const std::exception& error)
+	{
+		std::cout << error.what() << std::endl;
+	}
+}
+
+// Parse Basic assignment statements (e.g., "int a = 5;")
+std::unique_ptr<ExprAST> Parser::regularAssignmentParsing()
+{
+	std::string type = currentToken().getLiteral();
+	consume();
+
+	std::string varName = currentToken().getLiteral();
+	consume(); // Move past IDENTIFIER
+
+	if (currentToken().getType() == EQUAL_SIGN) {
+		consume(); // Move past '='
+		Helper::addSymbol(varName, type, currentToken().getLiteral());
+		if (type == FLOAT)
+		{
+			auto value_literal = std::make_unique<FloatNumberExprAST>(std::stod(currentToken().getLiteral()));
+			consume(); // Move past value
+			return std::make_unique<AssignExprAST>(varName, std::move(value_literal), type);
+		}
+		if (type == INTEGER)
+		{
+			auto value_literal = std::make_unique<IntegerNumberExprAST>(std::stod(currentToken().getLiteral()));
+			consume(); // Move past value
+			return std::make_unique<AssignExprAST>(varName, std::move(value_literal), type);
+		}
+		if (type == CHAR)
+		{
+			auto value_literal = std::make_unique<CharExprAST>(currentToken().getLiteral()[1]);
+			consume(); // Move past value
+			return std::make_unique<AssignExprAST>(varName, std::move(value_literal), type);
+		}
+	}
 }

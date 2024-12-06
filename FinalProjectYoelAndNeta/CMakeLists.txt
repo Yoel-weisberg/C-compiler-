@@ -26,7 +26,7 @@ file(GLOB_RECURSE SOURCES "${CMAKE_SOURCE_DIR}/cpp/*.cpp")
 file(GLOB_RECURSE HEADERS "${CMAKE_SOURCE_DIR}/Header/*.h")
 
 # Create an executable from the source files
-add_executable(FinalProjectYoelAndNeta ${SOURCES} ${HEADERS})
+add_executable(FinalProjectYoelAndNeta ${SOURCES} ${HEADERS} "cpp/Conversion.cpp")
 
 # Include header files in the project structure
 source_group("Source Files" FILES ${SOURCES})
