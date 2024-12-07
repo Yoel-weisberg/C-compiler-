@@ -12,9 +12,9 @@ Tokeniser::Tokeniser(const std::string& string)
 			this->tokens.push_back({ currentLiteral, categoriseLiteral(currentLiteral) });
 			currentLiteral = "";
 		} // Any other valid char exept for a digit
-		else if (Helper::literalToType.find(currentLiteral) != Helper::literalToType.end())
+		else if (Helper::literalToType.find(std::string(1, string[i])) != Helper::literalToType.end())
 		{
-			this->tokens.push_back({ currentLiteral, categoriseLiteral(currentLiteral) });
+			if (!currentLiteral.empty())  this->tokens.push_back({ currentLiteral, categoriseLiteral(currentLiteral) });
 			this->tokens.push_back({ std::string(1, string[i]), categoriseLiteral(std::string(1, string[i])) });
 			currentLiteral = "";
 		}
@@ -27,7 +27,7 @@ Tokeniser::Tokeniser(const std::string& string)
 				currentLiteral = "";
 			}
 		}
-		else
+		else if (string[i] != ' ')
 		{
 			currentLiteral += string[i];
 		}
@@ -55,7 +55,7 @@ Tokens_type Tokeniser::categoriseLiteral(const std::string& literal)
 	{
 		return TYPE_DECLERATION;
 	}
-	else if (literal == "IF")
+	else if (literal == "if")
 	{
 		return IF_WORD;
 	}

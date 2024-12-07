@@ -110,46 +110,50 @@ void SyntexAnalysis::checkAlgebricStructure()
 
 int SyntexAnalysis::variebleDefinitionStructure(int pos)
 {
-	if (pos + 1 >= _tokens.size())
+	pos++;
+	if (pos >= _tokens.size())
 	{
 		throw SyntaxError("missing Identifier");
 	}
-	if (_tokens[pos + 1].getType() != IDENTIFIER)
+	if (_tokens[pos ].getType() != IDENTIFIER)
 	{
 		throw SyntaxError("missing Identifier");
 	}
-	if (!Helper::checkIdentifier(_tokens[pos + 1].getLiteral()))
+	if (!Helper::checkIdentifier(_tokens[pos].getLiteral()))
 	{
 		throw SyntaxError("Identifier not valid");
 	}
 
+	pos++;
 	// Check if there are enough tokens for the next set of operations
-	if (pos + 2 >= _tokens.size())
+	if (pos >= _tokens.size())
 	{
 		throw SyntaxError("unexpected end of input");
 	}
-	if (_tokens[pos + 2].getType() == EQUEL_SIGN)
+	if (_tokens[pos].getType() == EQUEL_SIGN)
 	{
+		pos++;
 		// Check for additional tokens needed for this branch
-		if (pos + 3 >= _tokens.size())
+		if (pos >= _tokens.size())
 		{
 			throw SyntaxError("missing value after equal sign");
 		}
-		if (!doesVariebleFitType(_tokens[pos].getLiteral(), _tokens[pos + 3].getLiteral()))
+		if (!doesVariebleFitType(_tokens[pos - 3].getLiteral(), _tokens[pos].getLiteral()))
 		{
 			throw SyntaxError("Varieble type dosent fit decleration");
 		}
-		pos + 4 >= _tokens.size() ? throw SyntaxError("excepted a semicolumn") : true;
-		if (!_tokens[pos + 4].getType() == SEMICOLUMN)
+		pos++;
+		pos >= _tokens.size() ? throw SyntaxError("excepted a semicolumn") : true;
+		if (!_tokens[pos].getType() == SEMICOLUMN)
 		{
 			throw SyntaxError("excepted a semicolumn");
 		}
 		// advancing pos by 4 to get to the next action
-		return pos + 4;
+		return pos;
 	}
-	else if (_tokens[pos + 2].getType() == SEMICOLUMN)
+	else if (_tokens[pos].getType() == SEMICOLUMN)
 	{
-		return pos + 2;
+		return pos;
 	}
 	else
 	{
@@ -225,9 +229,10 @@ int SyntexAnalysis::validSentences(int pos)
 			// TODO - need to check if the sentnce is an algebric sentnece 
 			else if (_tokens[pos].getType() == IF_WORD)
 			{
-
+				checkIfStructure(pos);
 			}
-			else if (_tokens[pos].getType() == L_CURLY_PRAN)
+			// oit of current scope
+			else if (_tokens[pos].getType() == R_CURLY_PRAN)
 			{
 				return pos;
 			}

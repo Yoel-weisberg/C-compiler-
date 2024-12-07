@@ -12,7 +12,7 @@
 class ExprAST;
 class AssignExprAST;
 class BinaryExprAST;
-class NumberExprAST;
+class FloatNumberExprAST;
 
 class Parser {
 private:
@@ -32,13 +32,18 @@ public:
     // Parse methods
     std::unique_ptr<ExprAST> parse();
     std::unique_ptr<ExprAST> parseAssignment();
-    
+    std::unique_ptr<ExprAST> parseIfStatement();
+    std::unique_ptr<ExprAST> ParseNumberExpr();
+    std::unique_ptr<ExprAST> ParseParenExpr();
+    std::unique_ptr<ExprAST> ParseIdentifierExpr();
+    std::unique_ptr<ExprAST> ParseExpression();
+    std::unique_ptr<ExprAST> ParsePrimary();
+    std::unique_ptr<ExprAST> ParseBinOpRHS(int ExprPrec,
+        std::unique_ptr<ExprAST> LHS);
+
     // Getter for the root AST
     ExprAST* getAst();
 
-    //std::unique_ptr<ExprAST> parseExpression();
-    //std::unique_ptr<ExprAST> parseTerm();
-    //std::unique_ptr<ExprAST> parseFactor();
 };
 
 #endif // PARSER_H

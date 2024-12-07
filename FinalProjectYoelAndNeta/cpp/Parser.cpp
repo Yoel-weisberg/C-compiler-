@@ -54,39 +54,71 @@ std::unique_ptr<ExprAST> Parser::parseAssignment() {
 	}
 	return nullptr;
 }
-//
-// Parse general expressions (addition, subtraction, etc.)
-//std::unique_ptr<ExprAST> Parser::parseExpression() {
-//	if ()
-//}
 
-//// Parse terms (handling multiplication, division, etc.)
-//std::unique_ptr<ExprAST> Parser::parseTerm() {
-//	auto lhs = parseFactor();
-//	while (currentToken().getType() == Tokens_type::ADDITION ||
-//		currentToken().getType() == Tokens_type::SUBTRACTION) {
-//		char op = currentToken().getLiteral()[0];
-//		consume(); // Move past the operator
-//		auto rhs = parseFactor();
-//		lhs = std::make_unique<BinaryExprAST>(op, std::move(lhs), std::move(rhs));
-//	}
-//	return lhs;
-//}
-//
-//// Parse factors (numbers, parentheses)
-//std::unique_ptr<ExprAST> Parser::parseFactor() {
-//	if (currentToken().getType() == Tokens_type::LPAREN) {
-//		consume(); // Move past '('
-//		auto expr = parseExpression();
-//		if (currentToken().getType() == Tokens_type::RPAREN) {
-//			consume(); // Move past ')'
-//		}
-//		return expr;
-//	}
-//
-//	double value = std::stod(currentToken().getLiteral());
-//	consume(); // Move past the integer
-//	return std::make_unique<FloatNumberExprAST>(value);
-//
-//	return nullptr; // Handle errors
-//}
+std::unique_ptr<ExprAST> Parser::parseIfStatement() {
+	consume(); // eat the if.
+	std::unique_ptr<ExprAST> Else = nullptr;
+	// condition.
+	auto Cond = ParseExpression();
+	if (!Cond)
+		return nullptr;
+
+	
+	consume(); // eat the {
+
+	auto Then = ParseExpression();
+	if (!Then)
+		return nullptr;
+
+	if (currentToken().getType() == ELSE)
+		Else = ParseExpression();
+
+	consume();
+
+	return std::make_unique<IfExprAST>(std::move(Cond), std::move(Then),
+		std::move(Else));
+
+}
+
+std::unique_ptr<ExprAST> Parser::ParseNumberExpr()
+{
+	auto Result = std::make_unique<FloatNumberExprAST>(std::stoi(currentToken().getLiteral()));
+	consume();
+	return std::move(Result);
+}
+
+std::unique_ptr<ExprAST> Parser::ParseParenExpr()
+{
+	consume(); // eat (.
+	auto V = ParseExpression();
+	if (!V)
+		return nullptr;
+
+	consume(); // eat ).
+	return V;
+}
+
+//Parse general expressions (addition, subtraction, etc.)
+std::unique_ptr<ExprAST> Parser::ParseExpression() {
+	auto LHS = ParsePrimary();
+	if (!LHS)
+		return nullptr;
+
+	return ParseBinOpRHS(0, std::move(LHS));
+}
+
+// this is like the sentence switch but for the parser
+std::unique_ptr<ExprAST> Parser::ParsePrimary()
+{
+	switch (currentToken().getType())
+	{
+	case TYPE_DECLERATION:
+		return parseAssignment();
+	case LPAREN:
+		return ParseParenExpr();
+	case IF_WORD:
+		return parseIfStatement();
+	default:
+		break;
+	}
+}
