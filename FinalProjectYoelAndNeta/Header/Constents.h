@@ -4,6 +4,7 @@
 
 enum Tokens_type {
 	INT,
+	FLOAT,
 	LPAREN,
 	RPAREN,
 	ADDITION,

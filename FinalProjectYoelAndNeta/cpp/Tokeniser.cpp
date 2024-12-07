@@ -51,6 +51,10 @@ Tokens_type Tokeniser::categoriseLiteral(const std::string& literal)
 		// Assuming INT is the default case for literals that aren't operators or parentheses
 		return INT;
 	}
+	else if (isFloat(literal))
+	{
+		return FLOAT;
+	}
 	else if (std::find(Helper::definedTypes.begin(), Helper::definedTypes.end(), literal) != Helper::definedTypes.end())
 	{
 		return TYPE_DECLERATION;
@@ -81,6 +85,12 @@ bool Tokeniser::isNumber(const std::string& literal)
 		}
 	}
 	return true;
+}
+
+bool Tokeniser::isFloat(const std::string& literal)
+{
+	std::regex floatRegex(R"(^[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?$)");
+    return std::regex_match(literal, floatRegex);
 }
 
 std::ostream& operator<<(std::ostream& os, const Tokeniser& tokeniser)

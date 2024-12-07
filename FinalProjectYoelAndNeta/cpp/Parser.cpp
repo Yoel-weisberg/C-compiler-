@@ -80,7 +80,7 @@ std::unique_ptr<ExprAST> Parser::parseIfStatement() {
 
 }
 
-std::unique_ptr<ExprAST> Parser::ParseNumberExpr()
+std::unique_ptr<ExprAST> Parser::ParseFloatNumberExpr()
 {
 	auto Result = std::make_unique<FloatNumberExprAST>(std::stoi(currentToken().getLiteral()));
 	consume();
@@ -118,6 +118,8 @@ std::unique_ptr<ExprAST> Parser::ParsePrimary()
 		return ParseParenExpr();
 	case IF_WORD:
 		return parseIfStatement();
+	case FLOAT:
+		return ParseFloatNumberExpr();
 	default:
 		break;
 	}

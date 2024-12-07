@@ -33,7 +33,7 @@ public:
     std::unique_ptr<ExprAST> parse();
     std::unique_ptr<ExprAST> parseAssignment();
     std::unique_ptr<ExprAST> parseIfStatement();
-    std::unique_ptr<ExprAST> ParseNumberExpr();
+    std::unique_ptr<ExprAST> ParseFloatNumberExpr();
     std::unique_ptr<ExprAST> ParseParenExpr();
     std::unique_ptr<ExprAST> ParseIdentifierExpr();
     std::unique_ptr<ExprAST> ParseExpression();
