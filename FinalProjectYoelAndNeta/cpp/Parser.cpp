@@ -33,7 +33,7 @@ bool Parser::isAtEnd() {
 
 // Main entry point to parse tokens and build an AST
 std::unique_ptr<ExprAST> Parser::parse() {
-	return parseAssignment();
+	return ParsePrimary();
 }
 
 // Parse assignment statements (e.g., "int a = 5;")
@@ -106,6 +106,7 @@ std::unique_ptr<ExprAST> Parser::ParseExpression() {
 
 	return ParseBinOpRHS(0, std::move(LHS));
 }
+
 
 // this is like the sentence switch but for the parser
 std::unique_ptr<ExprAST> Parser::ParsePrimary()
