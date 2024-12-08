@@ -141,3 +141,22 @@ Value* IfExprAST::codegen()
     PN->addIncoming(ElseV, ElseBB);
     return PN;
 }
+
+Function* PrototypeAST::codegen()
+{
+    // TO-DO make that it would not only work eith double
+    // Make the function type:  double(double,double) etc.
+    std::vector<Type*> Doubles(Args.size(), Type::getDoubleTy(Helper::getContext()));
+    FunctionType* FT =
+        FunctionType::get(Type::getDoubleTy(Helper::getContext()), Doubles, false);
+
+    Function* F =
+        Function::Create(FT, Function::ExternalLinkage, Name, Helper::getModule());
+
+    // Set names for all arguments.
+    unsigned Idx = 0;
+    for (auto& Arg : F->args())
+        Arg.setName(Args[Idx++]);
+
+    return F;
+}

@@ -18,7 +18,7 @@ class Parser {
 private:
     std::vector<Token> tokens;
     size_t currentTokenIndex;
-
+    std::string IdentifierStr;
     Token& currentToken();
     void consume();
     bool isAtEnd();
@@ -40,7 +40,8 @@ public:
     std::unique_ptr<ExprAST> ParsePrimary();
     std::unique_ptr<ExprAST> ParseBinOpRHS(int ExprPrec,
         std::unique_ptr<ExprAST> LHS);
-
+    std::unique_ptr<FunctionAST> ParseTopLevelExpr();
+    std::unique_ptr<PrototypeAST> ParsePrototype();
     // Getter for the root AST
     ExprAST* getAst();
 
