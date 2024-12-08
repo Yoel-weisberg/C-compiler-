@@ -5,15 +5,73 @@
 #include <iostream>
 #include <stdexcept>
 
+int Parser::getTokenPrecedence()
+{
+	//if (!isascii(currentToken().getLiteral())
+	//	return -1;
+
+	//// Make sure it's a declared binop.
+	//int TokPrec = BinopPrecedence[CurTok];
+	//if (TokPrec <= 0)
+	//	return -1;
+	//return TokPrec;
+	if (BinopPrecedence.find(currentToken().getType()) != BinopPrecedence.end())
+	{
+		return BinopPrecedence[currentToken().getType()];
+	}
+	else
+	{
+		return -1;
+	}
+}
+
 // Constructor for Parser
 Parser::Parser(const std::vector<Token>& tokens)
 	: tokens(tokens), currentTokenIndex(0) {
 	head =  parse();
+	BinopPrecedence[ADDITION] = 20;
+	BinopPrecedence[SUBTRACTION] = 20;
+	BinopPrecedence[MULTIPLICATION] = 30;
+	BinopPrecedence[DIVISION] = 30;
 }
 
 ExprAST* Parser::getAst()
 {
 	return head.get();
+}
+
+std::unique_ptr<ExprAST> Parser::ParseBinOpRHS(int ExprPrec, std::unique_ptr<ExprAST> LHS)
+{
+	// If this is a binop, find its precedence.
+	while (true) {
+		int TokPrec = getTokenPrecedence();
+
+		// If this is a binop that binds at least as tightly as the current binop,
+		// consume it, otherwise we are done.
+		if (TokPrec < ExprPrec)
+			return LHS;
+
+		// Okay, we know this is a binop.
+		Tokens_type BinOp = currentToken().getType();
+		consume(); // eat binop
+
+		// Parse the primary expression after the binary operator.
+		auto RHS = ParsePrimary();
+		if (!RHS)
+			return nullptr;
+
+		// If BinOp binds less tightly with RHS than the operator after RHS, let
+		// the pending operator take RHS as its LHS.
+		int NextPrec = getTokenPrecedence();
+		if (TokPrec < NextPrec) {
+			RHS = ParseBinOpRHS(TokPrec + 1, std::move(RHS));
+			if (!RHS)
+				return nullptr;
+		}
+
+		// Merge LHS/RHS.
+		LHS = std::make_unique<BinaryExprAST>(BinOp, std::move(LHS), std::move(RHS));
+	}
 }
 
 // Current token getter

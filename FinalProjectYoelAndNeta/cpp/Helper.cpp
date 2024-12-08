@@ -34,6 +34,7 @@ std::unique_ptr<llvm::CGSCCAnalysisManager> Helper::TheCGAM = nullptr;
 std::unique_ptr<llvm::ModuleAnalysisManager> Helper::TheMAM = nullptr;
 std::unique_ptr<llvm::PassInstrumentationCallbacks> Helper::ThePIC = nullptr;
 std::unique_ptr<llvm::StandardInstrumentations> Helper::TheSI = nullptr;
+std::map<std::string, std::unique_ptr<PrototypeAST>> Helper::FunctionProtos;
 llvm::ExitOnError Helper::ExitOnErr;
 
 
@@ -99,6 +100,22 @@ void Helper::createAnonymousFunction()
     if (llvm::verifyFunction(*anonFunc, &llvm::errs())) {
         std::cerr << "Error: Invalid LLVM function generated.\n";
     }
+}
+
+Function* Helper::getFunction(std::string Name)
+{
+    // First, see if the function has already been added to the current module.
+    if (auto* F = TheModule->getFunction(Name))
+        return F;
+
+    // If not, check whether we can codegen the declaration from some existing
+    // prototype.
+    auto FI = FunctionProtos.find(Name);
+    if (FI != FunctionProtos.end())
+        return FI->second->codegen();
+
+    // If no existing prototype exists, return null.
+    return nullptr;
 }
 
 bool Helper::checkIdentifier(const std::string& id)

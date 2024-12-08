@@ -22,6 +22,9 @@ private:
     bool isAtEnd();
 
     std::unique_ptr<ExprAST> head;
+    int getTokenPrecedence();
+
+    std::map<Tokens_type, int> BinopPrecedence;
 
 public:
     // Constructor

@@ -26,6 +26,8 @@
 #include "SymbalTable.h"
 #include "Helper.h"
 
+class Helper;
+
 using namespace llvm;
 
 
@@ -48,6 +50,17 @@ public:
 	virtual Value* codegen() override;
 };
 
+class BinaryExprAST : public ExprAST {
+	Tokens_type Op;
+	std::unique_ptr<ExprAST> LHS, RHS;
+
+public:
+	BinaryExprAST(Tokens_type Op, std::unique_ptr<ExprAST> LHS,
+		std::unique_ptr<ExprAST> RHS)
+		: Op(Op), LHS(std::move(LHS)), RHS(std::move(RHS)) {}
+
+	Value* codegen() override;
+};
 
 /// VariableExprAST - Expression class for referencing a variable, like "a".
 class VariableExprAST : public ExprAST {

@@ -58,8 +58,12 @@ llvm_map_components_to_libnames(LLVM_LIBS
     core
     bitwriter
     support
-    analysis
     irPrinter
+    x86codegen  # Add this for X86 target support
+    x86desc     # Add this for X86-specific descriptors
+    x86asmparser # Optional, needed if you're parsing X86 assembly
+    analysis 
+    orcjit
     target
 )
 

@@ -160,3 +160,64 @@ Function* PrototypeAST::codegen()
 
     return F;
 }
+
+Function* FunctionAST::codegen()
+{
+    // Transfer ownership of the prototype to the FunctionProtos map, but keep a
+   // reference to it for use below.
+    auto& P = *Proto;
+    Helper::FunctionProtos[Proto->getName()] = std::move(Proto);
+    Function* TheFunction = Helper::getFunction(P.getName());
+    if (!TheFunction)
+        return nullptr;
+
+    // Create a new basic block to start insertion into.
+    BasicBlock* BB = BasicBlock::Create(Helper::getContext(), "entry", TheFunction);
+    Helper::getBuilder().SetInsertPoint(BB);
+
+    // Record the function arguments in the NamedValues map.
+    // TODO - add scope to variebles
+    //for (auto& Arg : TheFunction->args())
+    //    Symbol newSymbol = Symbol(std::string(Arg.getName()), &Arg)
+    //    SymbolTable   = &Arg;
+
+    if (Value* RetVal = Body->codegen()) {
+        // Finish off the function.
+       Helper::Builder->CreateRet(RetVal);
+
+        // Validate the generated code, checking for consistency.
+        verifyFunction(*TheFunction);
+
+        // Run the optimizer on the function.
+        Helper::TheFPM->run(*TheFunction, *Helper::TheFAM);
+
+        return TheFunction;
+    }
+
+    // Error reading body, remove function.
+    TheFunction->eraseFromParent();
+    return nullptr;
+}
+
+Value* BinaryExprAST::codegen()
+{
+    Value* L = LHS->codegen();
+    Value* R = RHS->codegen();
+    if (!L || !R)
+        return nullptr;
+
+    switch (Op) {
+    case ADDITION:
+        return Helper::Builder->CreateFAdd(L, R, "addtmp");
+    case SUBTRACTION:
+        return Helper::Builder->CreateFSub(L, R, "subtmp");
+    case MULTIPLICATION:
+        return Helper::Builder->CreateFMul(L, R, "multmp");
+    case LOWER_THEN:
+        L = Helper::Builder->CreateFCmpULT(L, R, "cmptmp");
+        // Convert bool 0/1 to double 0.0 or 1.0
+        return Helper::Builder->CreateUIToFP(L, Type::getDoubleTy(Helper::getContext()), "booltmp");
+    default:
+        throw SyntaxError("invalid binary operator");
+    }
+}

@@ -7,6 +7,7 @@
 #include "SymbalTable.h"
 #include <map>
 #include "Constents.h"
+#include "ExprAST.h"
 
 #include "KaleidoscopeJIT.h"
 #include "llvm/ADT/APFloat.h"
@@ -34,6 +35,7 @@
 
 #include <memory>
 
+class PrototypeAST;
 
 using namespace llvm;
 
@@ -54,6 +56,7 @@ public:
     static std::unique_ptr<ModuleAnalysisManager> TheMAM;
     static std::unique_ptr<PassInstrumentationCallbacks> ThePIC;
     static std::unique_ptr<StandardInstrumentations> TheSI;
+    static std::map<std::string, std::unique_ptr<PrototypeAST>> FunctionProtos;
     static ExitOnError ExitOnErr;
 
     // Accessor methods to get the objects
@@ -61,6 +64,7 @@ public:
     static llvm::IRBuilder<>& getBuilder() { return *Builder; }
     static llvm::Module& getModule() { return *TheModule; }
     static void createAnonymousFunction();
+    static Function* getFunction(std::string Name);
 
     // Utility methods
     static bool checkIdentifier(const std::string& id);

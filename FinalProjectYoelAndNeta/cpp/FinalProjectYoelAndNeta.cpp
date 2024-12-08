@@ -40,10 +40,17 @@ int main(int argc, char* argv[]) {
 		parser.mainLoop();
 
 	
+		// ---- Emit LLVM IR ----
+		std::error_code EC;
+		llvm::raw_fd_ostream dest("output.ll", EC, llvm::sys::fs::OF_None);
+		if (EC) {
+			std::cerr << "Could not open file: " << EC.message() << std::endl;
+			return 1;
+		}
+		Helper::TheModule->print(dest, nullptr);
+		dest.flush();
+		std::cout << "LLVM IR emitted to output.ll" << std::endl;
 
-
-		// ----     To LLVM IR                     ----
-		// ----     Rest of compilation process    ----
 	}
 	catch (const SyntaxError& err)
 	{
