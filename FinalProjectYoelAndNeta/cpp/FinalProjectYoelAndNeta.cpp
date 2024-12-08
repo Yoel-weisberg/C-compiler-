@@ -6,13 +6,17 @@
 #include "../Header/Tokenizer.h"
 #include "../Header/SyntexAnalysis.h"	
 #include "../Header/Parser.h"
+#include "TopLevelParser.h"
 #include "Helper.h"
 
 int main(int argc, char* argv[]) {
 
 	try
 	{
-		Helper::initializeModule();
+		InitializeNativeTarget();
+		InitializeNativeTargetAsmPrinter();
+		InitializeNativeTargetAsmParser();
+		Helper::InitializeModuleAndManagers();
 
 		std::cout << "----      Compiler for C :)       ----" << std::endl;
 
@@ -32,13 +36,10 @@ int main(int argc, char* argv[]) {
 		std::cout << "Syntax analysed" << std::endl;
 
 		// ----     Parser                         ----
-		Parser parser = Parser(tokeniser.getTokens());
-		auto head = parser.getAst();
+		TopLevelParser parser = TopLevelParser(tokeniser.getTokens());
+		parser.mainLoop();
 
-		std::cout << "Ast created" << std::endl;
-
-		llvm::Value* generatedValue = head->codegen();
-		generatedValue->print(llvm::errs());  // Prints the LLVM IR for the value
+	
 
 
 		// ----     To LLVM IR                     ----

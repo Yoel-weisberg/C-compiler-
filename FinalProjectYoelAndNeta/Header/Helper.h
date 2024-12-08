@@ -8,10 +8,7 @@
 #include <map>
 #include "Constents.h"
 
-#include <llvm/IR/LLVMContext.h>
-#include <llvm/IR/IRBuilder.h>
-#include <llvm/IR/Module.h>
-#include <llvm/IR/Verifier.h>
+#include "KaleidoscopeJIT.h"
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/IR/BasicBlock.h"
@@ -34,24 +31,35 @@
 #include "llvm/Transforms/Scalar/GVN.h"
 #include "llvm/Transforms/Scalar/Reassociate.h"
 #include "llvm/Transforms/Scalar/SimplifyCFG.h"
+
 #include <memory>
+
+
+using namespace llvm;
 
 class Helper
 {
 public:
     // llvm related
-    static std::unique_ptr<llvm::LLVMContext> TheContext;
-    static std::unique_ptr<llvm::IRBuilder<>> Builder;
-    static std::unique_ptr<llvm::Module> TheModule;
-
-    // Initialization of the static members
-    static void initializeModule();
+    static void InitializeModuleAndManagers();
+    static std::unique_ptr<LLVMContext> TheContext;
+    static std::unique_ptr<Module> TheModule;
+    static std::unique_ptr<IRBuilder<>> Builder;
+    static std::map<std::string, Value*> NamedValues;
+    static std::unique_ptr<llvm::orc::KaleidoscopeJIT> TheJIT;
+    static std::unique_ptr<FunctionPassManager> TheFPM;
+    static std::unique_ptr<LoopAnalysisManager> TheLAM;
+    static std::unique_ptr<FunctionAnalysisManager> TheFAM;
+    static std::unique_ptr<CGSCCAnalysisManager> TheCGAM;
+    static std::unique_ptr<ModuleAnalysisManager> TheMAM;
+    static std::unique_ptr<PassInstrumentationCallbacks> ThePIC;
+    static std::unique_ptr<StandardInstrumentations> TheSI;
+    static ExitOnError ExitOnErr;
 
     // Accessor methods to get the objects
     static llvm::LLVMContext& getContext() { return *TheContext; }
     static llvm::IRBuilder<>& getBuilder() { return *Builder; }
     static llvm::Module& getModule() { return *TheModule; }
-    static void HandleTopLevelExpression();
     static void createAnonymousFunction();
 
     // Utility methods

@@ -23,78 +23,56 @@ std::map<std::string, Tokens_type> Helper::literalToType = {
 SymbolTable Helper::symbolTable;
 
 std::unique_ptr<llvm::LLVMContext> Helper::TheContext = nullptr;
-std::unique_ptr<llvm::IRBuilder<>> Helper::Builder = nullptr;
 std::unique_ptr<llvm::Module> Helper::TheModule = nullptr;
+std::unique_ptr<llvm::IRBuilder<>> Helper::Builder = nullptr;
+std::map<std::string, llvm::Value*> Helper::NamedValues = {};
+std::unique_ptr<llvm::orc::KaleidoscopeJIT> Helper::TheJIT = nullptr;
+std::unique_ptr<llvm::FunctionPassManager> Helper::TheFPM = nullptr;
+std::unique_ptr<llvm::LoopAnalysisManager> Helper::TheLAM = nullptr;
+std::unique_ptr<llvm::FunctionAnalysisManager> Helper::TheFAM = nullptr;
+std::unique_ptr<llvm::CGSCCAnalysisManager> Helper::TheCGAM = nullptr;
+std::unique_ptr<llvm::ModuleAnalysisManager> Helper::TheMAM = nullptr;
+std::unique_ptr<llvm::PassInstrumentationCallbacks> Helper::ThePIC = nullptr;
+std::unique_ptr<llvm::StandardInstrumentations> Helper::TheSI = nullptr;
+llvm::ExitOnError Helper::ExitOnErr;
 
-// Define the initialization method
-void Helper::initializeModule()
+
+void Helper::InitializeModuleAndManagers()
 {
     // Create the LLVM context and module
-    TheContext = std::make_unique<llvm::LLVMContext>();
-    TheModule = std::make_unique<llvm::Module>("Yoel and neta JIT", *TheContext);
+    Helper::TheContext = std::make_unique<llvm::LLVMContext>();
+    Helper::TheModule = std::make_unique<llvm::Module>("Yoel and neta JIT", Helper::getContext());
 
     // Create the IRBuilder for the module
-    Builder = std::make_unique<llvm::IRBuilder<>>(*TheContext);
+    Helper::Builder = std::make_unique<llvm::IRBuilder<>>(Helper::getContext());
 
 
     // Create new pass and analysis managers.
-    auto TheFPM = std::make_unique<llvm::FunctionPassManager>();
-    auto TheLAM = std::make_unique<llvm::LoopAnalysisManager>();
-    auto TheFAM = std::make_unique<llvm::FunctionAnalysisManager>();
-    auto TheCGAM = std::make_unique<llvm::CGSCCAnalysisManager>();
-    auto TheMAM = std::make_unique<llvm::ModuleAnalysisManager>();
-    auto ThePIC = std::make_unique<llvm::PassInstrumentationCallbacks>();
-    auto TheSI = std::make_unique<llvm::StandardInstrumentations>(*TheContext,
+    Helper::TheFPM = std::make_unique<llvm::FunctionPassManager>();
+    Helper::TheLAM = std::make_unique<llvm::LoopAnalysisManager>();
+    Helper::TheFAM = std::make_unique<llvm::FunctionAnalysisManager>();
+    Helper::TheCGAM = std::make_unique<llvm::CGSCCAnalysisManager>();
+    Helper::TheMAM = std::make_unique<llvm::ModuleAnalysisManager>();
+    Helper::ThePIC = std::make_unique<llvm::PassInstrumentationCallbacks>();
+    Helper::TheSI = std::make_unique<llvm::StandardInstrumentations>(Helper::getContext(),
         /*DebugLogging*/ true);
-    TheSI->registerCallbacks(*ThePIC, TheMAM.get());
+    Helper::TheSI->registerCallbacks(*Helper::ThePIC, Helper::TheMAM.get());
 
     // Add transform passes.
     // Do simple "peephole" optimizations and bit-twiddling optzns.
-    TheFPM->addPass(llvm::InstCombinePass());
+    Helper::TheFPM->addPass(llvm::InstCombinePass());
     // Reassociate expressions.
-    TheFPM->addPass(llvm::ReassociatePass());
+    Helper::TheFPM->addPass(llvm::ReassociatePass());
     // Eliminate Common SubExpressions.
-    TheFPM->addPass(llvm::GVNPass());
+    Helper::TheFPM->addPass(llvm::GVNPass());
     // Simplify the control flow graph (deleting unreachable blocks, etc).
-    TheFPM->addPass(llvm::SimplifyCFGPass());
+    Helper::TheFPM->addPass(llvm::SimplifyCFGPass());
 
     // Register analysis passes used in these transform passes.
     llvm::PassBuilder PB;
-    PB.registerModuleAnalyses(*TheMAM);
-    PB.registerFunctionAnalyses(*TheFAM);
-    PB.crossRegisterProxies(*TheLAM, *TheFAM, *TheCGAM, *TheMAM);
-}
-
-
-void Helper::HandleTopLevelExpression()
-{
-    // Evaluate a top-level expression into an anonymous function.
-    if (auto FnAST = ParseTopLevelExpr()) {
-        if (FnAST->codegen()) {
-            // Create a ResourceTracker to track JIT'd memory allocated to our
-            // anonymous expression -- that way we can free it after executing.
-            auto RT = TheJIT->getMainJITDylib().createResourceTracker();
-
-            auto TSM = ThreadSafeModule(std::move(TheModule), std::move(TheContext));
-            ExitOnErr(TheJIT->addModule(std::move(TSM), RT));
-            InitializeModuleAndManagers();
-
-            // Search the JIT for the __anon_expr symbol.
-            auto ExprSymbol = ExitOnErr(TheJIT->lookup("__anon_expr"));
-
-            // Get the symbol's address and cast it to the right type (takes no
-            // arguments, returns a double) so we can call it as a native function.
-            double (*FP)() = ExprSymbol.getAddress().toPtr<double (*)()>();
-            fprintf(stderr, "Evaluated to %f\n", FP());
-
-            // Delete the anonymous expression module from the JIT.
-            ExitOnErr(RT->remove());
-        }
-    }
-    else {
-        // Skip token for error recovery.
-        getNextToken();
-    }
+    PB.registerModuleAnalyses(*Helper::TheMAM);
+    PB.registerFunctionAnalyses(*Helper::TheFAM);
+    PB.crossRegisterProxies(*Helper::TheLAM, *Helper::TheFAM, *Helper::TheCGAM, *Helper::TheMAM);
 }
 
 void Helper::createAnonymousFunction()

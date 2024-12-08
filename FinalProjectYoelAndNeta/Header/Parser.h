@@ -19,8 +19,6 @@ private:
     std::vector<Token> tokens;
     size_t currentTokenIndex;
     std::string IdentifierStr;
-    Token& currentToken();
-    void consume();
     bool isAtEnd();
 
     std::unique_ptr<ExprAST> head;
@@ -28,6 +26,9 @@ private:
 public:
     // Constructor
     Parser(const std::vector<Token>& tokens);
+    
+    void consume();
+    Token& currentToken();
 
     // Parse methods
     std::unique_ptr<ExprAST> parse();
