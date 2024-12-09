@@ -101,15 +101,21 @@ Value* IfExprAST::codegen()
 
     Function* TheFunction = Builder.GetInsertBlock()->getParent();
 
-    // Create blocks for the then and else cases.  Insert the 'then' block at the
-    // end of the function.
+    // Create basic blocks for the "then" case and merge point.
     BasicBlock* ThenBB = BasicBlock::Create(Context, "then", TheFunction);
-    BasicBlock* ElseBB = BasicBlock::Create(Context, "else");
     BasicBlock* MergeBB = BasicBlock::Create(Context, "ifcont");
 
-    Builder.CreateCondBr(CondV, ThenBB, ElseBB);
+    // Conditionally create the "else" block if it exists.
+    BasicBlock* ElseBB = nullptr;
+    if (Else) {
+        ElseBB = BasicBlock::Create(Context, "else");
+        Builder.CreateCondBr(CondV, ThenBB, ElseBB);
+    }
+    else {
+        Builder.CreateCondBr(CondV, ThenBB, MergeBB);
+    }
 
-    // Emit then value.
+    // Emit the "then" block.
     Builder.SetInsertPoint(ThenBB);
 
     Value* ThenV = Then->codegen();
@@ -117,29 +123,39 @@ Value* IfExprAST::codegen()
         return nullptr;
 
     Builder.CreateBr(MergeBB);
-    // Codegen of 'Then' can change the current block, update ThenBB for the PHI.
+
+    // Update the block for the PHI node.
     ThenBB = Builder.GetInsertBlock();
 
-    // Emit else block.
-    TheFunction->insert(TheFunction->end(), ElseBB);
-    Builder.SetInsertPoint(ElseBB);
+    Value* ElseV = nullptr; // Default if no "else".
+    if (Else) {
+        // Emit the "else" block if it exists.
+        TheFunction->insert(TheFunction->end(), ElseBB);
+        Builder.SetInsertPoint(ElseBB);
 
-    Value* ElseV = Else->codegen();
-    if (!ElseV)
-        return nullptr;
+        ElseV = Else->codegen();
+        if (!ElseV)
+            return nullptr;
 
-    Builder.CreateBr(MergeBB);
-    // Codegen of 'Else' can change the current block, update ElseBB for the PHI.
-    ElseBB = Builder.GetInsertBlock();
+        Builder.CreateBr(MergeBB);
+        ElseBB = Builder.GetInsertBlock(); // Update block for PHI.
+    }
 
-    // Emit merge block.
+    // Emit the merge block.
     TheFunction->insert(TheFunction->end(), MergeBB);
     Builder.SetInsertPoint(MergeBB);
-    PHINode* PN = Builder.CreatePHI(Type::getDoubleTy(Context), 2, "iftmp");
 
-    PN->addIncoming(ThenV, ThenBB);
-    PN->addIncoming(ElseV, ElseBB);
-    return PN;
+    if (Else) {
+        // Create a PHI node for the result of both "then" and "else".
+        PHINode* PN = Builder.CreatePHI(Type::getDoubleTy(Context), 2, "iftmp");
+        PN->addIncoming(ThenV, ThenBB);
+        PN->addIncoming(ElseV, ElseBB);
+        return PN;
+    }
+    else {
+        // If no "else", return the "then" value directly.
+        return ThenV;
+    }
 }
 
 Function* PrototypeAST::codegen()
@@ -216,6 +232,12 @@ Value* BinaryExprAST::codegen()
     case LOWER_THEN:
         L = Helper::Builder->CreateFCmpULT(L, R, "cmptmp");
         // Convert bool 0/1 to double 0.0 or 1.0
+        return Helper::Builder->CreateUIToFP(L, Type::getDoubleTy(Helper::getContext()), "booltmp");
+    case HIGHER_THEN:
+        L = Helper::Builder->CreateFCmpUGT(L, R, "cmptmp");
+        return Helper::Builder->CreateUIToFP(L, Type::getDoubleTy(Helper::getContext()), "booltmp");
+    case EQUELS_CMP:
+        L = Helper::Builder->CreateFCmpUEQ(L, R, "cmptmp");
         return Helper::Builder->CreateUIToFP(L, Type::getDoubleTy(Helper::getContext()), "booltmp");
     default:
         throw SyntaxError("invalid binary operator");

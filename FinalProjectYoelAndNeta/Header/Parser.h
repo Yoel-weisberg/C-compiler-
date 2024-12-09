@@ -31,6 +31,8 @@ public:
     // Constructor
     Parser(const std::vector<Token>& tokens);
     
+    bool isFinished() const;
+
     void consume();
     Token& currentToken();
 
@@ -49,7 +51,6 @@ public:
     std::unique_ptr<PrototypeAST> ParsePrototype();
     // Getter for the root AST
     ExprAST* getAst();
-
 };
 
 #endif // PARSER_H

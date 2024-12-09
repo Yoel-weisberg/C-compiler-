@@ -171,8 +171,9 @@ int SyntexAnalysis::checkConditionStructure(int& pos)
 	currentState currentType = OPERAND;
 	while (numPran != 0)
 	{
+		Tokens_type tokT = _tokens[pos].getType();
 		// if its a value to campare to and not a opreand
-		if (_tokens[pos].getType() == INT || _tokens[pos].getType() == IDENTIFIER || _tokens[pos].getType() == FLOAT)
+		if (tokT == INT || tokT == IDENTIFIER || tokT == FLOAT)
 		{
 			if (currentType != OPERAND)
 			{
@@ -180,13 +181,14 @@ int SyntexAnalysis::checkConditionStructure(int& pos)
 			}
 			currentType = VALUE;
 		}
-		else if (_tokens[pos].getType() == AND || _tokens[pos].getType() == OR || _tokens[pos].getType() == EQUELS_CMP || _tokens[pos].getType() == LPAREN || _tokens[pos].getType() == RPAREN)
+		else if (tokT == AND || tokT == OR || tokT == EQUELS_CMP || tokT == LPAREN 
+			|| tokT == RPAREN || tokT == LOWER_THEN || tokT == HIGHER_THEN)
 		{
-			if (_tokens[pos].getType() == LPAREN)
+			if (tokT == LPAREN)
 			{
 				numPran++;
 			}
-			else if (_tokens[pos].getType() == RPAREN)
+			else if (tokT == RPAREN)
 			{
 				numPran--;
 			}

@@ -119,6 +119,11 @@ std::unique_ptr<ExprAST> Parser::parseAssignment() {
 	return nullptr;
 }
 
+bool Parser::isFinished() const
+{
+	return currentTokenIndex == this->tokens.size();
+}
+
 std::unique_ptr<ExprAST> Parser::parseIfStatement() {
 	consume(); // eat the if.
 	std::unique_ptr<ExprAST> Else = nullptr;
@@ -133,11 +138,12 @@ std::unique_ptr<ExprAST> Parser::parseIfStatement() {
 	auto Then = ParseExpression();
 	if (!Then)
 		return nullptr;
+	
+	consume(); // eat the }
 
 	if (currentToken().getType() == ELSE)
 		Else = ParseExpression();
 
-	consume();
 
 	return std::make_unique<IfExprAST>(std::move(Cond), std::move(Then),
 		std::move(Else));
@@ -148,6 +154,7 @@ std::unique_ptr<ExprAST> Parser::ParseFloatNumberExpr()
 {
 	auto Result = std::make_unique<FloatNumberExprAST>(std::stoi(currentToken().getLiteral()));
 	consume();
+	if (currentToken().getType() == SEMICOLUMN) consume();
 	return std::move(Result);
 }
 

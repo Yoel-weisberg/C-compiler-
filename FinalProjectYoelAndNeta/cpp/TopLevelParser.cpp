@@ -39,7 +39,7 @@ void TopLevelParser::HandleTopLevelExpression()
 
 void TopLevelParser::mainLoop()
 {
-    while (true)
+    while (!parser.isFinished())
     {
         fprintf(stderr, " ready > ");
         switch (parser.currentToken().getType())
