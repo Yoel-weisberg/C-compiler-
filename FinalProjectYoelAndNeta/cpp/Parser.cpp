@@ -28,6 +28,12 @@ int Parser::getTokenPrecedence()
 // Constructor for Parser
 Parser::Parser(const std::vector<Token>& tokens)
 	: tokens(tokens), currentTokenIndex(0) {
+
+	// comparing operaters
+	BinopPrecedence[OR] = 2;
+	BinopPrecedence[AND] = 3;
+	BinopPrecedence[LOWER_THEN] = 4;
+	BinopPrecedence[HIGHER_THEN] = 5;
 	BinopPrecedence[ADDITION] = 20;
 	BinopPrecedence[SUBTRACTION] = 20;
 	BinopPrecedence[MULTIPLICATION] = 30;
@@ -106,6 +112,7 @@ std::unique_ptr<ExprAST> Parser::parseAssignment() {
 			consume(); // Move past '='
 			auto rhs = std::make_unique<FloatNumberExprAST>(std::stod(currentToken().getLiteral()));
 			consume(); // Move past the number
+			consume(); // move past the semicolomn
 			return std::make_unique<AssignExprAST>(varName, std::move(rhs), type);
 		}
 	}
@@ -203,7 +210,7 @@ std::unique_ptr<ExprAST> Parser::ParsePrimary()
 	switch (currentToken().getType())
 	{
 	case TYPE_DECLERATION:
-		return parseAssignment();
+		return this->parseAssignment();
 	case LPAREN:
 		return ParseParenExpr();
 	case IF_WORD:
@@ -213,7 +220,7 @@ std::unique_ptr<ExprAST> Parser::ParsePrimary()
 	case IDENTIFIER:
 		return ParseIdentifierExpr();
 	default:
-		break;
+		throw SyntaxError("Undefined Sentence begining");
 	}
 }
 

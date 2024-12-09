@@ -172,7 +172,7 @@ int SyntexAnalysis::checkConditionStructure(int& pos)
 	while (numPran != 0)
 	{
 		// if its a value to campare to and not a opreand
-		if (_tokens[pos].getType() == INT || _tokens[pos].getType() == IDENTIFIER)
+		if (_tokens[pos].getType() == INT || _tokens[pos].getType() == IDENTIFIER || _tokens[pos].getType() == FLOAT)
 		{
 			if (currentType != OPERAND)
 			{

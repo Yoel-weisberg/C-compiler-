@@ -7,6 +7,7 @@
 #include "Token.h"  // Make sure Token.h is in the same directory
 #include "ExprAST.h"
 #include "Constents.h"
+#include "SyntexError.h"
 
 // Forward declarations of the AST classes
 class ExprAST;
