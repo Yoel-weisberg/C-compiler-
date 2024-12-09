@@ -6,6 +6,7 @@
 #include <memory>
 #include <regex>
 #include <algorithm>
+#include <cmath>
 #include <sstream>
 
 

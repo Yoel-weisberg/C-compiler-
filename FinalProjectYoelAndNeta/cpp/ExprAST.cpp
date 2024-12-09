@@ -30,11 +30,12 @@ Value* ptrExprAST::codegen()
     //iss >> value;
     //std::hex(_valAsStr);
     //auto s = reinterpret_cast<uintptr_t>(_valAsStr);
+    uint64_t res = Helper::hexToDec(_valAsStr);
     std::cout << " " << _valAsStr << " String to int --> " << std::stoi(_valAsStr) << std::endl;
-    Constant* b = ConstantInt::get(Type::getInt64Ty(Helper::getContext()), (uint64_t)std::stoi(_valAsStr)); 
+    Constant* con = ConstantInt::get(Type::getInt64Ty(Helper::getContext()), (uint64_t)std::stoi(_valAsStr)); 
     //Constant* Sb = ConstantInt::get(Type::getInt64Ty(Helper::getContext()),value);
 
-    return ConstantExpr::getIntToPtr(b, PointerType::getUnqual(Type::getInt64Ty(Helper::getContext())));
+    return ConstantExpr::getIntToPtr(con, PointerType::getUnqual(Type::getInt64Ty(Helper::getContext())));
     //return PointerType::get(Helper::getContext(), Type::getPointerAddressSpace());
 }
 

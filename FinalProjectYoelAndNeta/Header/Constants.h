@@ -43,6 +43,8 @@ enum Tokens_type {
 
 // Other
 #define CHAR_DEC_LEN 3
+#define	HEX_VAL 55
+#define HEX_BASE 16
 
 // Variable Sizes
 #define INTEGER_AND_FLOAT_SIZE 32

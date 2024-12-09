@@ -109,6 +109,25 @@ bool Helper::isChar(const std::string& ch)
 //    return uint64Value;
 //}
 
+uint64_t Helper::hexToDec(std::string& str)
+{
+    uint64_t res = 0;
+    int index = 0;
+    for (int i = str.size() - 1; i >= 0; i--)
+    {
+        if (isalpha(str[index]))
+        {
+            res += (int(str[index]) - HEX_VAL) * std::pow(HEX_BASE, i);
+        }
+        else
+        {
+            res += (str[index]- '0') * std::pow(HEX_BASE, i);
+        }
+        index++;
+    }
+    return res;
+}
+
 llvm::Type* Helper::getLLVMptrType(std::string var_type, llvm::LLVMContext& Context, std::string var_name)
 {
     llvm::PointerType* llvm_type;
