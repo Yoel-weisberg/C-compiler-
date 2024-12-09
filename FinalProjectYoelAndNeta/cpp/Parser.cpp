@@ -28,7 +28,6 @@ int Parser::getTokenPrecedence()
 // Constructor for Parser
 Parser::Parser(const std::vector<Token>& tokens)
 	: tokens(tokens), currentTokenIndex(0) {
-	head =  parse();
 	BinopPrecedence[ADDITION] = 20;
 	BinopPrecedence[SUBTRACTION] = 20;
 	BinopPrecedence[MULTIPLICATION] = 30;
@@ -145,6 +144,38 @@ std::unique_ptr<ExprAST> Parser::ParseFloatNumberExpr()
 	return std::move(Result);
 }
 
+std::unique_ptr<ExprAST> Parser::ParseIdentifierExpr()
+{
+	std::string IdName = IdentifierStr;
+
+	consume(); // eat identifier.
+
+	if (currentToken().getType() != LPAREN) // Simple variable ref.
+		return std::make_unique<VariableExprAST>(IdName);
+
+	// Call.
+	consume(); // eat (
+	std::vector<std::unique_ptr<ExprAST>> Args;
+	if (currentToken().getType() != RPAREN) {
+		while (true) {
+			if (auto Arg = ParseExpression())
+				Args.push_back(std::move(Arg));
+			else
+				return nullptr;
+
+			if (currentToken().getType() == RPAREN)
+				break;
+
+			consume();
+		}
+	}
+
+	// Eat the ')'.
+	consume();
+
+	return std::make_unique<CallExprAST>(IdName, std::move(Args));
+}
+
 std::unique_ptr<ExprAST> Parser::ParseParenExpr()
 {
 	consume(); // eat (.
@@ -179,6 +210,8 @@ std::unique_ptr<ExprAST> Parser::ParsePrimary()
 		return parseIfStatement();
 	case FLOAT:
 		return ParseFloatNumberExpr();
+	case IDENTIFIER:
+		return ParseIdentifierExpr();
 	default:
 		break;
 	}

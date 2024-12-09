@@ -123,6 +123,19 @@ public:
 	Function* codegen();
 };
 
+/// CallExprAST - Expression class for function calls.
+class CallExprAST : public ExprAST {
+	std::string Callee;
+	std::vector<std::unique_ptr<ExprAST>> Args;
+
+public:
+	CallExprAST(const std::string& Callee,
+		std::vector<std::unique_ptr<ExprAST>> Args)
+		: Callee(Callee), Args(std::move(Args)) {}
+
+	Value* codegen() override;
+};
+
 // code like a = 5;
 //class RedefinitionExprAst : public ExprAST
 //{

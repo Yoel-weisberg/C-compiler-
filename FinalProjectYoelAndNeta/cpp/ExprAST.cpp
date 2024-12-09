@@ -221,3 +221,24 @@ Value* BinaryExprAST::codegen()
         throw SyntaxError("invalid binary operator");
     }
 }
+
+Value* CallExprAST::codegen()
+{
+    // Look up the name in the global module table.
+    Function* CalleeF = Helper::getFunction(Callee);
+    if (!CalleeF)
+        throw SyntaxError("Unknown function name");
+
+    // If argument mismatch error.
+    if (CalleeF->arg_size() != Args.size())
+        throw SyntaxError("Incorrect # arguments passed");
+
+    std::vector<Value*> ArgsV;
+    for (unsigned i = 0, e = Args.size(); i != e; ++i) {
+        ArgsV.push_back(Args[i]->codegen());
+        if (!ArgsV.back())
+            return nullptr;
+    }
+
+    return Helper::Builder->CreateCall(CalleeF, ArgsV, "calltmp");
+}

@@ -23,5 +23,6 @@ enum Tokens_type {
 	ELSE, 
 	LOWER_THEN,
 	HIGHER_THEN,
-	EQUELS_CMP
+	EQUELS_CMP,
+	COMMA
 };

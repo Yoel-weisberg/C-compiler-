@@ -17,7 +17,8 @@ std::map<std::string, Tokens_type> Helper::literalToType = {
     {"}", R_CURLY_PRAN},
     {">", HIGHER_THEN},
     {"<", LOWER_THEN},
-    {"==", EQUELS_CMP}
+    {"==", EQUELS_CMP},
+    {",", COMMA}
 };
 
 SymbolTable Helper::symbolTable;
@@ -36,19 +37,31 @@ std::unique_ptr<llvm::PassInstrumentationCallbacks> Helper::ThePIC = nullptr;
 std::unique_ptr<llvm::StandardInstrumentations> Helper::TheSI = nullptr;
 std::map<std::string, std::unique_ptr<PrototypeAST>> Helper::FunctionProtos;
 llvm::ExitOnError Helper::ExitOnErr;
-
-
 void Helper::InitializeModuleAndManagers()
 {
     // Create the LLVM context and module
     Helper::TheContext = std::make_unique<llvm::LLVMContext>();
     Helper::TheModule = std::make_unique<llvm::Module>("Yoel and neta JIT", Helper::getContext());
 
+    // Initialize the JIT
+    if (!Helper::TheJIT) {
+        auto JITOrError = llvm::orc::KaleidoscopeJIT::Create();
+        if (!JITOrError) {
+            llvm::logAllUnhandledErrors(JITOrError.takeError(), llvm::errs(),
+                "Error creating JIT: ");
+            return;
+        }
+        Helper::TheJIT = std::move(*JITOrError);
+    }
+
+    // Set the Module's DataLayout to match the JIT's DataLayout
+    Helper::TheModule->setDataLayout(Helper::TheJIT->getDataLayout());
+
+
     // Create the IRBuilder for the module
     Helper::Builder = std::make_unique<llvm::IRBuilder<>>(Helper::getContext());
 
-
-    // Create new pass and analysis managers.
+    // Create new pass and analysis managers
     Helper::TheFPM = std::make_unique<llvm::FunctionPassManager>();
     Helper::TheLAM = std::make_unique<llvm::LoopAnalysisManager>();
     Helper::TheFAM = std::make_unique<llvm::FunctionAnalysisManager>();
@@ -59,48 +72,19 @@ void Helper::InitializeModuleAndManagers()
         /*DebugLogging*/ true);
     Helper::TheSI->registerCallbacks(*Helper::ThePIC, Helper::TheMAM.get());
 
-    // Add transform passes.
-    // Do simple "peephole" optimizations and bit-twiddling optzns.
-    Helper::TheFPM->addPass(llvm::InstCombinePass());
-    // Reassociate expressions.
-    Helper::TheFPM->addPass(llvm::ReassociatePass());
-    // Eliminate Common SubExpressions.
-    Helper::TheFPM->addPass(llvm::GVNPass());
-    // Simplify the control flow graph (deleting unreachable blocks, etc).
-    Helper::TheFPM->addPass(llvm::SimplifyCFGPass());
+    // Add transform passes
+    Helper::TheFPM->addPass(llvm::InstCombinePass());      // Do simple optimizations
+    Helper::TheFPM->addPass(llvm::ReassociatePass());      // Reassociate expressions
+    Helper::TheFPM->addPass(llvm::GVNPass());             // Eliminate common subexpressions
+    Helper::TheFPM->addPass(llvm::SimplifyCFGPass());     // Simplify the control flow graph
 
-    // Register analysis passes used in these transform passes.
+    // Register analysis passes used in these transform passes
     llvm::PassBuilder PB;
     PB.registerModuleAnalyses(*Helper::TheMAM);
     PB.registerFunctionAnalyses(*Helper::TheFAM);
     PB.crossRegisterProxies(*Helper::TheLAM, *Helper::TheFAM, *Helper::TheCGAM, *Helper::TheMAM);
 }
 
-void Helper::createAnonymousFunction()
-{
-    // Create the function type (void function with no arguments)
-    llvm::FunctionType* funcType = llvm::FunctionType::get(llvm::Type::getVoidTy(getContext()), false);
-
-    // Create the function in the module
-    llvm::Function* anonFunc = llvm::Function::Create(
-        funcType,
-        llvm::Function::ExternalLinkage,
-        "", // No name, makes it anonymous
-        getModule()
-    );
-
-    // Add an entry block to the function
-    llvm::BasicBlock* entryBlock = llvm::BasicBlock::Create(getContext(), "entry", anonFunc);
-
-    // Set the builder's insertion point to the entry block
-    getBuilder().SetInsertPoint(entryBlock);
-
-
-    // Verify the function
-    if (llvm::verifyFunction(*anonFunc, &llvm::errs())) {
-        std::cerr << "Error: Invalid LLVM function generated.\n";
-    }
-}
 
 Function* Helper::getFunction(std::string Name)
 {
