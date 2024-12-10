@@ -52,7 +52,7 @@ std::unique_ptr<ExprAST> Parser::parseAssignment() {
 	{
 		return regularAssignmentParsing();
 	}
-	if (currentToken().getType() == PTR_TYPE_DELERATION)
+	if (currentToken().getType() == PTR_TYPE_DECLERATION)
 	{
 		return ptrAssignmentParsing();
 	}

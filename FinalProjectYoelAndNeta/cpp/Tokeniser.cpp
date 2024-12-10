@@ -97,16 +97,22 @@ Tokens_type Tokeniser::categoriseLiteral(const std::string& literal)
 	//	Check for pointer declerations
 	if (literal[literal.size() - 1] == MULTIPLICATION_LITERAL && (std::find(Helper::definedTypes.begin(), Helper::definedTypes.end(), removeSpecialCharacter(literal)) != Helper::definedTypes.end()))
 	{
-		return PTR_TYPE_DELERATION;
+		return PTR_TYPE_DECLERATION;
 	}
 	// Check for address referance
 	else if (literal[0] == AMPERSEND_LITERAL && literal.size() > 1)
 	{
 		return ADDR_REFERENCE;
 	}
+	else if ((literal[literal.size() - 2] == SQUARE_BRACK_L) 
+		&& (literal[literal.size() - 1] == SQUARE_BRACK_R)
+		&& (std::find(Helper::definedTypes.begin(), Helper::definedTypes.end(), removeSpecialCharacter(literal)) != Helper::definedTypes.end()))
+	{
+		std::cout << "Found Array!!! Hurray!!!" << std::endl;
+		return ARR_TYPE_DECLERATION;
+	}
 	else if (!literal.empty())
 	{
-
 		return IDENTIFIER; // Returning identifier without error handeling which would happen in the syntax analysis phase
 	}
 

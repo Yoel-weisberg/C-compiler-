@@ -119,7 +119,7 @@ void SyntaxAnalysis::validSentences()
 				// adding 1 because function returns the last token of the sentence
 				pos = variableDefinitionStructure(pos) + 1;
 			}
-			else if (_tokens[pos].getType() == PTR_TYPE_DELERATION)
+			else if (_tokens[pos].getType() == PTR_TYPE_DECLERATION)
 			{
 				pos = ptrVariableDefenitionStructure(pos + 1) + 1;
 			}
