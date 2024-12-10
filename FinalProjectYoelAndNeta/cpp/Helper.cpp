@@ -37,53 +37,45 @@ std::unique_ptr<llvm::PassInstrumentationCallbacks> Helper::ThePIC = nullptr;
 std::unique_ptr<llvm::StandardInstrumentations> Helper::TheSI = nullptr;
 std::map<std::string, std::unique_ptr<PrototypeAST>> Helper::FunctionProtos;
 llvm::ExitOnError Helper::ExitOnErr;
+
 void Helper::InitializeModuleAndManagers()
 {
-    // Create the LLVM context and module
-    Helper::TheContext = std::make_unique<llvm::LLVMContext>();
-    Helper::TheModule = std::make_unique<llvm::Module>("Yoel and neta JIT", Helper::getContext());
+    // Open a new context and module.
+    TheContext = std::make_unique<LLVMContext>();
+    TheModule = std::make_unique<Module>("Yoel and neta JIT", *TheContext);
+    TheModule->setDataLayout(TheJIT->getDataLayout());
 
-    // Initialize the JIT
-    if (!Helper::TheJIT) {
-        auto JITOrError = llvm::orc::KaleidoscopeJIT::Create();
-        if (!JITOrError) {
-            llvm::logAllUnhandledErrors(JITOrError.takeError(), llvm::errs(),
-                "Error creating JIT: ");
-            return;
-        }
-        Helper::TheJIT = std::move(*JITOrError);
-    }
+    // Create a new builder for the module.
+    Builder = std::make_unique<IRBuilder<>>(*TheContext);
 
-    // Set the Module's DataLayout to match the JIT's DataLayout
-    Helper::TheModule->setDataLayout(Helper::TheJIT->getDataLayout());
-
-
-    // Create the IRBuilder for the module
-    Helper::Builder = std::make_unique<llvm::IRBuilder<>>(Helper::getContext());
-
-    // Create new pass and analysis managers
-    Helper::TheFPM = std::make_unique<llvm::FunctionPassManager>();
-    Helper::TheLAM = std::make_unique<llvm::LoopAnalysisManager>();
-    Helper::TheFAM = std::make_unique<llvm::FunctionAnalysisManager>();
-    Helper::TheCGAM = std::make_unique<llvm::CGSCCAnalysisManager>();
-    Helper::TheMAM = std::make_unique<llvm::ModuleAnalysisManager>();
-    Helper::ThePIC = std::make_unique<llvm::PassInstrumentationCallbacks>();
-    Helper::TheSI = std::make_unique<llvm::StandardInstrumentations>(Helper::getContext(),
+    // Create new pass and analysis managers.
+    TheFPM = std::make_unique<FunctionPassManager>();
+    TheLAM = std::make_unique<LoopAnalysisManager>();
+    TheFAM = std::make_unique<FunctionAnalysisManager>();
+    TheCGAM = std::make_unique<CGSCCAnalysisManager>();
+    TheMAM = std::make_unique<ModuleAnalysisManager>();
+    ThePIC = std::make_unique<PassInstrumentationCallbacks>();
+    TheSI = std::make_unique<StandardInstrumentations>(*TheContext,
         /*DebugLogging*/ true);
-    Helper::TheSI->registerCallbacks(*Helper::ThePIC, Helper::TheMAM.get());
+    TheSI->registerCallbacks(*ThePIC, TheMAM.get());
 
-    // Add transform passes
-    Helper::TheFPM->addPass(llvm::InstCombinePass());      // Do simple optimizations
-    Helper::TheFPM->addPass(llvm::ReassociatePass());      // Reassociate expressions
-    Helper::TheFPM->addPass(llvm::GVNPass());             // Eliminate common subexpressions
-    Helper::TheFPM->addPass(llvm::SimplifyCFGPass());     // Simplify the control flow graph
+    // Add transform passes.
+    // Do simple "peephole" optimizations and bit-twiddling optzns.
+    TheFPM->addPass(InstCombinePass());
+    // Reassociate expressions.
+    TheFPM->addPass(ReassociatePass());
+    // Eliminate Common SubExpressions.
+    TheFPM->addPass(GVNPass());
+    // Simplify the control flow graph (deleting unreachable blocks, etc).
+    TheFPM->addPass(SimplifyCFGPass());
 
-    // Register analysis passes used in these transform passes
-    llvm::PassBuilder PB;
-    PB.registerModuleAnalyses(*Helper::TheMAM);
-    PB.registerFunctionAnalyses(*Helper::TheFAM);
-    PB.crossRegisterProxies(*Helper::TheLAM, *Helper::TheFAM, *Helper::TheCGAM, *Helper::TheMAM);
+    // Register analysis passes used in these transform passes.
+    PassBuilder PB;
+    PB.registerModuleAnalyses(*TheMAM);
+    PB.registerFunctionAnalyses(*TheFAM);
+    PB.crossRegisterProxies(*TheLAM, *TheFAM, *TheCGAM, *TheMAM);
 }
+
 
 
 Function* Helper::getFunction(std::string Name)

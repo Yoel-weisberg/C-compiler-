@@ -15,148 +15,128 @@ Value* VariableExprAST::codegen()
 }
 
 // code like int a = 5;
-Value* AssignExprAST::codegen() {
-    // Check if the variable already exists in the symbol table
+llvm::Value* AssignExprAST::codegen() {
+    llvm::IRBuilder<>& Builder = Helper::getBuilder(); // Using the active Builder
+    llvm::LLVMContext& Context = Helper::getContext(); // Using the Context from Helper
+    llvm::Type* llvmType = nullptr;
+
+    // Map the variable type to LLVM types
+    if (_varType == "int") {
+        llvmType = llvm::Type::getInt32Ty(Context);
+    }
+    else if (_varType == "float") {
+        llvmType = llvm::Type::getFloatTy(Context);
+    }
+    else {
+        std::cerr << "Error: Unsupported variable type '" << _varType << "'.\n";
+        return nullptr;
+    }
+
+    // Check if the variable exists in the symbol table
     auto symbolOpt = Helper::symbolTable.findSymbol(_VarName);
+    llvm::Value* varAddress = nullptr;
+
     if (!symbolOpt) {
-        // Variable is not declared, allocate and add it to the symbol table
-        llvm::IRBuilder<>& Builder = Helper::getBuilder(); // Using the Builder from Helper
-        llvm::LLVMContext& Context = Helper::getContext(); // Using the Context from Helper
-        llvm::Type* llvmType;
-
-        // Map the variable type to LLVM types
-        if (_varType == "int") {
-            llvmType = llvm::Type::getInt32Ty(Context);
-        }
-        else if (_varType == "float") {
-            llvmType = llvm::Type::getFloatTy(Context);
-        }
-        else {
-            std::cerr << "Error: Unsupported variable type '" << _varType << "'.\n";
-            return nullptr;
-        }
-
-        // Ensure we are in the context of a function
+        // Ensure we are in a function context
         llvm::Function* currentFunction = Builder.GetInsertBlock()->getParent();
         if (!currentFunction) {
             std::cerr << "Error: Attempting to allocate variable outside of a function.\n";
             return nullptr;
         }
 
-        // Move the builder's insertion point to the function's entry block
+        // Allocate memory for the variable in the entry block
         llvm::IRBuilder<> tempBuilder(&currentFunction->getEntryBlock(),
             currentFunction->getEntryBlock().begin());
-
-        // Allocate memory for the variable at the entry block
-        llvm::Value* varAddress = tempBuilder.CreateAlloca(llvmType, nullptr, _VarName.c_str());
-
+        varAddress = tempBuilder.CreateAlloca(llvmType, nullptr, _VarName.c_str());
 
         // Add the variable to the symbol table
         Helper::symbolTable.addSymbol(_VarName, _varType, varAddress);
-
-        // Re-fetch the symbol from the symbol table
-        symbolOpt = Helper::symbolTable.findSymbol(_VarName);
+    }
+    else {
+        // Retrieve the variable address from the symbol table
+        varAddress = symbolOpt->get().getLLVMValue();
+        if (!varAddress) {
+            std::cerr << "Error: Variable '" << _VarName << "' has no allocated memory.\n";
+            return nullptr;
+        }
     }
 
-    if (!symbolOpt) {
-        std::cerr << "Error: Failed to retrieve the variable '" << _VarName << "' after adding it.\n";
-        return nullptr;
-    }
-
-    Symbol& symbol = symbolOpt->get();
-
-    // Generate code for the right-hand side expression (only once)
+    // Generate code for the RHS expression
     llvm::Value* rhsValue = _Value->codegen();
     if (!rhsValue) {
         std::cerr << "Error: Failed to generate code for the assigned value.\n";
         return nullptr;
     }
 
-    // Retrieve the LLVM value (address) of the variable
-    llvm::Value* varAddress = symbol.getLLVMValue();
-    if (!varAddress) {
-        std::cerr << "Error: Variable '" << _VarName << "' has no allocated memory.\n";
-        return nullptr;
-    }
-
-    // Store the RHS value in the variable
-    llvm::IRBuilder<>& Builder = Helper::getBuilder(); // Use the Builder from Helper
+    // Store the RHS value in the allocated variable
     Builder.CreateStore(rhsValue, varAddress);
 
-    return rhsValue; // Return the RHS value for chaining if needed
+    // Return the address of the variable or the RHS value as needed
+    return varAddress;
 }
 
-Value* IfExprAST::codegen()
-{
-    llvm::IRBuilder<>& Builder = Helper::getBuilder(); // Using the Builder from Helper
-    llvm::LLVMContext& Context = Helper::getContext(); // Using the Context from Helper
-
+Value* IfExprAST::codegen() {
     Value* CondV = Cond->codegen();
     if (!CondV)
         return nullptr;
 
     // Convert condition to a bool by comparing non-equal to 0.0.
-    CondV = Builder.CreateFCmpONE(
-        CondV, ConstantFP::get(Context, APFloat(0.0)), "ifcond");
+    CondV = Helper::Builder->CreateFCmpONE(
+        CondV, ConstantFP::get(*Helper::TheContext, APFloat(0.0)), "ifcond");
 
-    Function* TheFunction = Builder.GetInsertBlock()->getParent();
+    Function* TheFunction = Helper::Builder->GetInsertBlock()->getParent();
 
-    // Create basic blocks for the "then" case and merge point.
-    BasicBlock* ThenBB = BasicBlock::Create(Context, "then", TheFunction);
-    BasicBlock* MergeBB = BasicBlock::Create(Context, "ifcont");
+    // Create blocks for the then and merge cases. Insert the 'then' block at the end of the function.
+    BasicBlock* ThenBB = BasicBlock::Create(*Helper::TheContext, "then", TheFunction);
+    BasicBlock* MergeBB = BasicBlock::Create(*Helper::TheContext, "ifcont");
 
-    // Conditionally create the "else" block if it exists.
     BasicBlock* ElseBB = nullptr;
     if (Else) {
-        ElseBB = BasicBlock::Create(Context, "else");
-        Builder.CreateCondBr(CondV, ThenBB, ElseBB);
+        ElseBB = BasicBlock::Create(*Helper::TheContext, "else", TheFunction);
+    }
+
+    // Create conditional branch.
+    if (Else) {
+        Helper::Builder->CreateCondBr(CondV, ThenBB, ElseBB);
     }
     else {
-        Builder.CreateCondBr(CondV, ThenBB, MergeBB);
+        Helper::Builder->CreateCondBr(CondV, ThenBB, MergeBB);
     }
 
-    // Emit the "then" block.
-    Builder.SetInsertPoint(ThenBB);
-
+    // Emit then value.
+    Helper::Builder->SetInsertPoint(ThenBB);
     Value* ThenV = Then->codegen();
     if (!ThenV)
         return nullptr;
 
-    Builder.CreateBr(MergeBB);
+    Helper::Builder->CreateBr(MergeBB);
+    ThenBB = Helper::Builder->GetInsertBlock();
 
-    // Update the block for the PHI node.
-    ThenBB = Builder.GetInsertBlock();
-
-    Value* ElseV = nullptr; // Default if no "else".
+    // Emit else block if it exists.
+    Value* ElseV = nullptr;
     if (Else) {
-        // Emit the "else" block if it exists.
         TheFunction->insert(TheFunction->end(), ElseBB);
-        Builder.SetInsertPoint(ElseBB);
-
+        Helper::Builder->SetInsertPoint(ElseBB);
         ElseV = Else->codegen();
         if (!ElseV)
             return nullptr;
 
-        Builder.CreateBr(MergeBB);
-        ElseBB = Builder.GetInsertBlock(); // Update block for PHI.
+        Helper::Builder->CreateBr(MergeBB);
+        ElseBB = Helper::Builder->GetInsertBlock();
     }
 
-    // Emit the merge block.
+    // Emit merge block.
     TheFunction->insert(TheFunction->end(), MergeBB);
-    Builder.SetInsertPoint(MergeBB);
+    Helper::Builder->SetInsertPoint(MergeBB);
 
-    if (Else) {
-        // Create a PHI node for the result of both "then" and "else".
-        PHINode* PN = Builder.CreatePHI(Type::getDoubleTy(Context), 2, "iftmp");
-        PN->addIncoming(ThenV, ThenBB);
+    PHINode* PN = Helper::Builder->CreatePHI(Type::getDoubleTy(*Helper::TheContext), 2, "iftmp");
+    PN->addIncoming(ThenV, ThenBB);
+    if (Else)
         PN->addIncoming(ElseV, ElseBB);
-        return PN;
-    }
-    else {
-        // If no "else", return the "then" value directly.
-        return ThenV;
-    }
+
+    return PN;
 }
+
 
 Function* PrototypeAST::codegen()
 {
@@ -198,6 +178,7 @@ Function* FunctionAST::codegen()
     //    SymbolTable   = &Arg;
 
     if (Value* RetVal = Body->codegen()) {
+        Helper::TheModule->print(llvm::errs(), nullptr); // Print IR here
         // Finish off the function.
        Helper::Builder->CreateRet(RetVal);
 

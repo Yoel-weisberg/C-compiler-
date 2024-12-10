@@ -8,6 +8,8 @@
 #include "../Header/Parser.h"
 #include "TopLevelParser.h"
 #include "Helper.h"
+#include "llvm/Support/Error.h"           // For llvm::Error and llvm::Expected
+#include "llvm/Support/ErrorHandling.h"   // For llvm::ExitOnError
 
 int main(int argc, char* argv[]) {
 
@@ -16,7 +18,6 @@ int main(int argc, char* argv[]) {
 		InitializeNativeTarget();
 		InitializeNativeTargetAsmPrinter();
 		InitializeNativeTargetAsmParser();
-		Helper::InitializeModuleAndManagers();
 
 		std::cout << "----      Compiler for C :)       ----" << std::endl;
 
@@ -37,6 +38,8 @@ int main(int argc, char* argv[]) {
 
 		// ----     Parser                         ----
 		TopLevelParser parser = TopLevelParser(tokeniser.getTokens());
+		Helper::TheJIT = Helper::ExitOnErr(llvm::orc::KaleidoscopeJIT::Create());
+		Helper::InitializeModuleAndManagers();
 		parser.mainLoop();
 
 	
