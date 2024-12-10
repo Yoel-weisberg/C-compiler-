@@ -20,9 +20,15 @@ private:
 	std::vector<Token> _tokens;
 
 	void checkParentheses();
-	void checkAlgebricStructure(); // No use!
-	int variableDefinitionStructure( int pos);
+	//void checkAlgebricStructure(); // No use!
 	bool doesVariableFitType(const std::string& type, std::string value);
-	void validSentences(); // a function to check that the code is made from a list of leagel sentences 
+	void validSentences(); // a function to check that the code is made from a list of leagel sentences
+	// Definitoin checkeing
 	int ptrVariableDefenitionStructure(int pos);
+	int variableDefinitionStructure(int pos);
+	int arrTypeVariableDefinitionStructure(int pos);
+	//bool innerArrInit(int pos, int arrType);
+
+
+	// 
 };

@@ -3,7 +3,7 @@
 // Define static members
 //std::vector<std::string> Helper::definedTypes = { FLOAT , INTEGER, CHAR};
 std::vector<std::string> Helper::definedTypes = { "float" , "int", "char"};
-std::vector<char> Helper::separetors = { SEMICOLON_LITERAL, LPAREN_LITERAL, RPAREN_LITERAL, EQUAL_SIGN_LITERAL };
+std::vector<char> Helper::separetors = { SEMICOLON_LIT, LPAREN_LIT, RPAREN_LIT, EQUAL_SIGN_LIT };
 std::vector<char> Helper::quotes = {SINGLE_QUOTE_LITERAL, DOUBLE_QUOTE_LITERAL};
 SymbolTable Helper::symbolTable;
 
@@ -178,7 +178,7 @@ llvm::Value* Helper::allocForNewSymbol(std::string var_name, std::string var_typ
         llvmType = llvm::Type::getInt8Ty(Context);
     }
     // Pointer
-    else if (var_type[var_type.size() -1] == MULTIPLICATION_LITERAL) 
+    else if (var_type[var_type.size() -1] == MULTIPLICATION_LIT) 
     {
         // SOURCE FOR SOLUTION --> https://stackoverflow.com/questions/9434602/creating-new-types-in-llvm-in-particular-a-pointer-to-function-type
         is_a_pointer = true;

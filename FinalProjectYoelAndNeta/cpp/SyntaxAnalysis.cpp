@@ -90,6 +90,70 @@ int SyntaxAnalysis::variableDefinitionStructure(int pos)
 	}
 }
 
+int SyntaxAnalysis::arrTypeVariableDefinitionStructure(int pos)
+{
+	int type_pos = pos; // Position of the array type
+	pos++;
+	if ((_tokens[pos].getType() != IDENTIFIER) && !(Helper::checkIdentifier(_tokens[pos].getLiteral())))
+	{
+		throw SyntaxError("Missing Identifier");
+	}
+	std::cout << "pos -- > " << _tokens[pos].getLiteral() << std::endl;
+	pos++;
+	if (_tokens[pos].getType() != EQUAL_SIGN)
+	{
+		throw SyntaxError("missing '='");
+	}
+	pos++;
+	// check array initilization, bracket placement
+	if (_tokens[pos].getLiteral() != std::string(1, CURL_BR_L_LIT) || _tokens[pos + 2].getLiteral() != std::string(1, CURL_BR_R_LIT))
+	{
+		throw SyntaxError("Missing bracket");
+	}
+	// check inside of initilization in parser
+	pos++;
+	pos++;
+	pos++;
+	return pos;
+
+	
+}
+
+//bool SyntaxAnalysis::innerArrInit(int pos, int arrTypePos)
+//{
+//	std::cout << "To check --> " << _tokens[pos].getLiteral() << std::endl;
+//	bool commaFl, valF = false; // F for "found"
+//	std::string literal = _tokens[pos].getLiteral();
+//	std::string arrType = _tokens[arrTypePos].getLiteral().substr(0, _tokens[arrTypePos].getLiteral().size() - 2);
+//	try
+//	{
+//		if (literal[0] == COMMA_LIT)
+//		{
+//			throw SyntaxError("")
+//		}
+//		for (int i = 0; i < literal.size(); i++)
+//		{
+//			if(literal[i] != )
+//			if (arrType == INTEGER)
+//			{
+//
+//			}
+//			if (arrType == FLOAT)
+//			{
+//
+//			}
+//			if (arrType == CHAR)
+//			{
+//
+//			}
+//		}
+//	}
+//	catch (const std::exception& e)
+//	{
+//		throw SyntaxError("Invalid Array initilization");
+//	}
+//}
+
 
 bool SyntaxAnalysis::doesVariableFitType(const std::string& type, std::string value)
 {
@@ -122,6 +186,11 @@ void SyntaxAnalysis::validSentences()
 			else if (_tokens[pos].getType() == PTR_TYPE_DECLERATION)
 			{
 				pos = ptrVariableDefenitionStructure(pos + 1) + 1;
+			}
+			else if (_tokens[pos].getType() == ARR_TYPE_DECLERATION)
+			{
+				std::cout << "Arr to syn --> " << _tokens[pos].getLiteral() << std::endl;
+				pos = arrTypeVariableDefinitionStructure(pos); // send identifier
 			}
 			// TODO - checking if the sentence just a defined identifier (like just 3; or somthing like that)
 			// TODO - need to check if its a redefinition of t a symbol 

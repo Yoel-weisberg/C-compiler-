@@ -18,23 +18,28 @@ enum Tokens_type {
 	AMPERSEND,
 	PTR_TYPE_DECLERATION, 
 	ADDR_REFERENCE,
-	ARR_TYPE_DECLERATION
+	ARR_TYPE_DECLERATION,
+	CURL_BR,
 };
 
-#define RPAREN_LITERAL ')'
-#define LPAREN_LITERAL '('
-#define ADDITION_LITERAL '+'
-#define MULTIPLICATION_LITERAL '*'
-#define DIVISION_LITERAL '/'
-#define SUBSTRICTION_LITERAL '-'
-#define EQUAL_SIGN_LITERAL '='
-#define SEMICOLON_LITERAL ';'
-#define AMPERSEND_LITERAL '&'
-#define SQUARE_BRACK_L '['
-#define SQUARE_BRACK_R ']'
+// LIT is short for "LITERAL"
+#define RPAREN_LIT ')'
+#define LPAREN_LIT '('
+#define ADDITION_LIT '+'
+#define MULTIPLICATION_LIT '*'
+#define DIVISION_LIT '/'
+#define SUBSTRICTION_LIT '-'
+#define EQUAL_SIGN_LIT '='
+#define SEMICOLON_LIT ';'
+#define AMPERSEND_LIT '&'
+#define SQUARE_BR_L_LIT '['
+#define SQUARE_BR_R_LIT ']'
+#define CURL_BR_L_LIT '{'
+#define CURL_BR_R_LIT '}'
 
 #define SINGLE_QUOTE_LITERAL '\''
 #define DOUBLE_QUOTE_LITERAL '"'
+#define	COMMA_LIT ','
 
 // ------ Keywords ------
 // -- variable types --

@@ -49,40 +49,44 @@ std::vector<Token> Tokeniser::getTokens() const
 
 Tokens_type Tokeniser::categoriseLiteral(const std::string& literal)
 {
-	if (literal == std::string(1, LPAREN_LITERAL))
+	if (literal == std::string(1, LPAREN_LIT))
 	{
 		return LPAREN;
 	}
-	else if (literal == std::string(1, RPAREN_LITERAL))
+	else if (literal == std::string(1, RPAREN_LIT))
 	{
 		return RPAREN;
 	}
-	else if (literal == std::string(1, ADDITION_LITERAL))
+	else if (literal == std::string(1, ADDITION_LIT))
 	{
 		return ADDITION;
 	}
-	else if (literal == std::string(1, MULTIPLICATION_LITERAL))
+	else if (literal == std::string(1, MULTIPLICATION_LIT))
 	{
 		return MULTIPLICATION;
 	}
-	else if (literal == std::string(1, DIVISION_LITERAL))
+	else if (literal == std::string(1, DIVISION_LIT))
 	{
 		return DIVISION;
 	}
-	else if (literal == std::string(1, SUBSTRICTION_LITERAL))
+	else if (literal == std::string(1, SUBSTRICTION_LIT))
 	{
 		return SUBTRACTION;
+	}
+	else if (literal == std::string(1, CURL_BR_L_LIT) || literal == std::string(1, CURL_BR_R_LIT))
+	{
+		return CURL_BR;
 	}
 	else if (isNumber(literal))
 	{
 		// Assuming INT is the default case for literals that aren't operators or parentheses
 		return INT;
 	}
-	else if (literal[0] == EQUAL_SIGN_LITERAL)
+	else if (literal[0] == EQUAL_SIGN_LIT)
 	{
 		return EQUAL_SIGN;
 	}
-	else if (literal[0] == SEMICOLON_LITERAL)
+	else if (literal[0] == SEMICOLON_LIT)
 	{
 		return SEMICOLON;
 	}
@@ -95,17 +99,17 @@ Tokens_type Tokeniser::categoriseLiteral(const std::string& literal)
 		return TYPE_DECLERATION;
 	}
 	//	Check for pointer declerations
-	if (literal[literal.size() - 1] == MULTIPLICATION_LITERAL && (std::find(Helper::definedTypes.begin(), Helper::definedTypes.end(), removeSpecialCharacter(literal)) != Helper::definedTypes.end()))
+	if (literal[literal.size() - 1] == MULTIPLICATION_LIT && (std::find(Helper::definedTypes.begin(), Helper::definedTypes.end(), removeSpecialCharacter(literal)) != Helper::definedTypes.end()))
 	{
 		return PTR_TYPE_DECLERATION;
 	}
 	// Check for address referance
-	else if (literal[0] == AMPERSEND_LITERAL && literal.size() > 1)
+	else if (literal[0] == AMPERSEND_LIT && literal.size() > 1)
 	{
 		return ADDR_REFERENCE;
 	}
-	else if ((literal[literal.size() - 2] == SQUARE_BRACK_L) 
-		&& (literal[literal.size() - 1] == SQUARE_BRACK_R)
+	else if ((literal[literal.size() - 2] == SQUARE_BR_L_LIT) 
+		&& (literal[literal.size() - 1] == SQUARE_BR_R_LIT)
 		&& (std::find(Helper::definedTypes.begin(), Helper::definedTypes.end(), removeSpecialCharacter(literal)) != Helper::definedTypes.end()))
 	{
 		std::cout << "Found Array!!! Hurray!!!" << std::endl;
