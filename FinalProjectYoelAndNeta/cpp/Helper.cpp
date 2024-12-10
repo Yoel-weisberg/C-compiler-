@@ -1,7 +1,7 @@
 #include "../Header/Helper.h"
 
 // Define static members
-std::vector<std::string> Helper::definedTypes = { "float" };
+std::vector<std::string> Helper::definedTypes = { "float", "void"};
 std::map<std::string, Tokens_type> Helper::literalToType = {
     {")", RPAREN},
     {"(", LPAREN},
