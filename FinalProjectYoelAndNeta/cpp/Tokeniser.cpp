@@ -108,13 +108,13 @@ Tokens_type Tokeniser::categoriseLiteral(const std::string& literal)
 	{
 		return ADDR_REFERENCE;
 	}
-	else if ((literal[literal.size() - 2] == SQUARE_BR_L_LIT) 
-		&& (literal[literal.size() - 1] == SQUARE_BR_R_LIT)
-		&& (std::find(Helper::definedTypes.begin(), Helper::definedTypes.end(), removeSpecialCharacter(literal)) != Helper::definedTypes.end()))
-	{
-		std::cout << "Found Array!!! Hurray!!!" << std::endl;
-		return ARR_TYPE_DECLERATION;
-	}
+	//else if ((literal[literal.size() - 2] == SQUARE_BR_L_LIT) 
+	//	&& (literal[literal.size() - 1] == SQUARE_BR_R_LIT)
+	//	&& (std::find(Helper::definedTypes.begin(), Helper::definedTypes.end(), removeSpecialCharacter(literal)) != Helper::definedTypes.end()))
+	//{
+	//	std::cout << "Found Array!!! Hurray!!!" << std::endl;
+	//	return ARR_TYPE_DECLERATION;
+	//}
 	else if (!literal.empty())
 	{
 		return IDENTIFIER; // Returning identifier without error handeling which would happen in the syntax analysis phase

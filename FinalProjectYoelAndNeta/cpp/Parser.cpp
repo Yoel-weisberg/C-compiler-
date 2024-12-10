@@ -56,6 +56,10 @@ std::unique_ptr<ExprAST> Parser::parseAssignment() {
 	{
 		return ptrAssignmentParsing();
 	}
+	if (currentToken().getType() == ARR_TYPE_DECLERATION)
+	{
+		return arrAssignmentParsing();
+	}
 	return nullptr;
 }
 
@@ -129,5 +133,45 @@ std::unique_ptr<ExprAST> Parser::regularAssignmentParsing()
 			consume(); // Move past value
 			return std::make_unique<AssignExprAST>(varName, std::move(value_literal), type);
 		}
+	}
+}
+
+std::unique_ptr<ExprAST> Parser::arrAssignmentParsing()
+{
+	bool commaF, valF = false; // F for "found"
+	std::string type = currentToken().getLiteral();
+	consume();
+	std::string varName = currentToken().getLiteral().substr(0, currentToken().getLiteral().size() - 2); // Cut out '[]'
+	consume();
+	consume(); // Move past '='
+	consume(); // Move part '{'
+	std::string init = currentToken().getLiteral();
+	try
+	{
+
+		if (init[0] == COMMA_LIT)
+		{
+			throw ParserError("Value missing");
+		}
+		for (int i = 0; i < init.size(); i++)
+		{
+			if (type == INTEGER)
+			{
+
+			}
+			if (type == FLOAT)
+			{
+
+			}
+			if (type == CHAR)
+			{
+
+			}
+		}
+		//return std::unique_ptr<ExprAST>();
+	}
+	catch (const std::exception& e)
+	{
+		std::cerr << e.what() << std::endl;
 	}
 }

@@ -40,6 +40,7 @@ enum Tokens_type {
 #define SINGLE_QUOTE_LITERAL '\''
 #define DOUBLE_QUOTE_LITERAL '"'
 #define	COMMA_LIT ','
+#define ARR_INIT_LIT "[]"
 
 // ------ Keywords ------
 // -- variable types --

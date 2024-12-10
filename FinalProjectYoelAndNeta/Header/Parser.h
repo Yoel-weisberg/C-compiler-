@@ -42,6 +42,7 @@ public:
     std::unique_ptr<ExprAST> parseAssignment();
     std::unique_ptr<ExprAST> ptrAssignmentParsing();
     std::unique_ptr<ExprAST> regularAssignmentParsing();
+    std::unique_ptr<ExprAST> arrAssignmentParsing();
     
     // Getter for the root AST
     ExprAST* getAst();
