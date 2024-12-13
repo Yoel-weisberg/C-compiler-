@@ -158,7 +158,29 @@ llvm::Type* Helper::getLLVMptrType(std::string var_type, llvm::LLVMContext& Cont
     }
 }
 
-llvm::Value* Helper::allocForNewSymbol(std::string var_name, std::string var_type)
+llvm::Type* Helper::getLLVMarrType(std::string var_type, llvm::LLVMContext& Context, const int size)
+{
+    // Determine the type of the array elements from pTT
+    llvm::Type* elementType;
+    if (var_type == INTEGER) {
+        elementType = llvm::Type::getInt32Ty(Context);
+    }
+    else if (var_type == FLOAT) {
+        elementType = llvm::Type::getFloatTy(Context);
+    }
+    else if (var_type == CHAR) {
+        elementType = llvm::Type::getInt8Ty(Context);
+    }
+    else {
+        std::cerr << "Error: Unsupported array element type '" << var_type << "'.\n";
+        return nullptr;
+    }
+
+    // Create an LLVM array type
+    return llvm::ArrayType::get(elementType, size);
+}
+    
+llvm::Value* Helper::allocForNewSymbol(std::string var_name, std::string var_type, const int size, const std::string& pTT)
 {
     llvm::IRBuilder<>& Builder = Helper::getBuilder(); // Using the Builder from Helper
     llvm::LLVMContext& Context = Helper::getContext(); // Using the Context from Helper
@@ -184,7 +206,12 @@ llvm::Value* Helper::allocForNewSymbol(std::string var_name, std::string var_typ
         is_a_pointer = true;
         llvmType = getLLVMptrType(var_type.substr(0, var_type.size() - 1), Context, var_name);
     }
-    else {
+    else if (var_type == ARRAY)
+    {
+        llvmType = getLLVMarrType(pTT, Context, size);
+    }
+    else
+    {
         std::cerr << "Error: Unsupported variable type '" << var_type << "'.\n";
         return nullptr;
     }
@@ -202,19 +229,17 @@ llvm::Value* Helper::allocForNewSymbol(std::string var_name, std::string var_typ
 
     // Allocate memory for the variable at the entry block
     return tempBuilder.CreateAlloca(llvmType, nullptr, var_name.c_str());
-
-
 }
 
-bool Helper::addSymbol(std::string var_name, std::string var_type, std::string val)
+bool Helper::addSymbol(std::string var_name, std::string var_type, std::string val, const std::string& pTT, const int size)
 {
     if (symbolTable.findSymbol(var_name)) { // NOTE: THIS STATEMENT DOESN'T CONSIDER SCOPES 
                                             // (YET TO BE IMPLEMENTED)
         std::cerr << "Error: Symbol '" << var_name << "' already exists.\n";
         return false; // Symbol already exists
     }
-    llvm::Value* var_address = allocForNewSymbol(var_name, var_type); 
-    symbolTable.add(var_name, var_type, var_address, val);
+    llvm::Value* var_address = allocForNewSymbol(var_name, var_type, size, pTT); 
+    symbolTable.add(var_name, var_type, var_address, val, pTT);
     symbolTable.printSymbols();
     // Get the value of the variable
     //if (var_type == INTEGER)
@@ -245,4 +270,22 @@ bool Helper::addSymbol(std::string var_name, std::string var_type, std::string v
 
     ////}
     return true;
+}
+
+std::string Helper::removeSpecialCharacter(std::string str)
+{
+    for (int i = 0; i < str.size(); i++) {
+
+        // Finding the character whose
+        // ASCII value fall under this
+        // range
+        if (str[i] < 'A' || str[i] > 'Z' && str[i] < 'a'
+            || str[i] > 'z') {
+            // erase function to erase
+            // the character
+            str.erase(i, 1);
+            i--;
+        }
+    }
+    return str;
 }

@@ -20,6 +20,7 @@ enum Tokens_type {
 	ADDR_REFERENCE,
 	ARR_TYPE_DECLERATION,
 	CURL_BR,
+
 };
 
 // LIT is short for "LITERAL"
@@ -48,6 +49,7 @@ enum Tokens_type {
 #define INTEGER "int"
 #define CHAR "char"
 #define POINTER "ptr"
+#define ARRAY "arr"
 
 
 // Other

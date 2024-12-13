@@ -24,7 +24,11 @@ Tokeniser::Tokeniser(const std::string& raw_code_str)
 			this->_tokens.push_back({ currentLiteral, categoriseLiteral(currentLiteral) });
 			i += DIS_BETWEEN_SINGLE_QOUTES; // Skip char initilization 
 			currentLiteral = "";
-		}
+		}/*
+		else if (raw_code_str[i] == CURL_BR_L_LIT)
+		{
+
+		}*/
 		else if ((i == raw_code_str.size() - 1)) // Check if end is reached
 		{
 			currentLiteral += raw_code_str[i];
@@ -77,11 +81,6 @@ Tokens_type Tokeniser::categoriseLiteral(const std::string& literal)
 	{
 		return CURL_BR;
 	}
-	else if (isNumber(literal))
-	{
-		// Assuming INT is the default case for literals that aren't operators or parentheses
-		return INT;
-	}
 	else if (literal[0] == EQUAL_SIGN_LIT)
 	{
 		return EQUAL_SIGN;
@@ -94,12 +93,12 @@ Tokens_type Tokeniser::categoriseLiteral(const std::string& literal)
 	{
 		return CHAR_LITERAL;
 	}
-	else if (std::find(Helper::definedTypes.begin(), Helper::definedTypes.end(), literal) != Helper::definedTypes.end())
+	else if (std::find(Helper::definedTypes.begin(), Helper::definedTypes.end(), Helper::removeSpecialCharacter(literal)) != Helper::definedTypes.end())
 	{
 		return TYPE_DECLERATION;
 	}
 	//	Check for pointer declerations
-	if (literal[literal.size() - 1] == MULTIPLICATION_LIT && (std::find(Helper::definedTypes.begin(), Helper::definedTypes.end(), removeSpecialCharacter(literal)) != Helper::definedTypes.end()))
+	if (literal[literal.size() - 1] == MULTIPLICATION_LIT && (std::find(Helper::definedTypes.begin(), Helper::definedTypes.end(), Helper::removeSpecialCharacter(literal)) != Helper::definedTypes.end()))
 	{
 		return PTR_TYPE_DECLERATION;
 	}
@@ -114,7 +113,16 @@ Tokens_type Tokeniser::categoriseLiteral(const std::string& literal)
 	//{
 	//	std::cout << "Found Array!!! Hurray!!!" << std::endl;
 	//	return ARR_TYPE_DECLERATION;
+	////}
+	//else if (_tokens[_tokens.size() - 1].getLiteral() == std::string(1, CURL_BR_L_LIT))
+	//{
+	//	return ;
 	//}
+	else if (isNumber(literal))
+	{
+		// Assuming INT is the default case for literals that aren't operators or parentheses
+		return INT;
+	}
 	else if (!literal.empty())
 	{
 		return IDENTIFIER; // Returning identifier without error handeling which would happen in the syntax analysis phase
@@ -135,23 +143,6 @@ bool Tokeniser::isNumber(const std::string& literal)
 	return true;
 }
 
-std::string Tokeniser::removeSpecialCharacter(std::string str)
-{
-	for (int i = 0; i < str.size(); i++) {
-
-		// Finding the character whose
-		// ASCII value fall under this
-		// range
-		if (str[i] < 'A' || str[i] > 'Z' && str[i] < 'a'
-			|| str[i] > 'z') {
-			// erase function to erase
-			// the character
-			str.erase(i, 1);
-			i--;
-		}
-	}
-	return str;
-}
 
 std::ostream& operator<<(std::ostream& os, const Tokeniser& tokeniser)
 {

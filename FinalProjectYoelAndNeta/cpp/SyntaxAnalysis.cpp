@@ -94,6 +94,7 @@ int SyntaxAnalysis::arrTypeVariableDefinitionStructure(int pos)
 {
 	int type_pos = pos; // Position of the array type
 	pos++;
+
 	if ((_tokens[pos].getType() != IDENTIFIER) && !(Helper::checkIdentifier(_tokens[pos].getLiteral().substr(0, _tokens[pos + 1].getLiteral().size() - 2))))
 	{
 		throw SyntaxError("Missing Identifier");
@@ -177,7 +178,12 @@ void SyntaxAnalysis::validSentences()
 	{
 		while (pos < _tokens.size())
 		{
-			if (_tokens[pos].getType() == TYPE_DECLERATION)
+			if (_tokens[pos +1 ].getLiteral().substr(_tokens[pos + 1].getLiteral().size() - 2, _tokens[pos + 1].getLiteral().size()) == ARR_INIT_LIT)
+			{
+				std::cout << "Arr to syn --> " << _tokens[pos].getLiteral() << std::endl;
+				pos = arrTypeVariableDefinitionStructure(pos) + 1; // send identifier
+			}
+			else if (_tokens[pos].getType() == TYPE_DECLERATION)
 			{
 				// adding 1 because function returns the last token of the sentence
 				pos = variableDefinitionStructure(pos) + 1;
@@ -185,11 +191,6 @@ void SyntaxAnalysis::validSentences()
 			else if (_tokens[pos].getType() == PTR_TYPE_DECLERATION)
 			{
 				pos = ptrVariableDefenitionStructure(pos + 1) + 1;
-			}
-			else if (_tokens[pos +1 ].getLiteral().substr(_tokens[pos + 1].getLiteral().size() - 2, _tokens[pos + 1].getLiteral().size()) == ARR_INIT_LIT)
-			{
-				std::cout << "Arr to syn --> " << _tokens[pos].getLiteral() << std::endl;
-				pos = arrTypeVariableDefinitionStructure(pos) + 1; // send identifier
 			}
 			// TODO - checking if the sentence just a defined identifier (like just 3; or somthing like that)
 			// TODO - need to check if its a redefinition of t a symbol 

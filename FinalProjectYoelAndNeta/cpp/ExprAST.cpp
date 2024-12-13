@@ -22,6 +22,64 @@ Value* ptrExprAST::codegen()
 }
 
 
+
+Value* arrExprAST::codegen()
+{
+    // Need to specify type and size 
+    llvm::ArrayType* arrT = llvm::ArrayType::get(_type, _size);
+    return ConstantInt::get(arrT, APInt(_size, _data));
+}
+
+void arrExprAST::assignLLVMType(const std::string& type)
+{
+    //llvm::Types
+    ////_type = 
+    //if (type == INTEGER)
+    //{
+    //    _type = llvm::IntegerType::get(Helper::getContext(), 0); // Only for testing!!! do not keep it zero!!!!
+    //}
+    _type = llvm::IntegerType::get(Helper::getContext(), 0); // Only for testing!!! do not keep it zero!!!!
+}
+
+void arrExprAST::initArrayRef(const std::string& val, const std::string& type)
+{
+    // create vector for array inner values by type
+    std::vector<std::variant<int, float, char>> values;
+    for (size_t i = 0; i < val.size(); i++) // No need to check types or validation,
+    {                                    // So we can just add it to 'values'
+        if (val[i] == COMMA_LIT)
+        {
+            continue;
+        }
+        else
+        {
+            values.push_back(val[i]);
+        }
+    }
+    std::reverse(values.begin(), values.end());
+
+    // Convert to uint64_t
+    std::vector<uint64_t> transformedValues;
+    for (const auto& v : values) {
+        if (std::holds_alternative<int>(v)) {
+            transformedValues.push_back(static_cast<uint64_t>(std::get<int>(v)));
+        }
+        else if (std::holds_alternative<float>(v)) {
+            transformedValues.push_back(static_cast<uint64_t>(std::get<float>(v)));
+        }
+        else if (std::holds_alternative<char>(v)) {
+            transformedValues.push_back(static_cast<uint64_t>(std::get<char>(v)));
+        }
+        else {
+            // Handle unexpected case, if necessary
+        }
+    }
+
+    // Use arrayRef C'tor that uses the iteration through values
+    _data = llvm::ArrayRef<uint64_t>(transformedValues);
+}
+
+
 Value* VariableExprAST::codegen()
 {
 	// Look this variable up in the function.
@@ -64,5 +122,3 @@ Value* AssignExprAST::codegen() {
 
     return rhsValue; // Return the RHS value for chaining if needed
 }
-
-

@@ -38,8 +38,8 @@ public:
     static llvm::Module& getModule() { return *TheModule; }
     static void HandleTopLevelExpression();
     static void createAnonymousFunction();
-    static llvm::Value* allocForNewSymbol(std::string var_name, std::string var_type);
-    static bool addSymbol(std::string var_name, std::string var_type, std::string val);
+    static llvm::Value* allocForNewSymbol(std::string var_name, std::string var_type, const int size, const std::string& pTT);
+    static bool addSymbol(std::string var_name, std::string var_type, std::string val, const std::string& pTT = "", const int size = 1);
     
 
     // Utility methods
@@ -47,9 +47,12 @@ public:
     static bool isFloat(const std::string& num);
     static bool isInteger(const std::string& num);
     static bool isChar(const std::string& ch);
+    static std::string removeSpecialCharacter(std::string s);
+
 
     static uint64_t hexToDec(std::string& str);
     static llvm::Type* getLLVMptrType(std::string var_type, llvm::LLVMContext& Context, std::string var_name);
+    static llvm::Type * getLLVMarrType(std::string var_type, llvm::LLVMContext& context, const int size);
 
     // Data members
     static std::vector<std::string> definedTypes;

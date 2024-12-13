@@ -56,10 +56,6 @@ std::unique_ptr<ExprAST> Parser::parseAssignment() {
 	{
 		return ptrAssignmentParsing();
 	}
-	if (currentToken().getType() == ARR_TYPE_DECLERATION)
-	{
-		return arrAssignmentParsing();
-	}
 	return nullptr;
 }
 
@@ -106,8 +102,15 @@ std::unique_ptr<ExprAST> Parser::ptrAssignmentParsing()
 // Parse Basic assignment statements (e.g., "int a = 5;")
 std::unique_ptr<ExprAST> Parser::regularAssignmentParsing()
 {
+
 	std::string type = currentToken().getLiteral();
 	consume();
+
+	// Check for arrays 
+	if (currentToken().getLiteral().substr(currentToken().getLiteral().size() - 2, currentToken().getLiteral().size()) == ARR_INIT_LIT)
+	{
+		return arrAssignmentParsing(Helper::removeSpecialCharacter(type));
+	}
 
 	std::string varName = currentToken().getLiteral();
 	consume(); // Move past IDENTIFIER
@@ -136,11 +139,10 @@ std::unique_ptr<ExprAST> Parser::regularAssignmentParsing()
 	}
 }
 
-std::unique_ptr<ExprAST> Parser::arrAssignmentParsing()
+std::unique_ptr<ExprAST> Parser::arrAssignmentParsing(const std::string& type)
 {
-	bool commaF, valF = false; // F for "found"
-	std::string type = currentToken().getLiteral();
-	consume();
+	std::string currVal = "";
+	int len = 0; // Length of the created array
 	std::string varName = currentToken().getLiteral().substr(0, currentToken().getLiteral().size() - 2); // Cut out '[]'
 	consume();
 	consume(); // Move past '='
@@ -148,30 +150,56 @@ std::unique_ptr<ExprAST> Parser::arrAssignmentParsing()
 	std::string init = currentToken().getLiteral();
 	try
 	{
-
+		// Guide to the solution --> https://stackoverflow.com/questions/7844049/how-are-c-arrays-represented-in-memory	
 		if (init[0] == COMMA_LIT)
 		{
 			throw ParserError("Value missing");
 		}
+
 		for (int i = 0; i < init.size(); i++)
 		{
+			if (init[i] == COMMA_LIT)
+			{
+				throw ParserError("Empty initilization");
+			}
+			while (init[i] != COMMA_LIT && (i != init.size()))
+			{
+				currVal += init[i];
+				i++;
+			}
 			if (type == INTEGER)
 			{
-
+				if (!Helper::isInteger(currVal))
+				{
+					throw ParserError("Invalid type, supposd to be " + type);
+				}
 			}
-			if (type == FLOAT)
+			else if (type == FLOAT)
 			{
-
+				if (!Helper::isFloat(currVal))
+				{
+					throw ParserError("Invalid type, supposd to be " + type);
+				}
 			}
-			if (type == CHAR)
+			else if (type == CHAR)
 			{
-
+				if (!Helper::isChar(currVal))
+				{
+					throw ParserError("Invalid type, supposd to be " + type);
+				}
 			}
+			currVal = "";
+			len++;
 		}
-		//return std::unique_ptr<ExprAST>();
+		Helper::addSymbol(varName, ARRAY, init, type, len);
+		std::string convertalbleLen = std::to_string(len);
+		auto value_literal = std::make_unique<arrExprAST>(type, convertalbleLen, init);
+		return std::make_unique<AssignExprAST>(varName, std::move(value_literal), type);
 	}
 	catch (const std::exception& e)
 	{
 		std::cerr << e.what() << std::endl;
 	}
 }
+
+

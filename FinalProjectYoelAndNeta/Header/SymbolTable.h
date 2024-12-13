@@ -11,13 +11,14 @@
 
 class Symbol {
 public:
-    Symbol(const std::string& name, const std::string& type, llvm::Value* llvmValue, std::string& val);
+    Symbol(const std::string& name, const std::string& type, llvm::Value* llvmValue, std::string& val, const std::string& pTT);
 
     // Accessor methods
     const std::string& getName() const;
     const std::string& getType() const;
     llvm::Value* getLLVMValue() const;
     const std::string& getValue() const;
+    const std::string& getPointToType() const;
 
     // Modifier methods
     void setLLVMValue(llvm::Value* value);
@@ -27,6 +28,9 @@ private:
     std::string _type;      // Type of the symbol
     std::string _val;       // Value (content) of the symbol as string
     llvm::Value* _llvmValue; // LLVM representation of the symbol (address?)
+
+    // Optional
+    std::string _pointToType;
 };
 
 class SymbolTable {
@@ -34,7 +38,7 @@ public:
     SymbolTable();
 
     // Add a new symbol to the table
-    void add(const std::string& name, const std::string& type, llvm::Value* llvmValue, std::string& val);
+    void add(const std::string& name, const std::string& type, llvm::Value* llvmValue, std::string& val, const std::string& pTT = "");
 
     // Find a symbol by name
     std::optional<std::reference_wrapper<Symbol>> findSymbol(const std::string& name);

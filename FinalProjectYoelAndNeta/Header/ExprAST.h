@@ -22,6 +22,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <variant>
 
 #include "SymbolTable.h"
 #include "Helper.h"
@@ -32,6 +33,9 @@ using namespace llvm;
 
 #define INTEGER_SIZE 32
 #define CHAR_SIZE 8
+//
+//template<typename T> T(T);
+//std::vector<T> arrVec
 
 /// ExprAST - Base class for all expression nodes.
 class ExprAST {
@@ -89,6 +93,29 @@ private:
 public:
 	ptrExprAST(std::string val) : _valAsStr(val), _size(INTEGER_SIZE){}
 	virtual Value* codegen() override;
+};
+
+
+
+// Some helpful info about array in LLVM --> https://stackoverflow.com/questions/38548680/confused-about-llvm-arrays
+class arrExprAST : public ExprAST
+{
+private:
+	uint64_t _size; // Number of elements in array	
+	std::string _val; // Address to the first element in the array
+	ArrayRef<uint64_t> _data; 
+	//std::string _type; // Type of variables in the array
+	Type* _type;
+public:
+	arrExprAST(const std::string& type, std::string& size, const std::string& val) : _val(val)
+	{	
+		assignLLVMType(type);
+		initArrayRef(val, type);
+		_size = Helper::hexToDec(size);
+	}
+	virtual Value* codegen() override;
+	void assignLLVMType(const std::string& type);
+	void initArrayRef(const std::string& val, const std::string& type);
 };
 
 
