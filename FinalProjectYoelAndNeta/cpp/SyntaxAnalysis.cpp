@@ -119,41 +119,6 @@ int SyntaxAnalysis::arrTypeVariableDefinitionStructure(int pos)
 	return pos;
 }
 
-//bool SyntaxAnalysis::innerArrInit(int pos, int arrTypePos)
-//{
-//	std::cout << "To check --> " << _tokens[pos].getLiteral() << std::endl;
-//	bool commaFl, valF = false; // F for "found"
-//	std::string literal = _tokens[pos].getLiteral();
-//	std::string arrType = _tokens[arrTypePos].getLiteral().substr(0, _tokens[arrTypePos].getLiteral().size() - 2);
-//	try
-//	{
-//		if (literal[0] == COMMA_LIT)
-//		{
-//			throw SyntaxError("")
-//		}
-//		for (int i = 0; i < literal.size(); i++)
-//		{
-//			if(literal[i] != )
-//			if (arrType == INTEGER)
-//			{
-//
-//			}
-//			if (arrType == FLOAT)
-//			{
-//
-//			}
-//			if (arrType == CHAR)
-//			{
-//
-//			}
-//		}
-//	}
-//	catch (const std::exception& e)
-//	{
-//		throw SyntaxError("Invalid Array initilization");
-//	}
-//}
-
 
 bool SyntaxAnalysis::doesVariableFitType(const std::string& type, std::string value)
 {

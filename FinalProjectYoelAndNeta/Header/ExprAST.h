@@ -33,9 +33,6 @@ using namespace llvm;
 
 #define INTEGER_SIZE 32
 #define CHAR_SIZE 8
-//
-//template<typename T> T(T);
-//std::vector<T> arrVec
 
 /// ExprAST - Base class for all expression nodes.
 class ExprAST {

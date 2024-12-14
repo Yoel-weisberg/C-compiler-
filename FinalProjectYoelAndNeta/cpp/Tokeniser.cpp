@@ -107,17 +107,6 @@ Tokens_type Tokeniser::categoriseLiteral(const std::string& literal)
 	{
 		return ADDR_REFERENCE;
 	}
-	//else if ((literal[literal.size() - 2] == SQUARE_BR_L_LIT) 
-	//	&& (literal[literal.size() - 1] == SQUARE_BR_R_LIT)
-	//	&& (std::find(Helper::definedTypes.begin(), Helper::definedTypes.end(), removeSpecialCharacter(literal)) != Helper::definedTypes.end()))
-	//{
-	//	std::cout << "Found Array!!! Hurray!!!" << std::endl;
-	//	return ARR_TYPE_DECLERATION;
-	////}
-	//else if (_tokens[_tokens.size() - 1].getLiteral() == std::string(1, CURL_BR_L_LIT))
-	//{
-	//	return ;
-	//}
 	else if (isNumber(literal))
 	{
 		// Assuming INT is the default case for literals that aren't operators or parentheses

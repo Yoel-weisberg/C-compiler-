@@ -236,10 +236,6 @@ bool Helper::addSymbol(std::string var_name, std::string var_type, std::string v
 
     Helper::namedValues[var_name] = var_address; // Add to symbol table 
     printLLVMSymbolTable();
-    //  THESE LINES ARE FOR THE ORIGINAL SYNBOL TABLE!!!! 
-    //symbolTable.add(var_name, var_type, var_address, val, pTT); 
-    //symbolTable.printSymbols();
-
     return true;
 }
 

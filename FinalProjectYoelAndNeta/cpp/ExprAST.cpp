@@ -26,7 +26,7 @@ Value* ptrExprAST::codegen()
 
 Value* arrExprAST::codegen() {
     // Retrieve the pointer to the allocated array
-    AllocaInst* arrayPtr = Helper::namedValues[_name]; // Replace "array_name" with your actual variable
+    AllocaInst* arrayPtr = Helper::namedValues[_name]; 
     if (!arrayPtr) {
         throw std::runtime_error("Array pointer not found in symbol table.");
     }
@@ -40,7 +40,7 @@ Value* arrExprAST::codegen() {
 
         // Store value
         Value* elementValue = builder.getInt32(_data[i]); // Adjust for type
-        builder.CreateStore(elementValue, elementPtr);
+        // builder.CreateStore(elementValue, elementPtr);
     }
 
     return arrayPtr;
@@ -97,14 +97,12 @@ void arrExprAST::initArrayRef(const std::string& val, const std::string& type)
         else if (std::holds_alternative<char>(v)) {
             transformedValues.push_back(static_cast<uint64_t>(std::get<char>(v)));
         }
-        else {
-            // Handle unexpected case, if necessary
-        }
     }
 
     // Use arrayRef C'tor that uses the iteration through values
     _data = llvm::ArrayRef<uint64_t>(transformedValues);
 }
+
 
 
 Value* VariableExprAST::codegen()
