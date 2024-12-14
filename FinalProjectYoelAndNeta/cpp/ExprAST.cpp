@@ -1,5 +1,6 @@
 #include "ExprAST.h"
 
+
 Value* FloatNumberExprAST::codegen()
 {
 	return ConstantFP::get(Helper::getContext(), APFloat(_val));
@@ -23,30 +24,58 @@ Value* ptrExprAST::codegen()
 
 
 
-Value* arrExprAST::codegen()
-{
-    // Need to specify type and size 
-    llvm::ArrayType* arrT = llvm::ArrayType::get(_type, _size);
-    return ConstantInt::get(arrT, APInt(_size, _data));
+Value* arrExprAST::codegen() {
+    // Retrieve the pointer to the allocated array
+    AllocaInst* arrayPtr = Helper::namedValues[_name]; // Replace "array_name" with your actual variable
+    if (!arrayPtr) {
+        throw std::runtime_error("Array pointer not found in symbol table.");
+    }
+
+    //LLVMContext& context = Helper::getContext(); // Use IRBuilder context
+    //IRBuilder<> builder(context);
+    llvm::IRBuilder<>& builder = Helper::getBuilder();
+    // Initialize the array elements
+    for (uint64_t i = 0; i < _size; i++) {
+        Value* elementPtr = builder.CreateGEP(
+            _type, arrayPtr,
+            { builder.getInt32(0), builder.getInt32(i) }, _name + "_ptr");
+
+        // Store value
+        Value* elementValue = builder.getInt32(_data[i]); // Adjust for type
+        builder.CreateStore(elementValue, elementPtr);
+    }
+
+    return arrayPtr;
 }
 
-void arrExprAST::assignLLVMType(const std::string& type)
-{
-    //llvm::Types
-    ////_type = 
-    //if (type == INTEGER)
-    //{
-    //    _type = llvm::IntegerType::get(Helper::getContext(), 0); // Only for testing!!! do not keep it zero!!!!
-    //}
-    _type = llvm::IntegerType::get(Helper::getContext(), 0); // Only for testing!!! do not keep it zero!!!!
+
+
+
+
+void arrExprAST::assignLLVMType(const std::string& type) {
+    LLVMContext& context = Helper::getContext(); // Access the global LLVM context
+
+    if (type == "int") {
+        _type = llvm::Type::getInt32Ty(context); // 32-bit integer
+    }
+    else if (type == "float") {
+        _type = llvm::Type::getFloatTy(context); // 32-bit float
+    }
+    else if (type == "char") {
+        _type = llvm::Type::getInt8Ty(context); // 8-bit integer
+    }
+    else {
+        throw std::invalid_argument("Unknown type: " + type);
+    }
 }
+
 
 void arrExprAST::initArrayRef(const std::string& val, const std::string& type)
 {
     // create vector for array inner values by type
     std::vector<std::variant<int, float, char>> values;
     for (size_t i = 0; i < val.size(); i++) // No need to check types or validation,
-    {                                    // So we can just add it to 'values'
+    {                                       // So we can just add it to 'values'
         if (val[i] == COMMA_LIT)
         {
             continue;
@@ -82,43 +111,40 @@ void arrExprAST::initArrayRef(const std::string& val, const std::string& type)
 
 Value* VariableExprAST::codegen()
 {
-	// Look this variable up in the function.
-    Value* V = Helper::symbolTable.findSymbol(_name)->get().getLLVMValue();
-	if (!V)
-		throw SyntaxError("Not defined variable");
-	return V;
+    // Lookup the variable in the symbol table
+    AllocaInst* variable = Helper::namedValues[_name];
+    if (!variable) {
+        throw std::runtime_error("Unknown variable name: " + _name);
+    }
+
+    // Generate a load instruction to load the value of the variable
+    return Helper::getBuilder().CreateLoad(variable->getAllocatedType(), variable, _name);
+    // IMPLEMENTATION FOR ORIGINAL SYMBOL TABLE 
+	//// Look this variable up in the function.
+ //   Value* V = Helper::symbolTable.findSymbol(_name)->get().getLLVMValue();
+	//if (!V)
+	//	throw SyntaxError("Not defined variable");
+	//return V;
+
 }
 
 
 
 // code like int a = 5;
 Value* AssignExprAST::codegen() {
-    // Check if the variable already exists in the symbol table
-    auto symbolOpt = Helper::symbolTable.findSymbol(_varName);
-    if (!symbolOpt) {
-        std::cerr << "Error: Failed to retrieve the variable '" << _varName << "' after adding it.\n";
+    llvm::Value* varAlloca = Helper::getSymbolValue(_varName);
+    if (!varAlloca) {
+        std::cerr << "Error: Variable '" << _varName << "' not found in symbol table.\n";
         return nullptr;
     }
 
-    Symbol& symbol = symbolOpt->get();
-
-    // Generate code for the right-hand side expression (only once)
-    llvm::Value* rhsValue = _value->codegen();
-    if (!rhsValue) {
-        std::cerr << "Error: Failed to generate code for the assigned value.\n";
+    llvm::Value* value = _value->codegen();
+    if (!value) {
+        std::cerr << "Error: Unable to generate code for assigned value.\n";
         return nullptr;
     }
 
-    // Retrieve the LLVM value (address) of the variable
-    llvm::Value* varAddress = symbol.getLLVMValue();
-    if (!varAddress) {
-        std::cerr << "Error: Variable '" << _varName << "' has no allocated memory.\n";
-        return nullptr;
-    }
-
-    // Store the RHS value in the variable
-    llvm::IRBuilder<>& Builder = Helper::getBuilder(); // Use the Builder from Helper
-    Builder.CreateStore(rhsValue, varAddress);
-
-    return rhsValue; // Return the RHS value for chaining if needed
+    Helper::getBuilder().CreateStore(value, varAlloca);
+    return value;
 }
+

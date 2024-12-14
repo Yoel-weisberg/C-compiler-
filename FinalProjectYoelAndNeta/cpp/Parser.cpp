@@ -190,10 +190,12 @@ std::unique_ptr<ExprAST> Parser::arrAssignmentParsing(const std::string& type)
 			}
 			currVal = "";
 			len++;
-		}
+		} 
+		consume();
+		consume();
 		Helper::addSymbol(varName, ARRAY, init, type, len);
 		std::string convertalbleLen = std::to_string(len);
-		auto value_literal = std::make_unique<arrExprAST>(type, convertalbleLen, init);
+		auto value_literal = std::make_unique<arrExprAST>(type, convertalbleLen, init, varName);
 		return std::make_unique<AssignExprAST>(varName, std::move(value_literal), type);
 	}
 	catch (const std::exception& e)

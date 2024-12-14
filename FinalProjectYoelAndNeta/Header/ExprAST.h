@@ -104,14 +104,23 @@ private:
 	uint64_t _size; // Number of elements in array	
 	std::string _val; // Address to the first element in the array
 	ArrayRef<uint64_t> _data; 
+	std::string _name; // Variable name
 	//std::string _type; // Type of variables in the array
 	Type* _type;
 public:
-	arrExprAST(const std::string& type, std::string& size, const std::string& val) : _val(val)
+	arrExprAST(const std::string& type, std::string& size, const std::string& val, const std::string& name) : _val(val), _name(name)
 	{	
 		assignLLVMType(type);
-		initArrayRef(val, type);
 		_size = Helper::hexToDec(size);
+
+		// Parse 'init' into `_data`
+		std::vector<uint64_t> parsedData;
+		std::stringstream ss(val);
+		std::string token;
+		while (std::getline(ss, token, ',')) {
+			parsedData.push_back(std::stoull(token));
+		}
+		_data = llvm::ArrayRef<uint64_t>(parsedData);
 	}
 	virtual Value* codegen() override;
 	void assignLLVMType(const std::string& type);
