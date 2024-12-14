@@ -262,8 +262,6 @@ std::string Helper::removeSpecialCharacter(std::string str)
 }
 
 
-#include <iostream>
-
 void Helper::printLLVMSymbolTable() {
     std::cout << "Symbol Table:\n";
     std::cout << "----------------------------------\n";

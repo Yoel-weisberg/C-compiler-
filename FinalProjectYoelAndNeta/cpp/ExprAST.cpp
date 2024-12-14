@@ -31,8 +31,6 @@ Value* arrExprAST::codegen() {
         throw std::runtime_error("Array pointer not found in symbol table.");
     }
 
-    //LLVMContext& context = Helper::getContext(); // Use IRBuilder context
-    //IRBuilder<> builder(context);
     llvm::IRBuilder<>& builder = Helper::getBuilder();
     // Initialize the array elements
     for (uint64_t i = 0; i < _size; i++) {
@@ -119,13 +117,6 @@ Value* VariableExprAST::codegen()
 
     // Generate a load instruction to load the value of the variable
     return Helper::getBuilder().CreateLoad(variable->getAllocatedType(), variable, _name);
-    // IMPLEMENTATION FOR ORIGINAL SYMBOL TABLE 
-	//// Look this variable up in the function.
- //   Value* V = Helper::symbolTable.findSymbol(_name)->get().getLLVMValue();
-	//if (!V)
-	//	throw SyntaxError("Not defined variable");
-	//return V;
-
 }
 
 
