@@ -86,7 +86,7 @@ class ptrExprAST : public ExprAST
 private:
 	//int _addr; // Address of the "pointed to" variable
 	int _size;
-	std::string _valAsStr;
+	std::string _valAsStr; // name of the pointed to variable
 public:
 	ptrExprAST(std::string val) : _valAsStr(val), _size(INTEGER_SIZE){}
 	virtual Value* codegen() override;

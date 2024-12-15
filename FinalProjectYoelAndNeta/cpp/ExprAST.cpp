@@ -16,11 +16,24 @@ Value* CharExprAST::codegen()
     return ConstantInt::get(Helper::getContext(), APInt(_size, _val));
 }
 
+
 Value* ptrExprAST::codegen()
 {
-    Constant* con = ConstantInt::get(Type::getInt64Ty(Helper::getContext()), Helper::hexToDec(_valAsStr));
-    return ConstantExpr::getIntToPtr(con, PointerType::getUnqual(Helper::getBuilder().getInt32Ty()));
+    auto it = Helper::namedValues.find(_valAsStr);
+    llvm::AllocaInst* allocaInst = it->second;
+
+    if (!allocaInst) {
+        std::cerr << "Error: AllocaInst for variable '" << _valAsStr << "' is null.\n";
+        return nullptr;
+    }
+
+    llvm::Type* pointerType = llvm::PointerType::getUnqual(allocaInst->getAllocatedType());
+
+    // Generate a pointer value
+    llvm::IRBuilder<>& Builder = Helper::getBuilder();
+    return Builder.CreatePointerCast(allocaInst, pointerType, _valAsStr + "_ptr");
 }
+
 
 
 

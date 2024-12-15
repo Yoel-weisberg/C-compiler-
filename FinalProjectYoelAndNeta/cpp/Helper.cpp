@@ -5,9 +5,9 @@
 std::vector<std::string> Helper::definedTypes = { "float" , "int", "char"};
 std::vector<char> Helper::separetors = { SEMICOLON_LIT, LPAREN_LIT, RPAREN_LIT, EQUAL_SIGN_LIT };
 std::vector<char> Helper::quotes = {SINGLE_QUOTE_LITERAL, DOUBLE_QUOTE_LITERAL};
-SymbolTable Helper::symbolTable;
+SymbolTable Helper::symbolTable; // OLD SYMBO TABLE
 
-std::map<std::string, llvm::AllocaInst*> Helper::namedValues;
+std::map<std::string, llvm::AllocaInst*> Helper::namedValues; 
 
 std::unique_ptr<llvm::LLVMContext> Helper::TheContext = nullptr;
 std::unique_ptr<llvm::IRBuilder<>> Helper::Builder = nullptr;
@@ -114,29 +114,29 @@ uint64_t Helper::hexToDec(std::string& str)
     return res;
 }
 
-llvm::Type* Helper::getLLVMptrType(std::string var_type, llvm::LLVMContext& Context, std::string var_name)
-{
-    llvm::PointerType* llvm_type;
-    if (var_type == INTEGER)
-    {
-        return llvm_type = llvm::PointerType::get(llvm::IntegerType::get(Context, INTEGER_AND_FLOAT_SIZE), 0);
-    }
-    else if (var_type == FLOAT)
-    {
-        return llvm_type = llvm::PointerType::get(Context, 0);
-    }
-    else if (var_type == CHAR)
-    {
-        return llvm_type = llvm::PointerType::get(llvm::IntegerType::get(Context, CHAR_SIZE), 0);
-    }
-    else
-    {
-        std::cerr << "Error: Unsupported variable type '" << var_type << "'.\n";
-        return nullptr;
-    }
-}
+//llvm::Type* Helper::getLLVMptrType(std::string var_type, llvm::LLVMContext& Context, std::string var_name)
+//{
+//    llvm::PointerType* llvm_type;
+//    if (var_type == INTEGER)
+//    {
+//        return llvm_type = llvm::PointerType::get(llvm::IntegerType::get(Context, INTEGER_AND_FLOAT_SIZE), 0);
+//    }
+//    else if (var_type == FLOAT)
+//    {
+//        return llvm_type = llvm::PointerType::get(Context, 0);
+//    }
+//    else if (var_type == CHAR)
+//    {
+//        return llvm_type = llvm::PointerType::get(llvm::IntegerType::get(Context, CHAR_SIZE), 0);
+//    }
+//    else
+//    {
+//        std::cerr << "Error: Unsupported variable type '" << var_type << "'.\n";
+//        return nullptr;
+//    }
+//}
 
-llvm::Type* Helper::getLLVMarrType(std::string var_type, llvm::LLVMContext& Context, const int size)
+llvm::Type* Helper::getLLVMType(std::string var_type, llvm::LLVMContext& Context)
 {
     // Determine the type of the array elements from pTT
     llvm::Type* elementType;
@@ -153,8 +153,6 @@ llvm::Type* Helper::getLLVMarrType(std::string var_type, llvm::LLVMContext& Cont
         std::cerr << "Error: Unsupported array element type '" << var_type << "'.\n";
         return nullptr;
     }
-
-    // Create an LLVM array type
     return elementType;
 }
     
@@ -176,10 +174,10 @@ llvm::AllocaInst* Helper::allocForNewSymbol(std::string var_name, std::string va
         llvmType = llvm::Type::getInt8Ty(Context);
     }
     else if (var_type == ARRAY) {
-        llvmType = llvm::ArrayType::get(Helper::getLLVMarrType(pTT, Context, size), size);
+        llvmType = llvm::ArrayType::get(Helper::getLLVMType(pTT, Context), size);
     }
     else if (var_type.back() == MULTIPLICATION_LIT) { // Pointer
-        llvmType = llvm::PointerType::getUnqual(Helper::getLLVMptrType(var_type.substr(0, var_type.size() - 1), Context, var_name));
+        llvmType = llvm::PointerType::getUnqual(Helper::getLLVMType(Helper::removeSpecialCharacter(var_type.substr(0, var_type.size() - 1)), Context));
     }
     else {
         std::cerr << "Error: Unsupported variable type '" << var_type << "'.\n";
@@ -225,7 +223,7 @@ llvm::Value* Helper::getSymbolValue(const std::string& var_name)
 }
 
 
-bool Helper::addSymbol(std::string var_name, std::string var_type, std::string val, const std::string& pTT, const int size)
+bool Helper::addSymbol(std::string var_name, std::string var_type,const std::string& pTT, const int size)
 {
     if (symbolTable.findSymbol(var_name)) { // NOTE: THIS STATEMENT DOESN'T CONSIDER SCOPES 
                                             // (YET TO BE IMPLEMENTED)

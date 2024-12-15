@@ -4,4 +4,4 @@
 
 
 int hey = 3;
-int bla[] = { 3,2,4,3 };
+int* bla = &hey;

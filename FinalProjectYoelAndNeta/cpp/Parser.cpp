@@ -48,13 +48,13 @@ std::unique_ptr<ExprAST> Parser::parse() {
 
 
 std::unique_ptr<ExprAST> Parser::parseAssignment() {
-	if (currentToken().getType() == TYPE_DECLERATION)
-	{
-		return regularAssignmentParsing();
-	}
-	if (currentToken().getType() == PTR_TYPE_DECLERATION)
+	if (currentToken().getType() == TYPE_DECLERATION && currentToken().getLiteral().back() == MULTIPLICATION_LIT)
 	{
 		return ptrAssignmentParsing();
+	}
+	if (currentToken().getType() == TYPE_DECLERATION) // Indicates both regular and array type assignment
+	{
+		return regularAssignmentParsing();
 	}
 	return nullptr;
 }
@@ -65,31 +65,28 @@ std::unique_ptr<ExprAST> Parser::ptrAssignmentParsing()
 	try
 	{
 		// Regular parsing
-		std::string type = currentToken().getLiteral().substr(1, currentToken().getLiteral().size() - 1);
+		std::string type = Helper::removeSpecialCharacter(currentToken().getLiteral());
 		consume();
 
 		std::string var_name = currentToken().getLiteral();
-		consume();
 		consume(); // Skip equal sign
+		consume(); 
 
-		// Check if "pointed to" variable is valid
-		// Does it exists in the symbol table
-		auto symbolWrapped = Helper::symbolTable.findSymbol(currentToken().getLiteral().substr(1, currentToken().getLiteral().size() - 1));
-
-		if (!symbolWrapped)
+		std::string pointedToVar = Helper::removeSpecialCharacter(currentToken().getLiteral());
+		auto PTVit = Helper::namedValues.find(pointedToVar);
+		if (Helper::namedValues.end() == PTVit)
 		{
-			throw ParserError("can't point to non-existing variable");
+			throw ParserError("can't point to non-existing variable --> " + pointedToVar);
 		}
-		// Add pointer to symbol table
-		Symbol& pointed_to_var = symbolWrapped->get();
-		std::stringstream str_stream;
-		str_stream << pointed_to_var.getLLVMValue();
+		llvm::AllocaInst* allocInst = Helper::namedValues[pointedToVar];
 
-		Helper::addSymbol(var_name, type, str_stream.str());
+		Helper::addSymbol(var_name, type);
+
+		// Return
+		auto value_literal = std::make_unique<ptrExprAST>(pointedToVar);
 
 		consume();
-		// Return
-		auto value_literal = std::make_unique<ptrExprAST>(str_stream.str());
+
 		return std::make_unique<AssignExprAST>(var_name, std::move(value_literal), type);
 
 	}
@@ -193,7 +190,7 @@ std::unique_ptr<ExprAST> Parser::arrAssignmentParsing(const std::string& type)
 		} 
 		consume();
 		consume();
-		Helper::addSymbol(varName, ARRAY, init, type, len);
+		Helper::addSymbol(varName, ARRAY, type, len);
 		std::string convertalbleLen = std::to_string(len);
 		auto value_literal = std::make_unique<arrExprAST>(type, convertalbleLen, init, varName);
 		return std::make_unique<AssignExprAST>(varName, std::move(value_literal), type);
