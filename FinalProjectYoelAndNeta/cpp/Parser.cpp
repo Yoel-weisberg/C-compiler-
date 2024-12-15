@@ -119,18 +119,21 @@ std::unique_ptr<ExprAST> Parser::regularAssignmentParsing()
 		{
 			auto value_literal = std::make_unique<FloatNumberExprAST>(std::stod(currentToken().getLiteral()));
 			consume(); // Move past value
+			consume();
 			return std::make_unique<AssignExprAST>(varName, std::move(value_literal), type);
 		}
 		if (type == INTEGER)
 		{
 			auto value_literal = std::make_unique<IntegerNumberExprAST>(std::stod(currentToken().getLiteral()));
 			consume(); // Move past value
+			consume();
 			return std::make_unique<AssignExprAST>(varName, std::move(value_literal), type);
 		}
 		if (type == CHAR)
 		{
 			auto value_literal = std::make_unique<CharExprAST>(currentToken().getLiteral()[1]);
 			consume(); // Move past value
+			consume();
 			return std::make_unique<AssignExprAST>(varName, std::move(value_literal), type);
 		}
 	}

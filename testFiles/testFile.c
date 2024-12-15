@@ -3,5 +3,7 @@
 #define HEY 3
 
 
-int hey = 3;
+char hey = 'w';
+
+
 int* bla = &hey;

@@ -162,7 +162,10 @@ llvm::AllocaInst* Helper::allocForNewSymbol(std::string var_name, std::string va
     llvm::IRBuilder<>& Builder = Helper::getBuilder();
     llvm::LLVMContext& Context = Helper::getContext();
     llvm::Type* llvmType = nullptr;
-
+    if (var_type.back() == MULTIPLICATION_LIT) { // Pointer
+        llvmType = llvm::PointerType::getUnqual(Helper::getLLVMType(Helper::removeSpecialCharacter(var_type.substr(0, var_type.size() - 1)), Context));
+    }
+    var_type = Helper::removeSpecialCharacter(var_type);
     // Map variable type to LLVM type
     if (var_type == INTEGER) {
         llvmType = llvm::Type::getInt32Ty(Context);
@@ -175,9 +178,6 @@ llvm::AllocaInst* Helper::allocForNewSymbol(std::string var_name, std::string va
     }
     else if (var_type == ARRAY) {
         llvmType = llvm::ArrayType::get(Helper::getLLVMType(pTT, Context), size);
-    }
-    else if (var_type.back() == MULTIPLICATION_LIT) { // Pointer
-        llvmType = llvm::PointerType::getUnqual(Helper::getLLVMType(Helper::removeSpecialCharacter(var_type.substr(0, var_type.size() - 1)), Context));
     }
     else {
         std::cerr << "Error: Unsupported variable type '" << var_type << "'.\n";
