@@ -22,6 +22,7 @@ private:
 	int checkIfStructure(int& pos);
 	int variebleDefinitionStructure(int pos);
 	int checkConditionStructure(int& pos);
+	int checkFunctionDecleration(int& pos);
 
 	std::vector<Token> _tokens;
 };

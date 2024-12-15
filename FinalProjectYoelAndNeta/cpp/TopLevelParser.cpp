@@ -40,6 +40,13 @@ void TopLevelParser::HandleTopLevelExpression()
     }
 }
 
+bool TopLevelParser::isFunctionDecleration()
+{
+    parser.consume();
+    parser.consume();
+    if (parser.currentToken() == 
+}
+
 void TopLevelParser::mainLoop()
 {
     while (!parser.isFinished())
@@ -48,6 +55,8 @@ void TopLevelParser::mainLoop()
         switch (parser.currentToken().getType())
         {
          // TODO - add here function decleration
+        case TYPE_DECLERATION:
+            if (
         default:
             HandleTopLevelExpression();
         }

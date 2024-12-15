@@ -7,6 +7,6 @@ public:
 	void mainLoop();
 private:
 	void HandleTopLevelExpression();
-
+	bool isFunctionDecleration();
 	Parser parser;
 };

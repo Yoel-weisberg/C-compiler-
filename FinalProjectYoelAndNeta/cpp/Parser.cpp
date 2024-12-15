@@ -115,6 +115,11 @@ std::unique_ptr<ExprAST> Parser::parseAssignment() {
 			consume(); // move past the semicolomn
 			return std::make_unique<AssignExprAST>(varName, std::move(rhs), type);
 		}
+		// if its a function decleration
+		else if (currentToken().getType()  == LPAREN)
+		{
+
+		}
 	}
 	return nullptr;
 }

@@ -155,6 +155,11 @@ int SyntexAnalysis::variebleDefinitionStructure(int pos)
 	{
 		return pos;
 	}
+	// in case of a function
+	else if (_tokens[pos].getType() == LPAREN)
+	{
+		return checkFunctionDecleration(pos);
+	}
 	else
 	{
 		throw SyntaxError("excepted a semicolumn");
@@ -202,6 +207,37 @@ int SyntexAnalysis::checkConditionStructure(int& pos)
 	}
 }
 
+int SyntexAnalysis::checkFunctionDecleration(int& pos)
+{
+	// we know that the element in pos is a ( so we consume it
+	pos++;
+	int amountOfPeren = 1;
+	bool comma = true;
+	while (amountOfPeren != 0)
+	{
+		if (_tokens[pos].getType() == LPAREN) amountOfPeren++;
+		if (_tokens[pos].getType() == RPAREN) amountOfPeren--;
+
+		if (_tokens[pos].getType() == TYPE_DECLERATION)
+		{
+			if (!comma)
+			{
+				throw SyntaxError("Excepted a comma between arguments");
+			}
+			pos++;
+			if (_tokens[pos].getType() != IDENTIFIER)
+			{
+				throw SyntaxError("argument dosent have a valid identifier name", pos);
+			}
+			comma = false;
+		}
+		if (_tokens[pos].getType() == COMMA)
+		{
+			comma = true;
+		}
+	}
+}
+
 
 bool SyntexAnalysis::doesVariebleFitType(const std::string& type, std::string value)
 {
@@ -236,7 +272,11 @@ int SyntexAnalysis::validSentences(int pos)
 			// oit of current scope
 			else if (_tokens[pos].getType() == R_CURLY_PRAN)
 			{
-				return pos;
+				pos++;
+			}
+			else if (_tokens[pos].getType() == L_CURLY_PRAN)
+			{
+				pos++;
 			}
 			else
 			{
