@@ -3,7 +3,8 @@
 #define HEY 3
 
 
-char hey = 'w';
+float hey=3.0;    
 
-
-int* bla = &hey;
+if (3.0) {
+    3.0;
+}

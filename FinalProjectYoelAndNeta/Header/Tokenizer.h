@@ -22,4 +22,5 @@ private:
 	std::vector<Token> _tokens;
 	Tokens_type categoriseLiteral(const std::string& literal);
 	bool isNumber(const std::string& literal);
+	bool isFloat(const std::string& literal);
 };

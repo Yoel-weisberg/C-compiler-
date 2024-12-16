@@ -1,8 +1,7 @@
 #include "SyntaxAnalysis.h"
 #include <regex>
 
-SyntaxAnalysis::SyntaxAnalysis(const std::vector<Token>& _tokens) :
-	_tokens(_tokens)
+SyntaxAnalysis::SyntaxAnalysis(const std::vector<Token> &_tokens) : _tokens(_tokens)
 {
 	checkParentheses();
 	validSentences();
@@ -73,14 +72,14 @@ int SyntaxAnalysis::variableDefinitionStructure(int pos)
 			throw SyntaxError("Variable type dosent fit decleration");
 		}
 		pos + MAX_NUM_OF_OPERATIONS_FOR_DECLERATION >= _tokens.size() ? throw SyntaxError("excepted a semicolon") : true;
-		if (!_tokens[pos + MAX_NUM_OF_OPERATIONS_FOR_DECLERATION].getType() == SEMICOLON)
+		if (!_tokens[pos + MAX_NUM_OF_OPERATIONS_FOR_DECLERATION].getType() == SEMICOLUMN)
 		{
 			throw SyntaxError("excepted a semicolon");
 		}
 		// advancing pos by 4 to get to the next action
 		return pos + MAX_NUM_OF_OPERATIONS_FOR_DECLERATION;
 	}
-	else if (_tokens[pos + MIN_NUM_OF_OPERATIONS].getType() == SEMICOLON)
+	else if (_tokens[pos + MIN_NUM_OF_OPERATIONS].getType() == SEMICOLUMN)
 	{
 		return pos + MIN_NUM_OF_OPERATIONS;
 	}
@@ -108,7 +107,7 @@ int SyntaxAnalysis::arrTypeVariableDefinitionStructure(int pos)
 	pos++;
 	// check array initilization, bracket placement
 	std::cout << "pos -- > " << _tokens[pos].getLiteral() << std::endl;
-	if (_tokens[pos].getLiteral() != std::string(1, CURL_BR_L_LIT) || _tokens[pos + 2].getLiteral() != std::string(1, CURL_BR_R_LIT))
+	if (_tokens[pos].getType() == SQR_BR_L || _tokens[pos + 2].getType() == SQR_BR_R)
 	{
 		throw SyntaxError("Missing bracket");
 	}
@@ -119,18 +118,17 @@ int SyntaxAnalysis::arrTypeVariableDefinitionStructure(int pos)
 	return pos;
 }
 
-
-bool SyntaxAnalysis::doesVariableFitType(const std::string& type, std::string value)
+bool SyntaxAnalysis::doesVariableFitType(const std::string &type, std::string value)
 {
-	if (type == FLOAT)
+	if (type == "float")
 	{
 		return Helper::isFloat(value);
 	}
-	else if (type == INTEGER)
+	else if (type == "int")
 	{
 		return Helper::isInteger(value);
 	}
-	else if (type == CHAR)
+	else if (type == "char")
 	{
 		return Helper::isChar(value);
 	}
@@ -143,7 +141,7 @@ void SyntaxAnalysis::validSentences()
 	{
 		while (pos < _tokens.size())
 		{
-			if (_tokens[pos +1 ].getLiteral().substr(_tokens[pos + 1].getLiteral().size() - 2, _tokens[pos + 1].getLiteral().size()) == ARR_INIT_LIT)
+			if (_tokens[pos + 1].getLiteral().substr(_tokens[pos + 1].getLiteral().size() - 2, _tokens[pos + 1].getLiteral().size()) == "[]")
 			{
 				std::cout << "Arr to syn --> " << _tokens[pos].getLiteral() << std::endl;
 				pos = arrTypeVariableDefinitionStructure(pos) + 1; // send identifier
@@ -157,9 +155,13 @@ void SyntaxAnalysis::validSentences()
 			{
 				pos = ptrVariableDefenitionStructure(pos + 1) + 1;
 			}
+			else if (_tokens[pos].getType() == IF_WORD)
+			{
+				checkIfStructure(pos);
+			}
 			// TODO - checking if the sentence just a defined identifier (like just 3; or somthing like that)
-			// TODO - need to check if its a redefinition of t a symbol 
-			// TODO - need to check if the sentnce is an algebric sentnece 
+			// TODO - need to check if its a redefinition of t a symbol
+			// TODO - need to check if the sentnce is an algebric sentnece
 			// there is no suppert for other sentence structure
 			else
 			{
@@ -169,7 +171,7 @@ void SyntaxAnalysis::validSentences()
 			}
 		}
 	}
-	catch (const std::out_of_range& e)
+	catch (const std::out_of_range &e)
 	{
 		throw SyntaxError("Got to end of token stream without a semicolumn");
 	}
@@ -206,14 +208,139 @@ int SyntaxAnalysis::ptrVariableDefenitionStructure(int pos)
 			throw SyntaxError("Incorrect identifier");
 		}
 		pos++;
-		if (_tokens[pos].getType() != SEMICOLON)
+		if (_tokens[pos].getType() != SEMICOLUMN)
 		{
 			throw SyntaxError("Missing Line Ending");
 		}
 		return pos;
 	}
-	catch (const std::exception&)
+	catch (const std::exception &)
 	{
 		throw SyntaxError("Incorrect pointer decleration");
+	}
+}
+
+int SyntaxAnalysis::checkIfStructure(int &pos)
+{
+	int chrIndex = 0;
+	bool isThereIf = false;
+
+	// Check if the current token is "if"
+	if (_tokens[pos].getType() == IF_WORD)
+	{
+		isThereIf = true;
+		pos++; // Move to the next token
+
+		// Ensure the next token is a left parenthesis "("
+		if (_tokens[pos].getType() != LPAREN)
+		{
+			throw SyntaxError("Expected '(' after 'if'", chrIndex);
+		}
+		pos++;
+
+		// Check the actual condition
+		checkConditionStructure(pos);
+
+		// Ensure the next token is a left curly brace "{"
+		if (_tokens[pos].getType() != L_CURLY_PRAN)
+		{
+			throw SyntaxError("Expected '{' after 'if' condition", chrIndex);
+		}
+		pos++;
+
+		// Find the matching right curly brace "}"
+		int braceCount = 1;
+		while (pos < _tokens.size() && braceCount > 0)
+		{
+			if (_tokens[pos].getType() == L_CURLY_PRAN)
+				braceCount++;
+			else if (_tokens[pos].getType() == R_CURLY_PRAN)
+				braceCount--;
+
+			pos++;
+		}
+
+		if (braceCount > 0)
+		{
+			throw SyntaxError("Unmatched '{' in 'if' block", chrIndex);
+		}
+	}
+
+	// Check for "else" without a preceding "if"
+	if (_tokens[pos].getType() == ELSE)
+	{
+		if (!isThereIf)
+		{
+			throw SyntaxError("'else' without a previous 'if'", chrIndex);
+		}
+
+		pos++; // Move to the next token
+
+		// Ensure the next token is a left curly brace "{"
+		if (_tokens[pos].getType() != L_CURLY_PRAN)
+		{
+			throw SyntaxError("Expected '{' after 'else'", chrIndex);
+		}
+		pos++;
+
+		// Find the matching right curly brace "}"
+		int braceCount = 1;
+		while (pos < _tokens.size() && braceCount > 0)
+		{
+			if (_tokens[pos].getType() == L_CURLY_PRAN)
+				braceCount++;
+			else if (_tokens[pos].getType() == R_CURLY_PRAN)
+				braceCount--;
+
+			pos++;
+		}
+
+		if (braceCount > 0)
+		{
+			throw SyntaxError("Unmatched '{' in 'else' block", chrIndex);
+		}
+	}
+
+	return pos; // Return the updated position
+}
+
+int SyntaxAnalysis::checkConditionStructure(int &pos)
+{
+	int numPran = 1;
+	enum currentState
+	{
+		OPERAND,
+		VALUE
+	};
+	currentState currentType = OPERAND;
+	while (numPran != 0)
+	{
+		Tokens_type tokT = _tokens[pos].getType();
+		// if its a value to campare to and not a opreand
+		if (tokT == INT || tokT == IDENTIFIER || tokT == FLOAT)
+		{
+			if (currentType != OPERAND)
+			{
+				throw SyntaxError("cant give a number after a number in an if statement", pos);
+			}
+			currentType = VALUE;
+		}
+		else if (tokT == AND || tokT == OR || tokT == EQUELS_CMP || tokT == LPAREN || tokT == RPAREN || tokT == LOWER_THEN || tokT == HIGHER_THEN)
+		{
+			if (tokT == LPAREN)
+			{
+				numPran++;
+			}
+			else if (tokT == RPAREN)
+			{
+				numPran--;
+			}
+			if (currentType != VALUE)
+			{
+				throw SyntaxError("cant give an operand after an operand in an if statement", pos);
+			}
+			currentType = OPERAND;
+		}
+		pos++;
 	}
 }

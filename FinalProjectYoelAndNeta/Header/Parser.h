@@ -14,28 +14,28 @@
 class ExprAST;
 class AssignExprAST;
 class BinaryExprAST;
-class NumberExprAST;
+class FloatNumberExprAST;
 
 class Parser {
 private:
     std::vector<Token> _tokens;
     size_t _currentTokenIndex;
-
-    Token& currentToken();
-    void consume();
+    std::string _IdentifierStr;
     bool isAtEnd();
 
-    // !NOTE!
-    // I changed the '_head' variable to a vector because we haven't implemented 
-    // functions yet. so that each line is represented by an AST of it's own, 
-    // without being connected to the rest of the code, 
-    // causing only the first line to be executed. 
-    // But in order to have a functioning symbol table, all of the data needs to be there.
-    std::vector<std::unique_ptr<ExprAST>> _head;
+    std::unique_ptr<ExprAST> _head;
+    int getTokenPrecedence();
+
+    std::map<Tokens_type, int> _BinopPrecedence;
 
 public:
     // Constructor
     Parser(const std::vector<Token>& tokens);
+    
+    bool isFinished() const;
+
+    void consume();
+    Token& currentToken();
 
     // Parse methods
     std::unique_ptr<ExprAST> parse();
@@ -43,10 +43,18 @@ public:
     std::unique_ptr<ExprAST> ptrAssignmentParsing();
     std::unique_ptr<ExprAST> regularAssignmentParsing();
     std::unique_ptr<ExprAST> arrAssignmentParsing(const std::string& type);
-    
+    std::unique_ptr<ExprAST> parseIfStatement();
+    std::unique_ptr<ExprAST> ParseFloatNumberExpr();
+    std::unique_ptr<ExprAST> ParseParenExpr();
+    std::unique_ptr<ExprAST> ParseIdentifierExpr();
+    std::unique_ptr<ExprAST> ParseExpression();
+    std::unique_ptr<ExprAST> ParsePrimary();
+    std::unique_ptr<ExprAST> ParseBinOpRHS(int ExprPrec,
+        std::unique_ptr<ExprAST> LHS);
+    std::unique_ptr<FunctionAST> ParseTopLevelExpr();
+    std::unique_ptr<PrototypeAST> ParsePrototype();
     // Getter for the root AST
     ExprAST* getAst();
-    std::vector<std::unique_ptr<ExprAST>>& getMainHead(); // Temporary - until we'll implement functions
 };
 
 #endif // PARSER_H

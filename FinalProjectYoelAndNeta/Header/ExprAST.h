@@ -25,8 +25,10 @@
 #include <variant>
 
 #include "SymbolTable.h"
-#include "Helper.h"
 #include "CompilationErrors.h"
+#include "Helper.h"
+
+class Helper;
 
 
 using namespace llvm;
@@ -42,7 +44,6 @@ public:
 	virtual Value* codegen() = 0;
 	ExprAST* kid = nullptr;
 };
-
 
 
 /// NumberExprAST - Expression class for numeric literals like "1.0".
@@ -105,25 +106,23 @@ private:
 	//std::string _type; // Type of variables in the array
 	Type* _type;
 public:
-	arrExprAST(const std::string& type, std::string& size, const std::string& val, const std::string& name) : _val(val), _name(name)
-	{	
-		assignLLVMType(type);
-		_size = Helper::hexToDec(size);
-
-		// Parse 'init' into `_data`
-		std::vector<uint64_t> parsedData;
-		std::stringstream ss(val);
-		std::string token;
-		while (std::getline(ss, token, ',')) {
-			parsedData.push_back(std::stoull(token));
-		}
-		_data = llvm::ArrayRef<uint64_t>(parsedData);
-	}
+	arrExprAST(const std::string& type, std::string& size, const std::string& val, const std::string& name);
 	virtual Value* codegen() override;
 	void assignLLVMType(const std::string& type);
 	void initArrayRef(const std::string& val, const std::string& type);
 };
 
+class BinaryExprAST : public ExprAST {
+	Tokens_type Op;
+	std::unique_ptr<ExprAST> LHS, RHS;
+
+public:
+	BinaryExprAST(Tokens_type Op, std::unique_ptr<ExprAST> LHS,
+		std::unique_ptr<ExprAST> RHS)
+		: Op(Op), LHS(std::move(LHS)), RHS(std::move(RHS)) {}
+
+	Value* codegen() override;
+};
 
 /// VariableExprAST - Expression class for referencing a variable, like "a".
 class VariableExprAST : public ExprAST
@@ -150,3 +149,59 @@ public:
 	const std::string getType() { return _varType; }
 	virtual Value* codegen() override;
 };
+
+
+class IfExprAST : public ExprAST {
+private:
+	std::unique_ptr<ExprAST> Cond, Then, Else;
+public:
+	IfExprAST(std::unique_ptr<ExprAST> Cond, std::unique_ptr<ExprAST> Then,
+		std::unique_ptr<ExprAST> Else)
+		: Cond(std::move(Cond)), Then(std::move(Then)), Else(std::move(Else)) {}
+
+	Value* codegen() override;
+};
+
+class PrototypeAST {
+	std::string Name;
+	std::vector<std::string> Args;
+
+public:
+	PrototypeAST(const std::string& Name, std::vector<std::string> Args)
+		: Name(Name), Args(std::move(Args)) {}
+
+	Function* codegen();
+	const std::string& getName() const { return Name; }
+};
+
+/// FunctionAST - This class represents a function definition itself.
+class FunctionAST {
+	std::unique_ptr<PrototypeAST> Proto;
+	std::unique_ptr<ExprAST> Body;
+
+public:
+	FunctionAST(std::unique_ptr<PrototypeAST> Proto,
+		std::unique_ptr<ExprAST> Body)
+		: Proto(std::move(Proto)), Body(std::move(Body)) {}
+
+	Function* codegen();
+};
+
+/// CallExprAST - Expression class for function calls.
+class CallExprAST : public ExprAST {
+	std::string Callee;
+	std::vector<std::unique_ptr<ExprAST>> Args;
+
+public:
+	CallExprAST(const std::string& Callee,
+		std::vector<std::unique_ptr<ExprAST>> Args)
+		: Callee(Callee), Args(std::move(Args)) {}
+
+	Value* codegen() override;
+};
+
+// code like a = 5;
+//class RedefinitionExprAst : public ExprAST
+//{
+//
+//};

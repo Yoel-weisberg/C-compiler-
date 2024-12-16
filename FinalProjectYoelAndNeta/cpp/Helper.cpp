@@ -1,61 +1,100 @@
 #include "../Header/Helper.h"
 
 // Define static members
-//std::vector<std::string> Helper::definedTypes = { FLOAT , INTEGER, CHAR};
-std::vector<std::string> Helper::definedTypes = { "float" , "int", "char"};
-std::vector<char> Helper::separetors = { SEMICOLON_LIT, LPAREN_LIT, RPAREN_LIT, EQUAL_SIGN_LIT };
-std::vector<char> Helper::quotes = {SINGLE_QUOTE_LITERAL, DOUBLE_QUOTE_LITERAL};
-SymbolTable Helper::symbolTable; // OLD SYMBO TABLE
+std::vector<std::string> Helper::definedTypes = { "float" };
+std::map<std::string, Tokens_type> Helper::literalToType = {
+    {")", RPAREN},
+    {"(", LPAREN},
+    {"+", ADDITION},
+    {"*", MULTIPLICATION},
+    {"/", DIVISION},
+    {"-", SUBTRACTION},
+    {"=", EQUAL_SIGN},
+    {";", SEMICOLUMN},
+    {"&&", AND},
+    {"||", OR},
+    {"{", L_CURLY_PRAN},
+    {"}", R_CURLY_PRAN},
+    {">", HIGHER_THEN},
+    {"<", LOWER_THEN},
+    {"==", EQUELS_CMP},
+    {",", COMMA},
+    {"&", AMPERSAND},
+    {"[", SQR_BR_L},
+    {"]", SQR_BR_R}
+};
 
-std::map<std::string, llvm::AllocaInst*> Helper::namedValues; 
+SymbolTable Helper::symbolTable;
 
 std::unique_ptr<llvm::LLVMContext> Helper::TheContext = nullptr;
-std::unique_ptr<llvm::IRBuilder<>> Helper::Builder = nullptr;
 std::unique_ptr<llvm::Module> Helper::TheModule = nullptr;
+std::unique_ptr<llvm::IRBuilder<>> Helper::Builder = nullptr;
+std::map<std::string, llvm::AllocaInst*> Helper::NamedValues = {};
+std::unique_ptr<llvm::orc::KaleidoscopeJIT> Helper::TheJIT = nullptr;
+std::unique_ptr<llvm::FunctionPassManager> Helper::TheFPM = nullptr;
+std::unique_ptr<llvm::LoopAnalysisManager> Helper::TheLAM = nullptr;
+std::unique_ptr<llvm::FunctionAnalysisManager> Helper::TheFAM = nullptr;
+std::unique_ptr<llvm::CGSCCAnalysisManager> Helper::TheCGAM = nullptr;
+std::unique_ptr<llvm::ModuleAnalysisManager> Helper::TheMAM = nullptr;
+std::unique_ptr<llvm::PassInstrumentationCallbacks> Helper::ThePIC = nullptr;
+std::unique_ptr<llvm::StandardInstrumentations> Helper::TheSI = nullptr;
+std::map<std::string, std::unique_ptr<PrototypeAST>> Helper::FunctionProtos;
+llvm::ExitOnError Helper::ExitOnErr;
 
-// Define the initialization method
-void Helper::initializeModule()
+void Helper::InitializeModuleAndManagers()
 {
-    // Create the LLVM context and module
-    TheContext = std::make_unique<llvm::LLVMContext>();
-    TheModule = std::make_unique<llvm::Module>("Yoel and neta JIT", *TheContext);
+    // Open a new context and module.
+    TheContext = std::make_unique<LLVMContext>();
+    TheModule = std::make_unique<Module>("Yoel and neta JIT", *TheContext);
+    TheModule->setDataLayout(TheJIT->getDataLayout());
 
-    // Create the IRBuilder for the module
-    Builder = std::make_unique<llvm::IRBuilder<>>(*TheContext);
+    // Create a new builder for the module.
+    Builder = std::make_unique<IRBuilder<>>(*TheContext);
 
-    createAnonymousFunction();
+    // Create new pass and analysis managers.
+    TheFPM = std::make_unique<FunctionPassManager>();
+    TheLAM = std::make_unique<LoopAnalysisManager>();
+    TheFAM = std::make_unique<FunctionAnalysisManager>();
+    TheCGAM = std::make_unique<CGSCCAnalysisManager>();
+    TheMAM = std::make_unique<ModuleAnalysisManager>();
+    ThePIC = std::make_unique<PassInstrumentationCallbacks>();
+    TheSI = std::make_unique<StandardInstrumentations>(*TheContext,
+        /*DebugLogging*/ true);
+    TheSI->registerCallbacks(*ThePIC, TheMAM.get());
+
+    // Add transform passes.
+    // Do simple "peephole" optimizations and bit-twiddling optzns.
+    TheFPM->addPass(InstCombinePass());
+    // Reassociate expressions.
+    TheFPM->addPass(ReassociatePass());
+    // Eliminate Common SubExpressions.
+    TheFPM->addPass(GVNPass());
+    // Simplify the control flow graph (deleting unreachable blocks, etc).
+    TheFPM->addPass(SimplifyCFGPass());
+
+    // Register analysis passes used in these transform passes.
+    PassBuilder PB;
+    PB.registerModuleAnalyses(*TheMAM);
+    PB.registerFunctionAnalyses(*TheFAM);
+    PB.crossRegisterProxies(*TheLAM, *TheFAM, *TheCGAM, *TheMAM);
 }
 
 
-void Helper::HandleTopLevelExpression()
+
+Function* Helper::getFunction(std::string Name)
 {
+    // First, see if the function has already been added to the current module.
+    if (auto* F = TheModule->getFunction(Name))
+        return F;
 
-}
+    // If not, check whether we can codegen the declaration from some existing
+    // prototype.
+    auto FI = FunctionProtos.find(Name);
+    if (FI != FunctionProtos.end())
+        return FI->second->codegen();
 
-void Helper::createAnonymousFunction()
-{
-    // Create the function type (void function with no arguments)
-    llvm::FunctionType* funcType = llvm::FunctionType::get(llvm::Type::getVoidTy(getContext()), false);
-
-    // Create the function in the module
-    llvm::Function* anonFunc = llvm::Function::Create(
-        funcType,
-        llvm::Function::ExternalLinkage,
-        "", // No name, makes it anonymous
-        getModule()
-    );
-
-    // Add an entry block to the function
-    llvm::BasicBlock* entryBlock = llvm::BasicBlock::Create(getContext(), "entry", anonFunc);
-
-    // Set the builder's insertion point to the entry block
-    getBuilder().SetInsertPoint(entryBlock);
-
-
-    // Verify the function
-    if (llvm::verifyFunction(*anonFunc, &llvm::errs())) {
-        std::cerr << "Error: Invalid LLVM function generated.\n";
-    }
+    // If no existing prototype exists, return null.
+    return nullptr;
 }
 
 bool Helper::checkIdentifier(const std::string& id)
@@ -140,13 +179,13 @@ llvm::Type* Helper::getLLVMType(std::string var_type, llvm::LLVMContext& Context
 {
     // Determine the type of the array elements from pTT
     llvm::Type* elementType;
-    if (var_type == INTEGER) {
+    if (var_type == "int") {
         elementType = llvm::Type::getInt32Ty(Context);
     }
-    else if (var_type == FLOAT) {
+    else if (var_type == "float") {
         elementType = llvm::Type::getFloatTy(Context);
     }
-    else if (var_type == CHAR) {
+    else if (var_type == "char") {
         elementType = llvm::Type::getInt8Ty(Context);
     }
     else {
@@ -162,21 +201,21 @@ llvm::AllocaInst* Helper::allocForNewSymbol(std::string var_name, std::string va
     llvm::IRBuilder<>& Builder = Helper::getBuilder();
     llvm::LLVMContext& Context = Helper::getContext();
     llvm::Type* llvmType = nullptr;
-    if (var_type.back() == MULTIPLICATION_LIT) { // Pointer
+    if (var_type == "*") { // Pointer
         llvmType = llvm::PointerType::getUnqual(Helper::getLLVMType(Helper::removeSpecialCharacter(var_type.substr(0, var_type.size() - 1)), Context));
     }
     var_type = Helper::removeSpecialCharacter(var_type);
     // Map variable type to LLVM type
-    if (var_type == INTEGER) {
+    if (var_type == "int") {
         llvmType = llvm::Type::getInt32Ty(Context);
     }
-    else if (var_type == FLOAT) {
+    else if (var_type == "float") {
         llvmType = llvm::Type::getFloatTy(Context);
     }
-    else if (var_type == CHAR) {
+    else if (var_type == "char") {
         llvmType = llvm::Type::getInt8Ty(Context);
     }
-    else if (var_type == ARRAY) {
+    else if (var_type == "arr") {
         llvmType = llvm::ArrayType::get(Helper::getLLVMType(pTT, Context), size);
     }
     else {
@@ -232,7 +271,7 @@ bool Helper::addSymbol(std::string var_name, std::string var_type,const std::str
     }
     llvm::AllocaInst* var_address = allocForNewSymbol(var_name, var_type, size, pTT);
 
-    Helper::namedValues[var_name] = var_address; // Add to symbol table 
+    Helper::NamedValues[var_name] = var_address; // Add to symbol table 
     printLLVMSymbolTable();
     return true;
 }
@@ -262,7 +301,7 @@ void Helper::printLLVMSymbolTable() {
     std::cout << "| Variable Name | Type    | Address |\n";
     std::cout << "----------------------------------\n";
 
-    for (const auto& entry : Helper::namedValues) {
+    for (const auto& entry : Helper::NamedValues) {
         const std::string& varName = entry.first;
         llvm::AllocaInst* allocaInst = entry.second;
 

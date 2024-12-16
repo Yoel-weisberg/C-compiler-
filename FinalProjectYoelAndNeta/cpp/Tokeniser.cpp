@@ -12,16 +12,16 @@ Tokeniser::Tokeniser(const std::string& raw_code_str)
 			this->_tokens.push_back({ currentLiteral, categoriseLiteral(currentLiteral) });
 			currentLiteral = "";
 		} // Any other valid char except for a digit
-		else if ((std::find(Helper::separetors.begin(), Helper::separetors.end(), raw_code_str[i]) != Helper::separetors.end()) && !currentLiteral.empty())
+		else if (Helper::literalToType.find(std::string(1, raw_code_str[i])) != Helper::literalToType.end())
 		{
-			this->_tokens.push_back({ currentLiteral, categoriseLiteral(currentLiteral) });
+			if (!currentLiteral.empty())  this->_tokens.push_back({ currentLiteral, categoriseLiteral(currentLiteral) });
 			this->_tokens.push_back({ std::string(1, raw_code_str[i]), categoriseLiteral(std::string(1, raw_code_str[i])) });
 			currentLiteral = "";
-		} // Check for char initilization
-		else if (raw_code_str[i] == SINGLE_QUOTE_LITERAL && raw_code_str[i + DIS_BETWEEN_SINGLE_QOUTES] == SINGLE_QUOTE_LITERAL)
+		}
+		else if (Helper::literalToType.find(std::string(1, raw_code_str[i])) != Helper::literalToType.end())
 		{
 			currentLiteral = raw_code_str.substr(i, DIS_BETWEEN_SINGLE_QOUTES + 1);
-			this->_tokens.push_back({ currentLiteral, categoriseLiteral(currentLiteral) });
+			if (!currentLiteral.empty())  this->_tokens.push_back({ currentLiteral, categoriseLiteral(currentLiteral) });
 			i += DIS_BETWEEN_SINGLE_QOUTES; // Skip char initilization 
 			currentLiteral = "";
 		}/*
@@ -38,7 +38,7 @@ Tokeniser::Tokeniser(const std::string& raw_code_str)
 				currentLiteral = "";
 			}
 		}
-		else
+		else if (raw_code_str[i] != ' ')
 		{
 			currentLiteral += raw_code_str[i];
 		}
@@ -47,70 +47,36 @@ Tokeniser::Tokeniser(const std::string& raw_code_str)
 
 std::vector<Token> Tokeniser::getTokens() const
 {
-	return this->_tokens;
+	return _tokens;
 }
 
 
 Tokens_type Tokeniser::categoriseLiteral(const std::string& literal)
 {
-	if (literal == std::string(1, LPAREN_LIT))
+	if (Helper::literalToType.find(literal) != Helper::literalToType.end())
 	{
-		return LPAREN;
-	}
-	else if (literal == std::string(1, RPAREN_LIT))
-	{
-		return RPAREN;
-	}
-	else if (literal == std::string(1, ADDITION_LIT))
-	{
-		return ADDITION;
-	}
-	else if (literal == std::string(1, MULTIPLICATION_LIT))
-	{
-		return MULTIPLICATION;
-	}
-	else if (literal == std::string(1, DIVISION_LIT))
-	{
-		return DIVISION;
-	}
-	else if (literal == std::string(1, SUBSTRICTION_LIT))
-	{
-		return SUBTRACTION;
-	}
-	else if (literal == std::string(1, CURL_BR_L_LIT) || literal == std::string(1, CURL_BR_R_LIT))
-	{
-		return CURL_BR;
-	}
-	else if (literal[0] == EQUAL_SIGN_LIT)
-	{
-		return EQUAL_SIGN;
-	}
-	else if (literal[0] == SEMICOLON_LIT)
-	{
-		return SEMICOLON;
-	}
-	else if (Helper::isChar(literal))
-	{
-		return CHAR_LITERAL;
-	}
-	else if (std::find(Helper::definedTypes.begin(), Helper::definedTypes.end(), Helper::removeSpecialCharacter(literal)) != Helper::definedTypes.end())
-	{
-		return TYPE_DECLERATION;
-	}
-	//	Check for pointer declerations
-	if (literal[literal.size() - 1] == MULTIPLICATION_LIT && (std::find(Helper::definedTypes.begin(), Helper::definedTypes.end(), Helper::removeSpecialCharacter(literal)) != Helper::definedTypes.end()))
-	{
-		return PTR_TYPE_DECLERATION;
-	}
-	// Check for address referance
-	else if (literal[0] == AMPERSEND_LIT && literal.size() > 1)
-	{
-		return ADDR_REFERENCE;
+		return Helper::literalToType.find(literal)->second;
 	}
 	else if (isNumber(literal))
 	{
 		// Assuming INT is the default case for literals that aren't operators or parentheses
 		return INT;
+	}
+	else if (isFloat(literal))
+	{
+		return FLOAT;
+	}
+	else if (std::find(Helper::definedTypes.begin(), Helper::definedTypes.end(), literal) != Helper::definedTypes.end())
+	{
+		return TYPE_DECLERATION;
+	}
+	else if (literal == "if")
+	{
+		return IF_WORD;
+	}
+	else if (literal == "else")
+	{
+		return ELSE;
 	}
 	else if (!literal.empty())
 	{
@@ -132,6 +98,11 @@ bool Tokeniser::isNumber(const std::string& literal)
 	return true;
 }
 
+bool Tokeniser::isFloat(const std::string& literal)
+{
+	std::regex floatRegex(R"(^[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?$)");
+    return std::regex_match(literal, floatRegex);
+}
 
 std::ostream& operator<<(std::ostream& os, const Tokeniser& tokeniser)
 {
