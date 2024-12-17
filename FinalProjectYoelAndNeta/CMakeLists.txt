@@ -26,7 +26,7 @@ file(GLOB_RECURSE SOURCES "${CMAKE_SOURCE_DIR}/cpp/*.cpp")
 file(GLOB_RECURSE HEADERS "${CMAKE_SOURCE_DIR}/Header/*.h")
 
 # Create an executable from the source files
-add_executable(FinalProjectYoelAndNeta ${SOURCES} ${HEADERS} "cpp/TopLevelParser.cpp")
+add_executable(FinalProjectYoelAndNeta ${SOURCES} ${HEADERS}   )
 
 # Include header files in the project structure
 source_group("Source Files" FILES ${SOURCES})
@@ -41,7 +41,20 @@ set_target_properties(FinalProjectYoelAndNeta PROPERTIES
 
 
 # Specify the LLVM installation directory
-set(LLVM_DIR "I:/llvm-project/install")
+set(LLVM_PATH_ONE "C:/llvm-project/")
+set(LLVM_PATH_TWO "I:/llvm-project/install")
+
+if(EXISTS ${LLVM_PATH_ONE})
+    set(LLVM_DIR ${LLVM_PATH_ONE})
+else()
+    if(EXISTS ${LLVM_PATH_TWO})
+        set(LLVM_DIR ${LLVM_PATH_TWO})
+    else()
+        message(FATAL_ERROR "Neither "${LLVM_PATH_ONE}" OR "${LLVM_PATH_TWO}" exist")
+    endif()
+endif()
+
+message(STATUS "Using LLVM in: "${LLVM_DIR}"")
 
 # Locate LLVMConfig.cmake
 find_package(LLVM REQUIRED CONFIG PATHS "${LLVM_DIR}/lib/cmake/llvm")

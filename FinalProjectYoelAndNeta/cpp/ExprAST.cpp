@@ -1,78 +1,172 @@
 #include "ExprAST.h"
-#include "SyntexError.h"
+
+
 Value* FloatNumberExprAST::codegen()
 {
-	return ConstantFP::get(Helper::getContext(), APFloat(Val));
+	return ConstantFP::get(Helper::getContext(), APFloat(_val));
 }
+
+Value* IntegerNumberExprAST::codegen()
+{
+    return ConstantInt::get(Helper::getContext(), APInt(_size, _val));
+}
+
+Value* CharExprAST::codegen()
+{
+    return ConstantInt::get(Helper::getContext(), APInt(_size, _val));
+}
+
+
+Value* ptrExprAST::codegen()
+{
+    auto it = Helper::NamedValues.find(_valAsStr);
+    llvm::AllocaInst* allocaInst = it->second;
+
+    if (!allocaInst) {
+        std::cerr << "Error: AllocaInst for variable '" << _valAsStr << "' is null.\n";
+        return nullptr;
+    }
+
+    llvm::Type* pointerType = llvm::PointerType::getUnqual(allocaInst->getAllocatedType());
+
+    // Generate a pointer value
+    llvm::IRBuilder<>& Builder = Helper::getBuilder();
+    return Builder.CreatePointerCast(allocaInst, pointerType, _valAsStr + "_ptr");
+}
+
+
+
+
+arrExprAST::arrExprAST(const std::string& type, std::string& size, const std::string& val, const std::string& name) :
+    _val(val), _name(name)
+{
+    assignLLVMType(type);
+    _size = Helper::hexToDec(size);
+
+    // Parse 'init' into `_data`
+    std::vector<uint64_t> parsedData;
+    std::stringstream ss(val);
+    std::string token;
+    while (std::getline(ss, token, ',')) {
+        parsedData.push_back(std::stoull(token));
+    }
+    _data = llvm::ArrayRef<uint64_t>(parsedData);
+}
+
+Value* arrExprAST::codegen() {
+    // Retrieve the pointer to the allocated array
+    AllocaInst* arrayPtr = Helper::NamedValues[_name]; 
+    if (!arrayPtr) {
+        throw std::runtime_error("Array pointer not found in symbol table.");
+    }
+
+    llvm::IRBuilder<>& builder = Helper::getBuilder();
+    
+    // Initialize the array elements
+    for (uint64_t i = 0; i < _size; i++) {
+        Value* elementPtr = builder.CreateGEP(
+            _type, arrayPtr,
+            { builder.getInt32(0), builder.getInt32(i) }, _name + "_ptr");
+
+        // Store value
+        Value* elementValue = builder.getInt32(_data[i]); // Adjust for type
+        // builder.CreateStore(elementValue, elementPtr);
+    }
+
+    return arrayPtr;
+}
+
+
+
+
+
+void arrExprAST::assignLLVMType(const std::string& type) {
+    LLVMContext& context = Helper::getContext(); // Access the global LLVM context
+
+    if (type == "int") {
+        _type = llvm::Type::getInt32Ty(context); // 32-bit integer
+    }
+    else if (type == "float") {
+        _type = llvm::Type::getFloatTy(context); // 32-bit float
+    }
+    else if (type == "char") {
+        _type = llvm::Type::getInt8Ty(context); // 8-bit integer
+    }
+    else {
+        throw std::invalid_argument("Unknown type: " + type);
+    }
+}
+
+
+void arrExprAST::initArrayRef(const std::string& val, const std::string& type)
+{
+    // create vector for array inner values by type
+    std::vector<std::variant<int, float, char>> values;
+    for (size_t i = 0; i < val.size(); i++) // No need to check types or validation,
+    {                                       // So we can just add it to 'values'
+        if (val[i] == ',')
+        {
+            continue;
+        }
+        else
+        {
+            values.push_back(val[i]);
+        }
+    }
+    std::reverse(values.begin(), values.end());
+
+    // Convert to uint64_t
+    std::vector<uint64_t> transformedValues;
+    for (const auto& v : values) {
+        if (std::holds_alternative<int>(v)) {
+            transformedValues.push_back(static_cast<uint64_t>(std::get<int>(v)));
+        }
+        else if (std::holds_alternative<float>(v)) {
+            transformedValues.push_back(static_cast<uint64_t>(std::get<float>(v)));
+        }
+        else if (std::holds_alternative<char>(v)) {
+            transformedValues.push_back(static_cast<uint64_t>(std::get<char>(v)));
+        }
+    }
+
+    // Use arrayRef C'tor that uses the iteration through values
+    _data = llvm::ArrayRef<uint64_t>(transformedValues);
+}
+
+
 
 Value* VariableExprAST::codegen()
 {
-	// Look this variable up in the function.
-    Value* V = Helper::symbolTable.findSymbol(Name)->get().getLLVMValue();
-	if (!V)
-		throw SyntaxError("Not defined varieble");
-	return V;
+    // Lookup the variable in the symbol table
+    AllocaInst* variable = Helper::NamedValues[_name];
+    if (!variable) {
+        throw std::runtime_error("Unknown variable name: " + _name);
+    }
+
+    // Generate a load instruction to load the value of the variable
+    return Helper::getBuilder().CreateLoad(variable->getAllocatedType(), variable, _name);
 }
 
+
+
 // code like int a = 5;
-llvm::Value* AssignExprAST::codegen() {
-    llvm::IRBuilder<>& Builder = Helper::getBuilder(); // Using the active Builder
-    llvm::LLVMContext& Context = Helper::getContext(); // Using the Context from Helper
-    llvm::Type* llvmType = nullptr;
+Value* AssignExprAST::codegen() {
+    Helper::addSymbol(_varName, _varType, _varType);
 
-    // Map the variable type to LLVM types
-    if (_varType == "int") {
-        llvmType = llvm::Type::getInt32Ty(Context);
-    }
-    else if (_varType == "float") {
-        llvmType = llvm::Type::getFloatTy(Context);
-    }
-    else {
-        std::cerr << "Error: Unsupported variable type '" << _varType << "'.\n";
+    llvm::Value* varAlloca = Helper::getSymbolValue(_varName);
+    if (!varAlloca) {
+        std::cerr << "Error: Variable '" << _varName << "' not found in symbol table.\n";
         return nullptr;
     }
 
-    // Check if the variable exists in the symbol table
-    auto symbolOpt = Helper::symbolTable.findSymbol(_VarName);
-    llvm::Value* varAddress = nullptr;
-
-    if (!symbolOpt) {
-        // Ensure we are in a function context
-        llvm::Function* currentFunction = Builder.GetInsertBlock()->getParent();
-        if (!currentFunction) {
-            std::cerr << "Error: Attempting to allocate variable outside of a function.\n";
-            return nullptr;
-        }
-
-        // Allocate memory for the variable in the entry block
-        llvm::IRBuilder<> tempBuilder(&currentFunction->getEntryBlock(),
-            currentFunction->getEntryBlock().begin());
-        varAddress = tempBuilder.CreateAlloca(llvmType, nullptr, _VarName.c_str());
-
-        // Add the variable to the symbol table
-        Helper::symbolTable.addSymbol(_VarName, _varType, varAddress);
-    }
-    else {
-        // Retrieve the variable address from the symbol table
-        varAddress = symbolOpt->get().getLLVMValue();
-        if (!varAddress) {
-            std::cerr << "Error: Variable '" << _VarName << "' has no allocated memory.\n";
-            return nullptr;
-        }
-    }
-
-    // Generate code for the RHS expression
-    llvm::Value* rhsValue = _Value->codegen();
-    if (!rhsValue) {
-        std::cerr << "Error: Failed to generate code for the assigned value.\n";
+    llvm::Value* value = _value->codegen();
+    if (!value) {
+        std::cerr << "Error: Unable to generate code for assigned value.\n";
         return nullptr;
     }
 
-    // Store the RHS value in the allocated variable
-    Builder.CreateStore(rhsValue, varAddress);
-
-    // Return the address of the variable or the RHS value as needed
-    return varAddress;
+    Helper::getBuilder().CreateStore(value, varAlloca);
+    return value;
 }
 
 Value* IfExprAST::codegen() {
@@ -245,3 +339,4 @@ Value* CallExprAST::codegen()
 
     return Helper::Builder->CreateCall(CalleeF, ArgsV, "calltmp");
 }
+

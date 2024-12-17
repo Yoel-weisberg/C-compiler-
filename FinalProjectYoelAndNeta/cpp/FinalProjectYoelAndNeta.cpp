@@ -2,9 +2,9 @@
 #include <fstream>
 #include "../Header/sourceFileHandler.h"
 #include "../Header/Preprocess.h"
-#include "../Header/SyntexError.h"
+#include "../Header/CompilationErrors.h"
 #include "../Header/Tokenizer.h"
-#include "../Header/SyntexAnalysis.h"	
+#include "../Header/SyntaxAnalysis.h"	
 #include "../Header/Parser.h"
 #include "TopLevelParser.h"
 #include "Helper.h"
@@ -26,15 +26,16 @@ int main(int argc, char* argv[]) {
 		// ----     Preprocessor                   ----
 		Preprocess preprocessFile = Preprocess(sourceFile.getSrcFileContent());
 
-		std::cout << "After preprocesser: " << preprocessFile.getFinalStream() << std::endl;
+		//std::cout << "After preprocesser: " << preprocessFile.getFinalStream() << std::endl;
 
 		// ----     Lexical Analyzer               ----
 		Tokeniser tokeniser = Tokeniser(preprocessFile.getFinalStream());
-		std::cout << "After tokeniser " << std::endl;
+		//std::cout << tokeniser << std::endl;
+		//std::cout << "After tokeniser " << std::endl;
 
 		// ----     Syntax Analyzer                ----
-		SyntexAnalysis syntaxAnalysis = SyntexAnalysis(tokeniser.getTokens());
-		std::cout << "Syntax analysed" << std::endl;
+		SyntaxAnalysis syntaxAnalysis = SyntaxAnalysis(tokeniser.getTokens());
+		//std::cout << "Syntax analysed" << std::endl;
 
 		// ----     Parser                         ----
 		TopLevelParser parser = TopLevelParser(tokeniser.getTokens());

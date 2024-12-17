@@ -3,8 +3,8 @@
 #include <iostream>
 #include <fstream>
 #include <map>
-#include "SyntexError.h"
 #include "../Header/Helper.h"
+#include "../Header/CompilationErrors.h"
 
 #define INCLUDE_IDENTIFIER "#include"
 

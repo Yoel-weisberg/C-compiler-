@@ -1,5 +1,5 @@
 #include "../Header/sourceFileHandler.h"
-#include "../Header/SyntexError.h"
+#include "../Header/CompilationErrors.h"
 #include <iostream>
 #include <limits.h>
 

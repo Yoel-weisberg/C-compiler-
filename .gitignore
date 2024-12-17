@@ -458,3 +458,7 @@ out
 # Additional files built by Visual Studio
 
 # End of https://www.toptal.com/developers/gitignore/api/cmake,visualstudio,c++
+
+.\out\build
+**\out\build
+/FinalProjectYoelAndNeta/out/build/x64-debug/build.ninja

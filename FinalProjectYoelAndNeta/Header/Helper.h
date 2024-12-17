@@ -1,12 +1,17 @@
 #pragma once
+#define _OPEN_SYS_ITOA_EXT
 
 #include <iostream>
 #include <vector>
-#include "Constents.h"
+#include <memory>
 #include <regex>
-#include "SymbalTable.h"
+#include <algorithm>
+#include <cmath>
+#include <sstream>
+#include <map>      
+
 #include <map>
-#include "Constents.h"
+#include "Constants.h"
 #include "ExprAST.h"
 
 #include "KaleidoscopeJIT.h"
@@ -33,9 +38,16 @@
 #include "llvm/Transforms/Scalar/Reassociate.h"
 #include "llvm/Transforms/Scalar/SimplifyCFG.h"
 
-#include <memory>
+#include "llvm/IR/ValueSymbolTable.h"
+
+
+#include "Constants.h"
+#include "SymbolTable.h"
+
+
 
 class PrototypeAST;
+
 
 using namespace llvm;
 
@@ -47,7 +59,7 @@ public:
     static std::unique_ptr<LLVMContext> TheContext;
     static std::unique_ptr<Module> TheModule;
     static std::unique_ptr<IRBuilder<>> Builder;
-    static std::map<std::string, Value*> NamedValues;
+    static std::map<std::string, AllocaInst*> NamedValues;
     static std::unique_ptr<llvm::orc::KaleidoscopeJIT> TheJIT;
     static std::unique_ptr<FunctionPassManager> TheFPM;
     static std::unique_ptr<LoopAnalysisManager> TheLAM;
@@ -65,10 +77,24 @@ public:
     static llvm::Module& getModule() { return *TheModule; }
     static void createAnonymousFunction();
     static Function* getFunction(std::string Name);
+    static llvm::AllocaInst* allocForNewSymbol(std::string var_name, std::string var_type, const int size, const std::string& pTT);
+    static bool addSymbol(std::string var_name, std::string var_type, const std::string& pTT = "", const int size = 1);
+    
 
     // Utility methods
     static bool checkIdentifier(const std::string& id);
     static bool isFloat(const std::string& num);
+    static bool isInteger(const std::string& num);
+    static bool isChar(const std::string& ch);
+    static std::string removeSpecialCharacter(std::string s);
+
+    // New Symbol Table Methods
+    static llvm::Value* getSymbolValue(const std::string& var_name);
+    static void printLLVMSymbolTable();
+
+    static uint64_t hexToDec(std::string& str);
+    //static llvm::Type* getLLVMptrType(std::string var_type, llvm::LLVMContext& Context, std::string var_name);
+    static llvm::Type * getLLVMType(std::string var_type, llvm::LLVMContext& context);
 
     // Data members
     static std::vector<std::string> definedTypes;

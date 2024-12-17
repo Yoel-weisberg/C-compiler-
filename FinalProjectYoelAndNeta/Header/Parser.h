@@ -2,12 +2,13 @@
 #define PARSER_H
 
 #include <string>
-#include <memory>
+#include <memory>   
 #include <vector>
+#include <sstream>
 #include "Token.h"  // Make sure Token.h is in the same directory
 #include "ExprAST.h"
-#include "Constents.h"
-#include "SyntexError.h"
+#include "Constants.h"
+#include "CompilationErrors.h"
 
 // Forward declarations of the AST classes
 class ExprAST;
@@ -17,15 +18,15 @@ class FloatNumberExprAST;
 
 class Parser {
 private:
-    std::vector<Token> tokens;
-    size_t currentTokenIndex;
-    std::string IdentifierStr;
+    std::vector<Token> _tokens;
+    size_t _currentTokenIndex;
+    std::string _IdentifierStr;
     bool isAtEnd();
 
-    std::unique_ptr<ExprAST> head;
+    std::unique_ptr<ExprAST> _head;
     int getTokenPrecedence();
 
-    std::map<Tokens_type, int> BinopPrecedence;
+    std::map<Tokens_type, int> _BinopPrecedence;
 
 public:
     // Constructor
@@ -33,12 +34,15 @@ public:
     
     bool isFinished() const;
 
-    void consume();
+    void consume(int times = 1);
     Token& currentToken();
 
     // Parse methods
     std::unique_ptr<ExprAST> parse();
     std::unique_ptr<ExprAST> parseAssignment();
+    std::unique_ptr<ExprAST> ptrAssignmentParsing();
+    std::unique_ptr<ExprAST> regularAssignmentParsing();
+    std::unique_ptr<ExprAST> arrAssignmentParsing(const std::string& type);
     std::unique_ptr<ExprAST> parseIfStatement();
     std::unique_ptr<ExprAST> ParseFloatNumberExpr();
     std::unique_ptr<ExprAST> ParseParenExpr();
@@ -49,6 +53,7 @@ public:
         std::unique_ptr<ExprAST> LHS);
     std::unique_ptr<FunctionAST> ParseTopLevelExpr();
     std::unique_ptr<PrototypeAST> ParsePrototype();
+    std::unique_ptr<FunctionAST> ParseDefinition();
     // Getter for the root AST
     ExprAST* getAst();
 };

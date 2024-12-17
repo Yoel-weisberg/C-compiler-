@@ -22,14 +22,19 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <variant>
 
-#include "SymbalTable.h"
+#include "SymbolTable.h"
+#include "CompilationErrors.h"
 #include "Helper.h"
 
 class Helper;
 
+
 using namespace llvm;
 
+#define INTEGER_SIZE 32
+#define CHAR_SIZE 8
 
 /// ExprAST - Base class for all expression nodes.
 class ExprAST {
@@ -42,12 +47,69 @@ public:
 
 
 /// NumberExprAST - Expression class for numeric literals like "1.0".
-class	FloatNumberExprAST : public ExprAST {
-	double Val;
-
+class	FloatNumberExprAST : public ExprAST
+{
+private: 
+	double _val;
+	std::string _valAsStr;
 public:
-	FloatNumberExprAST(double Val) : Val(Val) {}
+	FloatNumberExprAST(double val) : _val(val) {}
 	virtual Value* codegen() override;
+};
+
+
+// IntegerNumberExprAST - class for numerical integers
+class IntegerNumberExprAST : public ExprAST
+{
+private:
+	int _val;
+	int _size;
+	std::string _valAsStr;
+public: 
+	IntegerNumberExprAST(int val) :_val(val), _size(INTEGER_SIZE) {}
+	virtual Value* codegen() override;
+};
+
+class CharExprAST : public ExprAST
+{
+private:
+	char _val;
+	int _size;
+	std::string _valAsStr;
+public:
+	CharExprAST(char val) : _val(val), _size(CHAR_SIZE) {}
+	virtual Value* codegen() override;
+};
+
+
+class ptrExprAST : public ExprAST
+{
+private:
+	//int _addr; // Address of the "pointed to" variable
+	int _size;
+	std::string _valAsStr; // name of the pointed to variable
+public:
+	ptrExprAST(std::string val) : _valAsStr(val), _size(INTEGER_SIZE){}
+	virtual Value* codegen() override;
+};
+
+
+
+// Some helpful info about array in LLVM --> https://stackoverflow.com/questions/38548680/confused-about-llvm-arrays
+class arrExprAST : public ExprAST
+{
+private:
+	uint64_t _size; // Number of elements in array	
+	std::string _val; // Address to the first element in the array
+	ArrayRef<uint64_t> _data; 
+	std::string _name; // Variable name
+	//std::string _type; // Type of variables in the array
+	Type* _type;
+public:
+	arrExprAST(const std::string& type, std::string& size, const std::string& val, const std::string& name);
+	virtual Value* codegen() override;
+	void assignLLVMType(const std::string& type);
+	void initArrayRef(const std::string& val, const std::string& type);
 };
 
 class BinaryExprAST : public ExprAST {
@@ -63,25 +125,27 @@ public:
 };
 
 /// VariableExprAST - Expression class for referencing a variable, like "a".
-class VariableExprAST : public ExprAST {
-	std::string Name;
+class VariableExprAST : public ExprAST
+{
+	std::string _name;
 
 public:
-	VariableExprAST(const std::string& Name) : Name(Name) {}
+	VariableExprAST(const std::string& Name) : _name(Name) {}
 	virtual Value* codegen() override;
 };
 
 // code like int a = 5;
-class AssignExprAST : public ExprAST {
-    std::string _VarName;
-    std::unique_ptr<ExprAST> _Value;
+class AssignExprAST : public ExprAST
+{
+    std::string _varName;
+    std::unique_ptr<ExprAST> _value;
 	std::string _varType;
 public:
     AssignExprAST(const std::string &VarName, std::unique_ptr<ExprAST> Value, std::string type)
-        : _VarName(VarName), _Value(std::move(Value)), _varType(type) {}
+        : _varName(VarName), _value(std::move(Value)), _varType(type) {}
 
-    const std::string &getVarName() const { return _VarName; }
-    ExprAST *getValue() const { return _Value.get(); }
+    const std::string &getVarName() const { return _varName; }
+    ExprAST *getValue() const { return _value.get(); }
 	const std::string getType() { return _varType; }
 	virtual Value* codegen() override;
 };

@@ -42,9 +42,32 @@ void TopLevelParser::HandleTopLevelExpression()
 
 bool TopLevelParser::isFunctionDecleration()
 {
-    parser.consume();
-    parser.consume();
-    if (parser.currentToken() == 
+    parser.consume(2);
+    if (parser.currentToken().getType() == LPAREN)
+    {
+        parser.consume(-2);
+        return true;
+    }
+    parser.consume(-2);
+    return false;
+}
+
+void TopLevelParser::HandeleDefinition()
+{
+    if (auto FnAST = parser.ParseDefinition()) {
+        if (auto* FnIR = FnAST->codegen()) {
+            fprintf(stderr, "Read function definition:");
+            FnIR->print(errs());
+            fprintf(stderr, "\n");
+            Helper::ExitOnErr(Helper::TheJIT->addModule(
+                llvm::orc::ThreadSafeModule(std::move(Helper::TheModule), std::move(Helper::TheContext))));
+            Helper::InitializeModuleAndManagers();
+        }
+    }
+    else {
+        // Skip token for error recovery.
+        parser.consume();
+    }
 }
 
 void TopLevelParser::mainLoop()
@@ -56,7 +79,14 @@ void TopLevelParser::mainLoop()
         {
          // TODO - add here function decleration
         case TYPE_DECLERATION:
-            if (
+            if (isFunctionDecleration())
+            {
+                HandeleDefinition();
+            }
+            break;
+        case R_CURLY_PRAN:
+            parser.consume();
+            break;
         default:
             HandleTopLevelExpression();
         }

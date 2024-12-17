@@ -1,42 +1,53 @@
 #include "../Header/Tokenizer.h"
 #include <algorithm>
 
-Tokeniser::Tokeniser(const std::string& string)
+Tokeniser::Tokeniser(const std::string& raw_code_str)
 {
 	std::string currentLiteral;
 
-	for (int i = 0; i < string.size(); i++)
+	for (int i = 0; i < raw_code_str.size(); i++)
 	{
-		if (string[i] == ' ' && !currentLiteral.empty()) // If it's a seperater 
+		if (raw_code_str[i] == BLANK && !currentLiteral.empty()) // If it's a seperator 
 		{
-			this->tokens.push_back({ currentLiteral, categoriseLiteral(currentLiteral) });
+			this->_tokens.push_back({ currentLiteral, categoriseLiteral(currentLiteral) });
 			currentLiteral = "";
-		} // Any other valid char exept for a digit
-		else if (Helper::literalToType.find(std::string(1, string[i])) != Helper::literalToType.end())
+		} // Any other valid char except for a digit
+		else if (Helper::literalToType.find(std::string(1, raw_code_str[i])) != Helper::literalToType.end())
 		{
-			if (!currentLiteral.empty())  this->tokens.push_back({ currentLiteral, categoriseLiteral(currentLiteral) });
-			this->tokens.push_back({ std::string(1, string[i]), categoriseLiteral(std::string(1, string[i])) });
+			if (!currentLiteral.empty())  this->_tokens.push_back({ currentLiteral, categoriseLiteral(currentLiteral) });
+			this->_tokens.push_back({ std::string(1, raw_code_str[i]), categoriseLiteral(std::string(1, raw_code_str[i])) });
 			currentLiteral = "";
 		}
-		else if ((i == string.size() - 1))
+		else if (Helper::literalToType.find(std::string(1, raw_code_str[i])) != Helper::literalToType.end())
 		{
-			currentLiteral += string[i];
-			if (!(currentLiteral.empty() || currentLiteral[0] == ' '))
+			currentLiteral = raw_code_str.substr(i, DIS_BETWEEN_SINGLE_QOUTES + 1);
+			if (!currentLiteral.empty())  this->_tokens.push_back({ currentLiteral, categoriseLiteral(currentLiteral) });
+			i += DIS_BETWEEN_SINGLE_QOUTES; // Skip char initilization 
+			currentLiteral = "";
+		}/*
+		else if (raw_code_str[i] == CURL_BR_L_LIT)
+		{
+
+		}*/
+		else if ((i == raw_code_str.size() - 1)) // Check if end is reached
+		{
+			currentLiteral += raw_code_str[i];
+			if (!(currentLiteral.empty() || currentLiteral[0] == BLANK)) // If not empty
 			{
-				this->tokens.push_back({ currentLiteral, categoriseLiteral(currentLiteral) });
+				this->_tokens.push_back({ currentLiteral, categoriseLiteral(currentLiteral) });
 				currentLiteral = "";
 			}
 		}
-		else if (string[i] != ' ')
+		else if (raw_code_str[i] != ' ')
 		{
-			currentLiteral += string[i];
+			currentLiteral += raw_code_str[i];
 		}
 	}
 }
 
 std::vector<Token> Tokeniser::getTokens() const
 {
-	return this->tokens;
+	return _tokens;
 }
 
 
@@ -69,7 +80,7 @@ Tokens_type Tokeniser::categoriseLiteral(const std::string& literal)
 	}
 	else if (!literal.empty())
 	{
-		return IDENTIFIER; // returning identifier without error handeling which would happen in the syntex analysis phrase
+		return IDENTIFIER; // Returning identifier without error handeling which would happen in the syntax analysis phase
 	}
 
 }
