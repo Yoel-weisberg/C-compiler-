@@ -4,8 +4,9 @@
 
 
 
-void foo () {
+int foo () {
     int hey = 3;
+    return hey;
 }
 
 void main () {

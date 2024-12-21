@@ -304,7 +304,10 @@ std::unique_ptr<ExprAST> Parser::ParseIdentifierExpr()
 	consume(); // eat identifier.
 
 	if (currentToken().getType() != LPAREN) // Simple variable ref.
+	{
+		if (currentToken().getType() == SEMICOLUMN) consume();
 		return std::make_unique<VariableExprAST>(IdName);
+	}
 
 	// Call.
 	consume(); // eat (
@@ -414,6 +417,7 @@ std::unique_ptr<FunctionAST> Parser::ParseDefinition()
 		{
 			consume();
 			auto returnStatement = ParseExpression();
+			
 			return std::make_unique<FunctionAST>(std::move(Proto), std::move(E), std::move(returnStatement), type);
 		}
 		else if (Proto.get()->getReturnType() == "void")
