@@ -114,14 +114,6 @@ void arrExprAST::assignLLVMType(const std::string& type) {
     }
 }
 
-//void arrExprAST::assignLLVMConstantType(const std::string& type)
-//{
-//    llvm::IRBuilder<>& builder = Helper::getBuilder();
-//    if (type == "int")
-//    {
-//        _LLVMConstantType = builder.getInt32();
-//    }
-//}
 
 
 void arrExprAST::initArrayRef(const std::string& val, const std::string& type)

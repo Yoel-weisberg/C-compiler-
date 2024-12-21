@@ -214,10 +214,8 @@ llvm::AllocaInst* Helper::allocForNewSymbol(std::string var_name, std::string va
         LLVMType = llvm::Type::getInt8Ty(Context);
         LLVMVal = llvm::ConstantInt::get(LLVMType, std::atoi(val.c_str()));
     }
-    else if (var_type == "arr") // FIXX HEREEEEEEE
-    {/*
-        LLVMType = llvm::ArrayType::get(Helper::getLLVMType(pTT, Context), size);
-        LLVMVal = llvm::ConstantArray::get(dynamic_cast<llvm::ArrayType*>(LLVMType), ArrayRef(&val));*/
+    else if (var_type == "arr")
+    {
         llvm::Type* elementType = Helper::getLLVMType(pTT, Context); 
         LLVMType = llvm::ArrayType::get(elementType, size);
     }
@@ -249,19 +247,6 @@ llvm::Value* Helper::getSymbolValue(const std::string& var_name)
         std::cerr << "Error: Attempting to access variable outside of a function.\n";
         return nullptr;
     }
-
-    //// Access the ValueSymbolTable of the function
-    //llvm::ValueSymbolTable* symbolTable = currentFunction->getValueSymbolTable();
-    //if (!symbolTable) {
-    //    std::cerr << "Error: No symbol table found in the current function.\n";
-    //    return nullptr;
-    //}
-    //llvm::Value* symbol = symbolTable->lookup(var_name);
-
-    //if (!symbol) {
-    //    std::cerr << "Error: Variable '" << var_name << "' not found in symbol table.\n";
-    //}
-    //return symbol;
     auto symbolIt = NamedValues.find(var_name);
     if (symbolIt == NamedValues.end()) // Check if symbol exists
     {
@@ -283,23 +268,7 @@ bool Helper::addSymbol(std::string var_name, std::string var_type, const std::st
     return true;
 }
 
-//std::pair<llvm::Value*, llvm::Type*> Helper::allocArr()
-//{
-//    llvm::Type* LLVMType = nullptr;
-//    llvm::Value* LLVMValue = nullptr;
-//    std::pair<llvm::Value*, llvm::Type*> res;
-//    llvm::IRBuilder<>& builder = Helper::getBuilder();
-//    llvm::LLVMContext& context = Helper::getContext();
-//
-//
-//    // Setup according to type
-//    LLVMType = llvm::ArrayType::get(Helper::getLLVMType(pTT, context), size);
-//
-//
-//    res.first = LLVMValue;
-//    res.second = LLVMType;
-//    return res;
-//}
+
 
 std::string Helper::removeSpecialCharacter(std::string str)
 {

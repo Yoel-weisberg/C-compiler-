@@ -79,7 +79,6 @@ public:
     static Function* getFunction(std::string Name);
     static llvm::AllocaInst* allocForNewSymbol(std::string var_name, std::string var_type, const int size, const std::string& pTT, const std::string& val );
     static bool addSymbol(std::string var_name, std::string var_type, const std::string& val, const std::string& pTT = "", const int size = 1);
-    //static std::pair<llvm::Value*, llvm::Type*> allocArr();
     
 
     // Utility methods
@@ -94,11 +93,9 @@ public:
     static void printLLVMSymbolTable();
 
     static uint64_t hexToDec(std::string& str);
-    //static llvm::Type* getLLVMptrType(std::string var_type, llvm::LLVMContext& Context, std::string var_name);
     static llvm::Type * getLLVMType(std::string var_type, llvm::LLVMContext& context);
 
     // Data members
     static std::vector<std::string> definedTypes;
     static std::map<std::string, Tokens_type> literalToType;
-    //static SymbolTable symbolTable;
 };

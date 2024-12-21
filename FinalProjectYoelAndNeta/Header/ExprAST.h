@@ -209,8 +209,3 @@ public:
 	Value* codegen() override;
 };
 
-// code like a = 5;
-//class RedefinitionExprAst : public ExprAST
-//{
-//
-//};

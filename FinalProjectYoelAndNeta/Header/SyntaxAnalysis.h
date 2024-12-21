@@ -27,10 +27,8 @@ private:
 	int ptrVariableDefenitionStructure(int pos);
 	int variableDefinitionStructure(int pos);
 	int arrTypeVariableDefinitionStructure(int pos);
-	//bool innerArrInit(int pos, int arrType);
 
 	int checkIfStructure(int& pos);
-	int variebleDefinitionStructure(int pos);
 	int checkConditionStructure(int& pos);
 
 	// 
