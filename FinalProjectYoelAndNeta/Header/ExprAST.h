@@ -24,7 +24,6 @@
 #include <vector>
 #include <variant>
 
-//#include "SymbolTable.h"
 #include "CompilationErrors.h"
 #include "Helper.h"
 
@@ -107,7 +106,6 @@ private:
 	ArrayRef<uint64_t> _data; 
 	std::string _name; // Variable name
 	std::string _typeStr; // Type of variables in the array
-	//llvm::Constant* _LLVMConstantType;
 	Type* _type;
 public:
 	arrExprAST(const std::string& type, std::string& size, const std::string& val, const std::string& name) : _size(std::stoull(size)), _name(name), _typeStr(type)
@@ -117,7 +115,6 @@ public:
 	}
 	virtual Value* codegen() override;
 	void assignLLVMType(const std::string& type);
-	//void assignLLVMConstantType(const std::string& type);
 	void initArrayRef(const std::string& val, const std::string& type);
 };
 

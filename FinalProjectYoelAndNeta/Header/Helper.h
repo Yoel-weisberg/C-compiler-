@@ -98,4 +98,5 @@ public:
     // Data members
     static std::vector<std::string> definedTypes;
     static std::map<std::string, Tokens_type> literalToType;
+    static std::map<std::string, Tokens_type> Keywords;
 };

@@ -30,7 +30,10 @@ enum Tokens_type {
 	ARR_TYPE_DECLERATION,
 	AMPERSAND,
 	SQR_BR_L,
-	SQR_BR_R
+	SQR_BR_R,
+	WHILE_LOOP,
+	DO_WHILE_LOOP,
+	FOR_LOOP
 };
 
 // Other

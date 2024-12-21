@@ -53,6 +53,10 @@ Tokens_type Tokeniser::categoriseLiteral(const std::string& literal)
 	{
 		return Helper::literalToType.find(literal)->second;
 	}
+	else if (Helper::Keywords.find(literal) != Helper::Keywords.end())
+	{
+		return Helper::Keywords.find(literal)->second;
+	}
 	else if (isNumber(literal))
 	{
 		// Assuming INT is the default case for literals that aren't operators or parentheses
@@ -65,14 +69,6 @@ Tokens_type Tokeniser::categoriseLiteral(const std::string& literal)
 	else if (std::find(Helper::definedTypes.begin(), Helper::definedTypes.end(), literal) != Helper::definedTypes.end())
 	{
 		return TYPE_DECLERATION;
-	}
-	else if (literal == "if")
-	{
-		return IF_WORD;
-	}
-	else if (literal == "else")
-	{
-		return ELSE;
 	}
 	else if (!literal.empty())
 	{
