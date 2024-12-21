@@ -133,10 +133,10 @@ std::unique_ptr<ExprAST> Parser::ptrAssignmentParsing()
 		}
 		llvm::AllocaInst* allocInst = Helper::NamedValues[pointedToVar];
 
-		Helper::addSymbol(var_name, type);
 
 		// Return
 		auto value_literal = std::make_unique<ptrExprAST>(pointedToVar);
+		Helper::addSymbol(var_name, type, pointedToVar);
 
 		consume();
 
@@ -165,12 +165,13 @@ std::unique_ptr<ExprAST> Parser::regularAssignmentParsing()
 	std::string varName = currentToken().getLiteral();
 	consume(); // Move past IDENTIFIER
 
-	if (currentToken().getType() == EQUAL_SIGN) {
+	if (currentToken().getType() == EQUAL_SIGN)
+	{
 		consume(); // Move past '='
 		Helper::addSymbol(varName, type, currentToken().getLiteral());
 		if (type == "float")
 		{
-			auto value_literal = std::make_unique<FloatNumberExprAST>(std::stod(currentToken().getLiteral()));
+			auto value_literal = std::make_unique<FloatNumberExprAST>(std::stod(currentToken().getLiteral()), varName);
 			consume(); // Move past value
 			consume();
 			return std::make_unique<AssignExprAST>(varName, std::move(value_literal), type);
@@ -233,7 +234,7 @@ std::unique_ptr<ExprAST> Parser::arrAssignmentParsing(const std::string& type)
 		}
 		consume();
 		consume();
-		Helper::addSymbol(varName, "arr", type, len);
+		Helper::addSymbol(varName, "arr", init, type, len);
 		std::string convertalbleLen = std::to_string(len);
 		auto value_literal = std::make_unique<arrExprAST>(type, convertalbleLen, init, varName);
 		return std::make_unique<AssignExprAST>(varName, std::move(value_literal), type);

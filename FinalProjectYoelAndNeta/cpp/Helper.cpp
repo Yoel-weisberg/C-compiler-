@@ -24,7 +24,7 @@ std::map<std::string, Tokens_type> Helper::literalToType = {
     {"]", SQR_BR_R}
 };
 
-SymbolTable Helper::symbolTable;
+//SymbolTable Helper::symbolTable;
 
 std::unique_ptr<llvm::LLVMContext> Helper::TheContext = nullptr;
 std::unique_ptr<llvm::Module> Helper::TheModule = nullptr;
@@ -50,6 +50,18 @@ void Helper::InitializeModuleAndManagers()
 
     // Create a new builder for the module.
     Builder = std::make_unique<IRBuilder<>>(*TheContext);
+
+    //// WHILE THERE IS NO "MAIN" FUNCTION /////
+    ////////////////////////////////////////////
+    llvm::FunctionType* funcType = llvm::FunctionType::get(llvm::Type::getVoidTy(*TheContext), false);
+    llvm::Function* dummyFunction = llvm::Function::Create(
+        funcType, llvm::Function::ExternalLinkage, "dummyFunction", TheModule.get());
+
+    llvm::BasicBlock* entryBlock = llvm::BasicBlock::Create(*TheContext, "entry", dummyFunction);
+    Builder->SetInsertPoint(entryBlock);
+
+    ///////////////////////////////////////////
+
 
     // Create new pass and analysis managers.
     TheFPM = std::make_unique<FunctionPassManager>();
@@ -153,28 +165,6 @@ uint64_t Helper::hexToDec(std::string& str)
     return res;
 }
 
-//llvm::Type* Helper::getLLVMptrType(std::string var_type, llvm::LLVMContext& Context, std::string var_name)
-//{
-//    llvm::PointerType* llvm_type;
-//    if (var_type == INTEGER)
-//    {
-//        return llvm_type = llvm::PointerType::get(llvm::IntegerType::get(Context, INTEGER_AND_FLOAT_SIZE), 0);
-//    }
-//    else if (var_type == FLOAT)
-//    {
-//        return llvm_type = llvm::PointerType::get(Context, 0);
-//    }
-//    else if (var_type == CHAR)
-//    {
-//        return llvm_type = llvm::PointerType::get(llvm::IntegerType::get(Context, CHAR_SIZE), 0);
-//    }
-//    else
-//    {
-//        std::cerr << "Error: Unsupported variable type '" << var_type << "'.\n";
-//        return nullptr;
-//    }
-//}
-
 llvm::Type* Helper::getLLVMType(std::string var_type, llvm::LLVMContext& Context)
 {
     // Determine the type of the array elements from pTT
@@ -195,30 +185,44 @@ llvm::Type* Helper::getLLVMType(std::string var_type, llvm::LLVMContext& Context
     return elementType;
 }
     
-llvm::AllocaInst* Helper::allocForNewSymbol(std::string var_name, std::string var_type, const int size, const std::string& pTT)
+llvm::AllocaInst* Helper::allocForNewSymbol(std::string var_name, std::string var_type, const int size, const std::string& pTT, const std::string& val)
 {
    
     llvm::IRBuilder<>& Builder = Helper::getBuilder();
     llvm::LLVMContext& Context = Helper::getContext();
-    llvm::Type* llvmType = nullptr;
+    llvm::Type* LLVMType = nullptr;
+    llvm::Value* LLVMVal = nullptr;
     if (var_type == "*") { // Pointer
-        llvmType = llvm::PointerType::getUnqual(Helper::getLLVMType(Helper::removeSpecialCharacter(var_type.substr(0, var_type.size() - 1)), Context));
+        LLVMType = llvm::PointerType::getUnqual(Helper::getLLVMType(Helper::removeSpecialCharacter(var_type.substr(0, var_type.size() - 1)), Context));
+        LLVMVal = Helper::NamedValues[val];
+
     }
     var_type = Helper::removeSpecialCharacter(var_type);
     // Map variable type to LLVM type
-    if (var_type == "int") {
-        llvmType = llvm::Type::getInt32Ty(Context);
+    if (var_type == "int")
+    {
+        LLVMType = llvm::Type::getInt32Ty(Context);
+        LLVMVal = llvm::ConstantInt::get(LLVMType, std::atoi(val.c_str()));
     }
-    else if (var_type == "float") {
-        llvmType = llvm::Type::getFloatTy(Context);
+    else if (var_type == "float")
+    {
+        LLVMType = llvm::Type::getFloatTy(Context);
+        LLVMVal = llvm::ConstantFP::get(LLVMType, val);
     }
-    else if (var_type == "char") {
-        llvmType = llvm::Type::getInt8Ty(Context);
+    else if (var_type == "char") 
+    {
+        LLVMType = llvm::Type::getInt8Ty(Context);
+        LLVMVal = llvm::ConstantInt::get(LLVMType, std::atoi(val.c_str()));
     }
-    else if (var_type == "arr") {
-        llvmType = llvm::ArrayType::get(Helper::getLLVMType(pTT, Context), size);
+    else if (var_type == "arr") // FIXX HEREEEEEEE
+    {/*
+        LLVMType = llvm::ArrayType::get(Helper::getLLVMType(pTT, Context), size);
+        LLVMVal = llvm::ConstantArray::get(dynamic_cast<llvm::ArrayType*>(LLVMType), ArrayRef(&val));*/
+        llvm::Type* elementType = Helper::getLLVMType(pTT, Context); 
+        LLVMType = llvm::ArrayType::get(elementType, size);
     }
-    else {
+    else 
+    {
         std::cerr << "Error: Unsupported variable type '" << var_type << "'.\n";
         return nullptr;
     }
@@ -232,8 +236,8 @@ llvm::AllocaInst* Helper::allocForNewSymbol(std::string var_name, std::string va
 
     // Allocate memory in the entry block
     llvm::IRBuilder<> tempBuilder(&currentFunction->getEntryBlock(), currentFunction->getEntryBlock().begin());
-    llvm::AllocaInst* allocaInst = tempBuilder.CreateAlloca(llvmType, nullptr, var_name);
-
+    llvm::AllocaInst* allocaInst = tempBuilder.CreateAlloca(LLVMType, nullptr, var_name);
+    Builder.CreateStore(LLVMVal, allocaInst);
     return allocaInst; // LLVM automatically tracks the name in its symbol table
 }
 
@@ -246,35 +250,56 @@ llvm::Value* Helper::getSymbolValue(const std::string& var_name)
         return nullptr;
     }
 
-    // Access the ValueSymbolTable of the function
-    llvm::ValueSymbolTable* symbolTable = currentFunction->getValueSymbolTable();
-    if (!symbolTable) {
-        std::cerr << "Error: No symbol table found in the current function.\n";
-        return nullptr;
-    }
+    //// Access the ValueSymbolTable of the function
+    //llvm::ValueSymbolTable* symbolTable = currentFunction->getValueSymbolTable();
+    //if (!symbolTable) {
+    //    std::cerr << "Error: No symbol table found in the current function.\n";
+    //    return nullptr;
+    //}
+    //llvm::Value* symbol = symbolTable->lookup(var_name);
 
-    llvm::Value* symbol = symbolTable->lookup(var_name);
-
-    if (!symbol) {
+    //if (!symbol) {
+    //    std::cerr << "Error: Variable '" << var_name << "' not found in symbol table.\n";
+    //}
+    //return symbol;
+    auto symbolIt = NamedValues.find(var_name);
+    if (symbolIt == NamedValues.end()) // Check if symbol exists
+    {
         std::cerr << "Error: Variable '" << var_name << "' not found in symbol table.\n";
     }
-    return symbol;
+    return (*symbolIt).second;
+
 }
 
 
-bool Helper::addSymbol(std::string var_name, std::string var_type,const std::string& pTT, const int size)
+bool Helper::addSymbol(std::string var_name, std::string var_type, const std::string& val, const std::string& pTT, const int size)
 {
-    if (symbolTable.findSymbol(var_name)) { // NOTE: THIS STATEMENT DOESN'T CONSIDER SCOPES 
-                                            // (YET TO BE IMPLEMENTED)
-        std::cerr << "Error: Symbol '" << var_name << "' already exists.\n";
-        return false; // Symbol already exists
-    }
-    llvm::AllocaInst* var_address = allocForNewSymbol(var_name, var_type, size, pTT);
+    // To Do: check if symbol allready exists in the table
+    llvm::AllocaInst* var_address = allocForNewSymbol(var_name, var_type, size, pTT, val);
+    if (!var_address) { std::cerr << "NOT FOUND " << std::endl; }
 
     Helper::NamedValues[var_name] = var_address; // Add to symbol table 
     printLLVMSymbolTable();
     return true;
 }
+
+//std::pair<llvm::Value*, llvm::Type*> Helper::allocArr()
+//{
+//    llvm::Type* LLVMType = nullptr;
+//    llvm::Value* LLVMValue = nullptr;
+//    std::pair<llvm::Value*, llvm::Type*> res;
+//    llvm::IRBuilder<>& builder = Helper::getBuilder();
+//    llvm::LLVMContext& context = Helper::getContext();
+//
+//
+//    // Setup according to type
+//    LLVMType = llvm::ArrayType::get(Helper::getLLVMType(pTT, context), size);
+//
+//
+//    res.first = LLVMValue;
+//    res.second = LLVMType;
+//    return res;
+//}
 
 std::string Helper::removeSpecialCharacter(std::string str)
 {

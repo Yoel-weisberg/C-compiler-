@@ -3,22 +3,30 @@
 
 Value* FloatNumberExprAST::codegen()
 {
+    //Allocate memory + add to symbol table
+    Helper::addSymbol(_name, "float", std::to_string(_val));
 	return ConstantFP::get(Helper::getContext(), APFloat(_val));
 }
 
 Value* IntegerNumberExprAST::codegen()
 {
+    //Allocate memory + add to symbol table
+    Helper::addSymbol(_name, "int", std::to_string(_val));
     return ConstantInt::get(Helper::getContext(), APInt(_size, _val));
 }
 
 Value* CharExprAST::codegen()
-{
+{    
+    //Allocate memory + add to symbol table
+    Helper::addSymbol(_name, "char", std::to_string(_val));
     return ConstantInt::get(Helper::getContext(), APInt(_size, _val));
 }
 
 
 Value* ptrExprAST::codegen()
 {
+    //Allocate memory + add to symbol table
+
     auto it = Helper::NamedValues.find(_valAsStr);
     llvm::AllocaInst* allocaInst = it->second;
 
@@ -34,26 +42,13 @@ Value* ptrExprAST::codegen()
     return Builder.CreatePointerCast(allocaInst, pointerType, _valAsStr + "_ptr");
 }
 
-
-
-
-arrExprAST::arrExprAST(const std::string& type, std::string& size, const std::string& val, const std::string& name) :
-    _val(val), _name(name)
+Value* arrExprAST::codegen() 
 {
-    assignLLVMType(type);
-    _size = Helper::hexToDec(size);
-
-    // Parse 'init' into `_data`
-    std::vector<uint64_t> parsedData;
-    std::stringstream ss(val);
-    std::string token;
-    while (std::getline(ss, token, ',')) {
-        parsedData.push_back(std::stoull(token));
-    }
-    _data = llvm::ArrayRef<uint64_t>(parsedData);
-}
-
-Value* arrExprAST::codegen() {
+    //Allocate memory + add to symbol table
+    // !NOTE!
+    // Memeory allocation for arrays is done here, 
+    // and not in the Helper method like the rest of the types
+    Helper::addSymbol(_name, "arr", _val, "int", _size); // Check if implementation is nessecary and adjust!
     // Retrieve the pointer to the allocated array
     AllocaInst* arrayPtr = Helper::NamedValues[_name]; 
     if (!arrayPtr) {
@@ -61,16 +56,36 @@ Value* arrExprAST::codegen() {
     }
 
     llvm::IRBuilder<>& builder = Helper::getBuilder();
+    llvm::LLVMContext& context = Helper::getContext();
+    Value* elementPtr = nullptr;
+    Value* elementValue = nullptr;
     
     // Initialize the array elements
-    for (uint64_t i = 0; i < _size; i++) {
-        Value* elementPtr = builder.CreateGEP(
-            _type, arrayPtr,
-            { builder.getInt32(0), builder.getInt32(i) }, _name + "_ptr");
-
-        // Store value
-        Value* elementValue = builder.getInt32(_data[i]); // Adjust for type
-        // builder.CreateStore(elementValue, elementPtr);
+    for (uint64_t i = 0; i < _size; i++)
+    {
+        if (_typeStr == "int")
+        {
+            Value* elementPtr = builder.CreateGEP(_type, arrayPtr, { builder.getInt32(0), builder.getInt32(i) }, _name + "_ptr");
+            // Store value
+            Value* elementValue = llvm::ConstantInt::get(llvm::Type::getInt32Ty(context), _data[i]);
+        }
+        else if (_typeStr == "float")
+        {
+            Value* elementPtr = builder.CreateGEP(_type, arrayPtr, { builder.getInt32(0), builder.getInt32(i) }, _name + "_ptr");
+            // Store value
+            Value* elementValue = llvm::ConstantFP::get(llvm::Type::getFloatTy(context), _data[i]);
+        }
+        else if (_typeStr == "char")
+        {
+            Value* elementPtr = builder.CreateGEP(_type, arrayPtr, { builder.getInt8(0), builder.getInt8(i) }, _name + "_ptr");
+            // Store value
+            Value* elementValue = llvm::ConstantInt::get(llvm::Type::getInt8Ty(context), _data[i]);
+        }
+        else 
+        {
+            throw std::invalid_argument("Unknown type: " + _typeStr);
+        }
+        builder.CreateStore(elementValue, elementPtr);
     }
 
     return arrayPtr;
@@ -79,9 +94,11 @@ Value* arrExprAST::codegen() {
 
 
 
-
+/*
+* Helper method for array type variables codegen. 
+*/
 void arrExprAST::assignLLVMType(const std::string& type) {
-    LLVMContext& context = Helper::getContext(); // Access the global LLVM context
+    LLVMContext& context = Helper::getContext(); 
 
     if (type == "int") {
         _type = llvm::Type::getInt32Ty(context); // 32-bit integer
@@ -96,6 +113,15 @@ void arrExprAST::assignLLVMType(const std::string& type) {
         throw std::invalid_argument("Unknown type: " + type);
     }
 }
+
+//void arrExprAST::assignLLVMConstantType(const std::string& type)
+//{
+//    llvm::IRBuilder<>& builder = Helper::getBuilder();
+//    if (type == "int")
+//    {
+//        _LLVMConstantType = builder.getInt32();
+//    }
+//}
 
 
 void arrExprAST::initArrayRef(const std::string& val, const std::string& type)

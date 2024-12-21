@@ -24,7 +24,7 @@
 #include <vector>
 #include <variant>
 
-#include "SymbolTable.h"
+//#include "SymbolTable.h"
 #include "CompilationErrors.h"
 #include "Helper.h"
 
@@ -50,10 +50,11 @@ public:
 class	FloatNumberExprAST : public ExprAST
 {
 private: 
+	std::string _name;
 	double _val;
 	std::string _valAsStr;
 public:
-	FloatNumberExprAST(double val) : _val(val) {}
+	FloatNumberExprAST(double val, const std::string& name = "") : _val(val), _name(name) {}
 	virtual Value* codegen() override;
 };
 
@@ -65,8 +66,9 @@ private:
 	int _val;
 	int _size;
 	std::string _valAsStr;
+	std::string _name;
 public: 
-	IntegerNumberExprAST(int val) :_val(val), _size(INTEGER_SIZE) {}
+	IntegerNumberExprAST(int val, const std::string& name) :_val(val), _size(INTEGER_SIZE), _name(name) {}
 	virtual Value* codegen() override;
 };
 
@@ -76,8 +78,9 @@ private:
 	char _val;
 	int _size;
 	std::string _valAsStr;
+	std::string _name;
 public:
-	CharExprAST(char val) : _val(val), _size(CHAR_SIZE) {}
+	CharExprAST(char val, const std::string& name) : _val(val), _size(CHAR_SIZE), _name(name) {}
 	virtual Value* codegen() override;
 };
 
@@ -103,12 +106,18 @@ private:
 	std::string _val; // Address to the first element in the array
 	ArrayRef<uint64_t> _data; 
 	std::string _name; // Variable name
-	//std::string _type; // Type of variables in the array
+	std::string _typeStr; // Type of variables in the array
+	//llvm::Constant* _LLVMConstantType;
 	Type* _type;
 public:
-	arrExprAST(const std::string& type, std::string& size, const std::string& val, const std::string& name);
+	arrExprAST(const std::string& type, std::string& size, const std::string& val, const std::string& name) : _size(std::stoull(size)), _name(name), _typeStr(type)
+	{
+		assignLLVMType(type);
+		initArrayRef(val, type);
+	}
 	virtual Value* codegen() override;
 	void assignLLVMType(const std::string& type);
+	//void assignLLVMConstantType(const std::string& type);
 	void initArrayRef(const std::string& val, const std::string& type);
 };
 

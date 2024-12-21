@@ -141,7 +141,7 @@ void SyntaxAnalysis::validSentences()
 	{
 		while (pos < _tokens.size())
 		{
-			if (_tokens[pos + 1].getLiteral().substr(_tokens[pos + 1].getLiteral().size() - 2, _tokens[pos + 1].getLiteral().size()) == "[]")
+			if (_tokens[pos + 1].getLiteral().substr(_tokens[pos + 1].getLiteral().size() - 1, _tokens[pos + 1].getLiteral().size()) == "[]")
 			{
 				std::cout << "Arr to syn --> " << _tokens[pos].getLiteral() << std::endl;
 				pos = arrTypeVariableDefinitionStructure(pos) + 1; // send identifier

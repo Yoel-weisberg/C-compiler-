@@ -42,7 +42,7 @@
 
 
 #include "Constants.h"
-#include "SymbolTable.h"
+//#include "SymbolTable.h"
 
 
 
@@ -77,8 +77,9 @@ public:
     static llvm::Module& getModule() { return *TheModule; }
     static void createAnonymousFunction();
     static Function* getFunction(std::string Name);
-    static llvm::AllocaInst* allocForNewSymbol(std::string var_name, std::string var_type, const int size, const std::string& pTT);
-    static bool addSymbol(std::string var_name, std::string var_type, const std::string& pTT = "", const int size = 1);
+    static llvm::AllocaInst* allocForNewSymbol(std::string var_name, std::string var_type, const int size, const std::string& pTT, const std::string& val );
+    static bool addSymbol(std::string var_name, std::string var_type, const std::string& val, const std::string& pTT = "", const int size = 1);
+    //static std::pair<llvm::Value*, llvm::Type*> allocArr();
     
 
     // Utility methods
@@ -99,5 +100,5 @@ public:
     // Data members
     static std::vector<std::string> definedTypes;
     static std::map<std::string, Tokens_type> literalToType;
-    static SymbolTable symbolTable;
+    //static SymbolTable symbolTable;
 };
