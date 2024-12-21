@@ -44,8 +44,6 @@
 #include "Constants.h"
 #include "SymbolTable.h"
 
-
-
 class PrototypeAST;
 
 
@@ -87,6 +85,7 @@ public:
     static bool isInteger(const std::string& num);
     static bool isChar(const std::string& ch);
     static std::string removeSpecialCharacter(std::string s);
+    static Type* getTypeFromString(const std::string type);
 
     // New Symbol Table Methods
     static llvm::Value* getSymbolValue(const std::string& var_name);
@@ -100,4 +99,5 @@ public:
     static std::vector<std::string> definedTypes;
     static std::map<std::string, Tokens_type> literalToType;
     static SymbolTable symbolTable;
+    
 };

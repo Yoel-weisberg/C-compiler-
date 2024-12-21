@@ -367,6 +367,8 @@ std::unique_ptr<ExprAST> Parser::ParsePrimary()
 		return ParseFloatNumberExpr();
 	case IDENTIFIER:
 		return ParseIdentifierExpr();
+	case RETURN_STATEMENT:
+		return nullptr;
 	default:
 		throw SyntaxError("Undefined Sentence begining");
 	}
@@ -377,24 +379,26 @@ std::unique_ptr<PrototypeAST> Parser::ParsePrototype()
 {
 	// were starting on the type
 	std::string returnType = currentToken().getLiteral();
-	if (returnType != "void")
-	{
-		std::cerr << "There is no suppert for return type except of void" << std::endl;
-	}
 	consume();
 	std::string FnName = currentToken().getLiteral();
 	consume(2);
 	// consume the (
-	std::vector<std::string> ArgNames;
-	while (currentToken().getType() == IDENTIFIER)
+	std::vector<FuncArg> argsTypesAndNames;
+	while (currentToken().getType() == TYPE_DECLERATION)
 	{
-		ArgNames.push_back(_IdentifierStr);
+		std::string type = currentToken().getLiteral();
 		consume();
+		std::string name = currentToken().getLiteral();
+		consume();
+		if (currentToken().getType() == COMMA)
+			consume();
+		
+		argsTypesAndNames.push_back({ type, name });
 	}
 		
 	// success.
 	consume(2); // eat ') and { or ;
-	return std::make_unique<PrototypeAST>(FnName, std::move(ArgNames));
+	return std::make_unique<PrototypeAST>(FnName, std::move(argsTypesAndNames), returnType);
 }
 
 std::unique_ptr<FunctionAST> Parser::ParseDefinition()
@@ -402,10 +406,34 @@ std::unique_ptr<FunctionAST> Parser::ParseDefinition()
 	auto Proto = ParsePrototype();
 	if (!Proto)
 		return nullptr;
+	std::string type = Proto.get()->getReturnType();
 
 	if (auto E = ParseExpression())
-		return std::make_unique<FunctionAST>(std::move(Proto), std::move(E));
+	{
+		if (currentToken().getType() == RETURN_STATEMENT)
+		{
+			consume();
+			auto returnStatement = ParseExpression();
+			return std::make_unique<FunctionAST>(std::move(Proto), std::move(E), std::move(returnStatement), type);
+		}
+		else if (Proto.get()->getReturnType() == "void")
+		{
+			// it dosent realy matter 
+			auto voidRet = ParseVoid();
+			return std::make_unique<FunctionAST>(std::move(Proto), std::move(E), std::move(voidRet), type);
+		}
+		else
+		{
+			throw SyntaxError("Excepted a return statement");
+		}
+
+	}
 	return nullptr;
+}
+
+std::unique_ptr<ExprAST> Parser::ParseVoid()
+{
+	return std::make_unique<VoidAst>();
 }
 
 std::unique_ptr<FunctionAST> Parser::ParseTopLevelExpr()
@@ -413,8 +441,9 @@ std::unique_ptr<FunctionAST> Parser::ParseTopLevelExpr()
 	if (auto E = ParseExpression()) {
 		// Make an anonymous proto.
 		auto Proto = std::make_unique<PrototypeAST>("__anon_expr",
-			std::vector<std::string>());
-		return std::make_unique<FunctionAST>(std::move(Proto), std::move(E));
+			std::vector<FuncArg>(),
+			"void");
+		return std::make_unique<FunctionAST>(std::move(Proto), std::move(E), nullptr, "void");
 	}
 	return nullptr;
 }

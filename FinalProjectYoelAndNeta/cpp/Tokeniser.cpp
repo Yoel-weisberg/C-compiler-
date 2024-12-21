@@ -78,6 +78,10 @@ Tokens_type Tokeniser::categoriseLiteral(const std::string& literal)
 	{
 		return ELSE;
 	}
+	else if(literal == "return")
+	{
+		return RETURN_STATEMENT;
+	}
 	else if (!literal.empty())
 	{
 		return IDENTIFIER; // Returning identifier without error handeling which would happen in the syntax analysis phase

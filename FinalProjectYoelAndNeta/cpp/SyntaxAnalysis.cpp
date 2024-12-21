@@ -173,6 +173,10 @@ void SyntaxAnalysis::validSentences()
 			{
 				pos = checkIdentifier(pos);
 			}
+			else if (_tokens[pos].getType() == RETURN_STATEMENT)
+			{
+				pos++;
+			}
 			// TODO - checking if the sentence just a defined identifier (like just 3; or somthing like that)
 			// TODO - need to check if its a redefinition of t a symbol
 			// TODO - need to check if the sentnce is an algebric sentnece

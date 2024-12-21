@@ -54,6 +54,7 @@ public:
     std::unique_ptr<FunctionAST> ParseTopLevelExpr();
     std::unique_ptr<PrototypeAST> ParsePrototype();
     std::unique_ptr<FunctionAST> ParseDefinition();
+    std::unique_ptr<ExprAST> ParseVoid();
     // Getter for the root AST
     ExprAST* getAst();
 };

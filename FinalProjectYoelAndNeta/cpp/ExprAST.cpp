@@ -236,9 +236,16 @@ Function* PrototypeAST::codegen()
 {
     // TO-DO make that it would not only work eith double
     // Make the function type:  double(double,double) etc.
-    std::vector<Type*> Doubles(Args.size(), Type::getDoubleTy(Helper::getContext()));
+    std::vector<Type*> ArgsList;
+
+    // handle args list:
+    for (auto arg : Args)
+    {
+        ArgsList.push_back(Helper::getTypeFromString(arg.Type));
+    }
+    Type* ReturnType = Helper::getTypeFromString(returnType);
     FunctionType* FT =
-        FunctionType::get(Type::getDoubleTy(Helper::getContext()), Doubles, false);
+        FunctionType::get(ReturnType, ArgsList, false);
 
     Function* F =
         Function::Create(FT, Function::ExternalLinkage, Name, Helper::getModule());
@@ -246,7 +253,7 @@ Function* PrototypeAST::codegen()
     // Set names for all arguments.
     unsigned Idx = 0;
     for (auto& Arg : F->args())
-        Arg.setName(Args[Idx++]);
+        Arg.setName(Args[Idx].Name);
 
     return F;
 }
@@ -265,22 +272,33 @@ Function* FunctionAST::codegen()
     BasicBlock* BB = BasicBlock::Create(Helper::getContext(), "entry", TheFunction);
     Helper::getBuilder().SetInsertPoint(BB);
 
+
     // Record the function arguments in the NamedValues map.
     // TODO - add scope to variebles
     //for (auto& Arg : TheFunction->args())
     //    Symbol newSymbol = Symbol(std::string(Arg.getName()), &Arg)
     //    SymbolTable   = &Arg;
 
-    if (Value* RetVal = Body->codegen()) {
-        Helper::TheModule->print(llvm::errs(), nullptr); // Print IR here
+    if (Value* functionBodeyIR = Body->codegen()) {
+
+        Value* RetVal = ReturnValue->codegen();
+
         // Finish off the function.
-       Helper::Builder->CreateRet(RetVal);
+        if (returnType == "void")
+        {
+            Helper::Builder->CreateRetVoid();
+        }
+        else
+        {
+            Helper::Builder->CreateRet(RetVal);
+        }
 
         // Validate the generated code, checking for consistency.
         verifyFunction(*TheFunction);
 
         // Run the optimizer on the function.
-        Helper::TheFPM->run(*TheFunction, *Helper::TheFAM);
+        // not now for debugging porpuses
+        // Helper::TheFPM->run(*TheFunction, *Helper::TheFAM);
 
         return TheFunction;
     }
@@ -336,7 +354,15 @@ Value* CallExprAST::codegen()
         if (!ArgsV.back())
             return nullptr;
     }
+    if (CalleeF->getReturnType()->isVoidTy())
+    {
+        return Helper::Builder->CreateCall(CalleeF, ArgsV);
 
+    }
     return Helper::Builder->CreateCall(CalleeF, ArgsV, "calltmp");
 }
 
+Value* VoidAst::codegen()
+{
+    return nullptr;
+}

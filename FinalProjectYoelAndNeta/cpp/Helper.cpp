@@ -294,6 +294,26 @@ std::string Helper::removeSpecialCharacter(std::string str)
     return str;
 }
 
+Type* Helper::getTypeFromString(const std::string type)
+{
+    if (type == "int")
+    {
+        return Type::getInt32Ty(Helper::getContext());
+    }
+    else if (type == "float")
+    {
+        return Type::getDoubleTy(Helper::getContext());
+    }
+    else if (type == "char")
+    {
+        return Type::getInt8Ty(Helper::getContext());
+    }
+    else if(type == "void")
+    {
+        return Type::getVoidTy(Helper::getContext());
+    }
+}
+
 
 void Helper::printLLVMSymbolTable() {
     std::cout << "Symbol Table:\n";

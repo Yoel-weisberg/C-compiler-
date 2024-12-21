@@ -30,7 +30,8 @@ enum Tokens_type {
 	ARR_TYPE_DECLERATION,
 	AMPERSAND,
 	SQR_BR_L,
-	SQR_BR_R
+	SQR_BR_R,
+	RETURN_STATEMENT
 };
 
 // Other
