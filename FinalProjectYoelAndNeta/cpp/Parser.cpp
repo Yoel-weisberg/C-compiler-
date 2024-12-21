@@ -299,7 +299,7 @@ std::unique_ptr<ExprAST> Parser::ParseFloatNumberExpr()
 
 std::unique_ptr<ExprAST> Parser::ParseIdentifierExpr()
 {
-	std::string IdName = _IdentifierStr;
+	std::string IdName = currentToken().getLiteral();
 
 	consume(); // eat identifier.
 
@@ -325,6 +325,8 @@ std::unique_ptr<ExprAST> Parser::ParseIdentifierExpr()
 
 	// Eat the ')'.
 	consume();
+	if (currentToken().getType() == SEMICOLUMN)
+		consume();
 
 	return std::make_unique<CallExprAST>(IdName, std::move(Args));
 }

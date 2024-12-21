@@ -146,7 +146,7 @@ void SyntaxAnalysis::validSentences()
 	{
 		while (pos < _tokens.size())
 		{
-			if (pos + 1 < _tokens.size() && ( _tokens[pos + 1].getLiteral().substr(_tokens[pos + 1].getLiteral().size() - 2, _tokens[pos + 1].getLiteral().size()) == "[]"))
+			if ((pos + 2 < _tokens.size()) && ( _tokens[pos + 1].getLiteral() == "[" && _tokens[pos + 2].getLiteral() == "]"))
 			{
 				std::cout << "Arr to syn --> " << _tokens[pos].getLiteral() << std::endl;
 				pos = arrTypeVariableDefinitionStructure(pos) + 1; // send identifier
@@ -390,9 +390,10 @@ int SyntaxAnalysis::checkIdentifier(int& pos)
 	pos++;
 	if (_tokens[pos].getType() == LPAREN)
 	{
+		// move past LPRAN
+		pos++;
 		while (_tokens[pos].getType() == INT || _tokens[pos].getType() == FLOAT)
 		{
-			pos++;
 			if (_tokens[pos].getType() != COMMA || _tokens[pos].getType() != RPAREN)
 			{
 				throw SyntaxError("Excepted a comma or a ) after argument in function call");
@@ -402,5 +403,5 @@ int SyntaxAnalysis::checkIdentifier(int& pos)
 		if (_tokens[pos].getType() == RPAREN) pos++;
 	}
 	if (_tokens[pos].getType() != SEMICOLUMN) throw SyntaxError("Excepted a semicolumn");
-	return pos;
+	return ++pos;
 }
