@@ -16,6 +16,9 @@ class AssignExprAST;
 class BinaryExprAST;
 class FloatNumberExprAST;
 
+class ParserError;
+
+
 class Parser {
 private:
     std::vector<Token> _tokens;
