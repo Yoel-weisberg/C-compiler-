@@ -8,6 +8,13 @@
 
 #define INCLUDE_IDENTIFIER "#include"
 
+struct macroTableEntry
+{
+    std::string key;
+    std::string value;
+    bool isFunction;
+    std::vector<std::string> args;
+};
 class Preprocess{
 public:
     Preprocess(const std::string& fileContent);
@@ -22,11 +29,16 @@ private:
     // Handle Macros
     void handleMacroVariables();
     std::string replaceMacro();
+    std::string handleFunctionReplacement(macroTableEntry entry);
     // void handleFunctinMacro(); - sprint2
-    bool checkMacroValueValidity (const std::string& macroValue);
+    bool checkMacroValueValidity (std::string& macroValue);
     bool isNumber(const std::string& number);
     std::string getFinalValue(std::string key);
 
     std::string _fileRawContent;
-    std::map <std::string, std::string> _macroTable;
+    std::vector<macroTableEntry> _macroTable;
+
+    macroTableEntry* getFromVector(std::string key);
+
+    int _pos;
 };
