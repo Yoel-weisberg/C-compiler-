@@ -196,7 +196,8 @@ std::string Preprocess::replaceMacro() {
         (ch == '\'' && !isThereQuotes) ? singleQuote = !singleQuote : true;
 
         if (((ch == ' ' || ch == '\n' || ch == '(' || ch == ',') && !isThereQuotes && !currentBlock.empty())) {
-
+            
+            codeStream += ch;
             macroTableEntry entry;
             // searching macro
             for (auto it : _macroTable)

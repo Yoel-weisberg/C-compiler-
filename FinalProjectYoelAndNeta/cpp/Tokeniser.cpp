@@ -7,7 +7,7 @@ Tokeniser::Tokeniser(const std::string& raw_code_str)
 
 	for (int i = 0; i < raw_code_str.size(); i++)
 	{
-		if (raw_code_str[i] == BLANK && !currentLiteral.empty()) // If it's a seperator 
+		if ((raw_code_str[i] == BLANK || raw_code_str[i] == '\n') && !currentLiteral.empty()) // If it's a seperator 
 		{
 			this->_tokens.push_back({ currentLiteral, categoriseLiteral(currentLiteral) });
 			currentLiteral = "";
@@ -38,7 +38,7 @@ Tokeniser::Tokeniser(const std::string& raw_code_str)
 				currentLiteral = "";
 			}
 		}
-		else if (raw_code_str[i] != ' ')
+		else if (raw_code_str[i] != ' ' && raw_code_str[i] != '\n')
 		{
 			currentLiteral += raw_code_str[i];
 		}
