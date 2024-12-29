@@ -398,11 +398,11 @@ int SyntaxAnalysis::checkIdentifier(int& pos)
 		pos++;
 		while (_tokens[pos].getType() == INT || _tokens[pos].getType() == FLOAT)
 		{
-			if (_tokens[pos].getType() != COMMA || _tokens[pos].getType() != RPAREN)
+			pos++;
+			if (_tokens[pos].getType() != COMMA && _tokens[pos].getType() != RPAREN)
 			{
 				throw SyntaxError("Excepted a comma or a ) after argument in function call");
 			}
-			pos++;
 		}
 		if (_tokens[pos].getType() == RPAREN) pos++;
 	}

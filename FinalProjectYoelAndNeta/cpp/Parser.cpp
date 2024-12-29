@@ -291,9 +291,16 @@ std::unique_ptr<ExprAST> Parser::parseIfStatement() {
 
 std::unique_ptr<ExprAST> Parser::ParseFloatNumberExpr()
 {
-	auto Result = std::make_unique<FloatNumberExprAST>(std::stoi(currentToken().getLiteral()));
+	auto Result = std::make_unique<FloatNumberExprAST>(std::stof(currentToken().getLiteral()));
 	consume();
 	if (currentToken().getType() == SEMICOLUMN) consume();
+	return std::move(Result);
+}
+
+std::unique_ptr<ExprAST> Parser::ParseIntagerNumberExpr()
+{
+	auto Result = std::make_unique<IntegerNumberExprAST>(std::stof(currentToken().getLiteral()));
+	consume();
 	return std::move(Result);
 }
 
@@ -372,6 +379,8 @@ std::unique_ptr<ExprAST> Parser::ParsePrimary()
 		return ParseIdentifierExpr();
 	case RETURN_STATEMENT:
 		return nullptr;
+	case INT:
+		return ParseIntagerNumberExpr();
 	default:
 		throw SyntaxError("Undefined Sentence begining");
 	}

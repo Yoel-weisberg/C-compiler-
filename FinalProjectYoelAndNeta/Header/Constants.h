@@ -42,3 +42,4 @@ enum Tokens_type {
 // Variable Sizes
 #define INTEGER_AND_FLOAT_SIZE 32
 #define CHAR_SIZE 8
+

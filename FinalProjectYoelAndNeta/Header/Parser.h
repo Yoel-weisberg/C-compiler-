@@ -45,6 +45,7 @@ public:
     std::unique_ptr<ExprAST> arrAssignmentParsing(const std::string& type);
     std::unique_ptr<ExprAST> parseIfStatement();
     std::unique_ptr<ExprAST> ParseFloatNumberExpr();
+    std::unique_ptr<ExprAST> ParseIntagerNumberExpr();
     std::unique_ptr<ExprAST> ParseParenExpr();
     std::unique_ptr<ExprAST> ParseIdentifierExpr();
     std::unique_ptr<ExprAST> ParseExpression();

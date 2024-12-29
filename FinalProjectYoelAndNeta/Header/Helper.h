@@ -99,5 +99,8 @@ public:
     static std::vector<std::string> definedTypes;
     static std::map<std::string, Tokens_type> literalToType;
     static SymbolTable symbolTable;
-    
+
+    // memory related 
+    static llvm::Function* MallocFunc;
+    static void defineMalloc();
 };

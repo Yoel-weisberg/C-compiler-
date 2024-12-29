@@ -40,6 +40,7 @@ std::unique_ptr<llvm::PassInstrumentationCallbacks> Helper::ThePIC = nullptr;
 std::unique_ptr<llvm::StandardInstrumentations> Helper::TheSI = nullptr;
 std::map<std::string, std::unique_ptr<PrototypeAST>> Helper::FunctionProtos;
 llvm::ExitOnError Helper::ExitOnErr;
+llvm::Function* Helper::MallocFunc = nullptr;
 
 void Helper::InitializeModuleAndManagers()
 {
@@ -77,6 +78,8 @@ void Helper::InitializeModuleAndManagers()
     PB.registerModuleAnalyses(*TheMAM);
     PB.registerFunctionAnalyses(*TheFAM);
     PB.crossRegisterProxies(*TheLAM, *TheFAM, *TheCGAM, *TheMAM);
+
+    defineMalloc();
 }
 
 
@@ -194,6 +197,56 @@ llvm::Type* Helper::getLLVMType(std::string var_type, llvm::LLVMContext& Context
     }
     return elementType;
 }
+
+void Helper::defineMalloc()
+{
+
+    llvm::Function* ExistingMalloc = getModule().getFunction("malloc");
+    if (ExistingMalloc) {
+        // If malloc is already defined, do nothing
+        llvm::outs() << "malloc function already exists.\n";
+        return;
+    }
+
+    // setting up the malloc function
+    MallocFunc = llvm::cast<llvm::Function>(
+        TheModule->getOrInsertFunction("malloc", Builder.get()->getInt32Ty(), Builder.get()->getInt32Ty()).getCallee()
+    );
+
+    // Create a Function Signature
+    llvm::FunctionType* FuncType = llvm::FunctionType::get(
+        getBuilder().getInt32Ty(), // Return type: int32
+        { getBuilder().getInt32Ty()}, // Parameter types: (int, int)
+        false // IsVarArg: false (not variadic)
+    );
+
+    // Add the Function to the Module
+    llvm::Function* AddFunction = llvm::Function::Create(
+        FuncType,
+        llvm::Function::ExternalLinkage,
+        "malloc", // Function name
+        getModule()
+    );
+
+    // Name the function parameters
+    llvm::Function::arg_iterator Args = AddFunction->arg_begin();
+    llvm::Value* AmountOfMemory = Args++;
+    AmountOfMemory->setName("amountToAllocate");
+
+    // Step 4: Define the Function's Body
+    llvm::BasicBlock* EntryBlock = llvm::BasicBlock::Create(getContext(), "entry", AddFunction);
+    getBuilder().SetInsertPoint(EntryBlock);
+
+    // Call malloc to allocate space for an int (4 bytes)
+    llvm::Value* HeapMemory = Helper::getBuilder().CreateCall(Helper::MallocFunc, AmountOfMemory, "heap_int");
+
+    // Return the result
+    getBuilder().CreateRet(HeapMemory);
+
+    // Print the module's IR
+    getModule().print(llvm::outs(), nullptr);
+}
+
     
 llvm::AllocaInst* Helper::allocForNewSymbol(std::string var_name, std::string var_type, const int size, const std::string& pTT)
 {

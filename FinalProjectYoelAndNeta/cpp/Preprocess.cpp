@@ -195,7 +195,7 @@ std::string Preprocess::replaceMacro() {
         (ch == '"' && !singleQuote) ? isThereQuotes = !isThereQuotes : true;
         (ch == '\'' && !isThereQuotes) ? singleQuote = !singleQuote : true;
 
-        if (((ch == ' ' || ch == '\n' || ch == '(' || ch == ',') && !isThereQuotes && !currentBlock.empty())) {
+        if (((ch == ' ' || ch == '\n') && !isThereQuotes && !currentBlock.empty()) || Helper::literalToType.find(std::string(ch, 1)) != Helper::literalToType.end()) {
             
             codeStream += ch;
             macroTableEntry entry;
