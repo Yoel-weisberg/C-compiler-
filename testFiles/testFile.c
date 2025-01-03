@@ -2,6 +2,7 @@
 
 #define HEY 3
 
+#define sum(x, y) (((x) + (y)))
 
 
 //for (int i = 0; i < 4 i++)

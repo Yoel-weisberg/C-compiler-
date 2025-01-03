@@ -83,6 +83,11 @@ int SyntaxAnalysis::variableDefinitionStructure(int pos)
 	{
 		return pos + MIN_NUM_OF_OPERATIONS;
 	}
+	else if (_tokens[pos + MIN_NUM_OF_OPERATIONS].getType() == LPAREN)
+	{
+		int currentIndex = pos + MIN_NUM_OF_OPERATIONS;
+		return checkFunctionDecleration(currentIndex);
+	}
 	else
 	{
 		throw SyntaxError("excepted a semicolon");
@@ -141,13 +146,14 @@ void SyntaxAnalysis::validSentences()
 	{
 		while (pos < _tokens.size())
 		{
-			if (_tokens[pos + 1].getLiteral().substr(_tokens[pos + 1].getLiteral().size() - 1, _tokens[pos + 1].getLiteral().size()) == "[]")
+			if ((pos + 2 < _tokens.size()) && ( _tokens[pos + 1].getLiteral() == "[" && _tokens[pos + 2].getLiteral() == "]"))
 			{
 				std::cout << "Arr to syn --> " << _tokens[pos].getLiteral() << std::endl;
 				pos = arrTypeVariableDefinitionStructure(pos) + 1; // send identifier
 			}
 			else if (_tokens[pos].getType() == TYPE_DECLERATION)
 			{
+
 				// adding 1 because function returns the last token of the sentence
 				pos = variableDefinitionStructure(pos) + 1;
 			}
@@ -157,11 +163,19 @@ void SyntaxAnalysis::validSentences()
 			}
 			else if (_tokens[pos].getType() == IF_WORD)
 			{
-				checkFlowControlStructure(pos);
+				checkIfStructure(pos);
 			}
-			else if (_tokens[pos].getType() >= WHILE_LOOP && _tokens[pos].getType() <= FOR_LOOP)
+			else if (_tokens[pos].getType() == R_CURLY_PRAN)
 			{
-				pos = checkLoopStructure(pos);
+				pos++;
+			}
+			else if(_tokens[pos].getType() == IDENTIFIER)
+			{
+				pos = checkIdentifier(pos);
+			}
+			else if (_tokens[pos].getType() == RETURN_STATEMENT)
+			{
+				pos++;
 			}
 			// TODO - checking if the sentence just a defined identifier (like just 3; or somthing like that)
 			// TODO - need to check if its a redefinition of t a symbol
@@ -224,7 +238,7 @@ int SyntaxAnalysis::ptrVariableDefenitionStructure(int pos)
 	}
 }
 
-int SyntaxAnalysis::checkFlowControlStructure(int &pos)
+int SyntaxAnalysis::checkIfStructure(int &pos)
 {
 	int chrIndex = 0;
 	bool isThereIf = false;
@@ -233,7 +247,41 @@ int SyntaxAnalysis::checkFlowControlStructure(int &pos)
 	if (_tokens[pos].getType() == IF_WORD)
 	{
 		isThereIf = true;
-		checkIfStructure(pos, chrIndex);
+		pos++; // Move to the next token
+
+		// Ensure the next token is a left parenthesis "("
+		if (_tokens[pos].getType() != LPAREN)
+		{
+			throw SyntaxError("Expected '(' after 'if'", chrIndex);
+		}
+		pos++;
+
+		// Check the actual condition
+		checkConditionStructure(pos);
+
+		// Ensure the next token is a left curly brace "{"
+		if (_tokens[pos].getType() != L_CURLY_PRAN)
+		{
+			throw SyntaxError("Expected '{' after 'if' condition", chrIndex);
+		}
+		pos++;
+
+		// Find the matching right curly brace "}"
+		int braceCount = 1;
+		while (pos < _tokens.size() && braceCount > 0)
+		{
+			if (_tokens[pos].getType() == L_CURLY_PRAN)
+				braceCount++;
+			else if (_tokens[pos].getType() == R_CURLY_PRAN)
+				braceCount--;
+
+			pos++;
+		}
+
+		if (braceCount > 0)
+		{
+			throw SyntaxError("Unmatched '{' in 'if' block", chrIndex);
+		}
 	}
 
 	// Check for "else" without a preceding "if"
@@ -243,113 +291,38 @@ int SyntaxAnalysis::checkFlowControlStructure(int &pos)
 		{
 			throw SyntaxError("'else' without a previous 'if'", chrIndex);
 		}
-		checkElseStructure(pos, chrIndex);
+
+		pos++; // Move to the next token
+
+		// Ensure the next token is a left curly brace "{"
+		if (_tokens[pos].getType() != L_CURLY_PRAN)
+		{
+			throw SyntaxError("Expected '{' after 'else'", chrIndex);
+		}
+		pos++;
+
+		// Find the matching right curly brace "}"
+		int braceCount = 1;
+		while (pos < _tokens.size() && braceCount > 0)
+		{
+			if (_tokens[pos].getType() == L_CURLY_PRAN)
+				braceCount++;
+			else if (_tokens[pos].getType() == R_CURLY_PRAN)
+				braceCount--;
+
+			pos++;
+		}
+
+		if (braceCount > 0)
+		{
+			throw SyntaxError("Unmatched '{' in 'else' block", chrIndex);
+		}
 	}
 
 	return pos; // Return the updated position
 }
 
-int SyntaxAnalysis::checkForLoopStructure(int& pos)
-{
-	checkForLoopInitialization(pos);
-	pos++;
-	// Check condition
-	checkConditionStructure(pos, true);
-	pos++;
-	
-	// Check increment - NOTE! it can be blank, but must include a semicolon 
-	do {
-		pos++;
-		if (_tokens[pos].getType() == L_CURLY_BRACK)
-		{
-			throw SyntaxError("Missing ')' for increment ", pos);
-		}
-	} while (_tokens[pos].getType() != RPAREN);
-	pos++;
-	pos++;
-	// Check brackets
-	std::pair<int, int> bCheck = findMatchingCurlB(pos);
-	pos = bCheck.first;
-	if (bCheck.second > 0)
-	{
-		throw SyntaxError("Unmatched '{' in 'for' block", pos);
-	}
-	return pos;
-}
-
-int SyntaxAnalysis::checkWhileLoopStructure(int& pos)
-{
-	checkConditionStructure(pos);
-	pos++;
-	std::pair<int, int> bCheck = findMatchingCurlB(pos);
-	pos = bCheck.first;
-	if (bCheck.second > 0)
-	{
-		throw SyntaxError("Unmatched '{' in 'while' block", pos);
-	}
-	return pos;
-}
-
-int SyntaxAnalysis::checkDoWhileStructure(int& pos)
-{
-	std::pair<int, int> bCheck = findMatchingCurlB(pos);
-	pos = bCheck.first;
-	if (bCheck.second > 0)
-	{
-		throw SyntaxError("Unmatched '{' in 'do-while' block", pos);
-	}
-	if (_tokens[pos].getType() != WHILE_LOOP)
-	{
-		throw SyntaxError("Expected 'while' in 'do-while' block", pos);
-	}
-	pos++;
-	pos++;
-	checkConditionStructure(pos);
-	if (_tokens[pos].getType() != SEMICOLUMN)
-	{
-		throw SyntaxError("Expected ';' ", pos);
-	}
-	return pos;
-}
-
-int SyntaxAnalysis::checkForLoopInitialization(int& pos)
-{
-	// Check initilization
-	if (_tokens[pos].getType() == TYPE_DECLERATION)
-	{
-		pos++;
-		if (_tokens[pos].getType() != IDENTIFIER)
-		{
-			throw SyntaxError("Missing Identifier ", pos);
-		}
-	}
-	else if (_tokens[pos].getType() != IDENTIFIER)
-	{
-		throw SyntaxError("missing identifier", pos);
-	}
-	else
-	{
-		throw SyntaxError("missing identifier", pos);
-	}
-	pos++;
-	if (_tokens[pos].getType() != EQUAL_SIGN)
-	{
-		throw SyntaxError("missing '='", pos);
-	}
-	pos++;
-	if (_tokens[pos].getType() != INT)
-	{
-		throw SyntaxError("Expected value for init ", pos);
-	}
-	pos++;
-	if (_tokens[pos].getType() != SEMICOLUMN)
-	{
-		throw SyntaxError("Expected ';' ", pos);
-	}
-	return pos;
-}
-
-int SyntaxAnalysis::checkConditionStructure(int &pos, bool isForLoop)
+int SyntaxAnalysis::checkConditionStructure(int &pos)
 {
 	int numPran = 1;
 	enum currentState
@@ -358,19 +331,15 @@ int SyntaxAnalysis::checkConditionStructure(int &pos, bool isForLoop)
 		VALUE
 	};
 	currentState currentType = OPERAND;
-	while (numPran != 0) 
+	while (numPran != 0)
 	{
 		Tokens_type tokT = _tokens[pos].getType();
-		if (tokT == SEMICOLUMN && isForLoop) // If it's a statement in a for loop
-		{
-			break;
-		}
 		// if its a value to campare to and not a opreand
 		if (tokT == INT || tokT == IDENTIFIER || tokT == FLOAT)
 		{
 			if (currentType != OPERAND)
 			{
-				throw SyntaxError("Can't give a number after a number in a condition", pos);
+				throw SyntaxError("cant give a number after a number in an if statement", pos);
 			}
 			currentType = VALUE;
 		}
@@ -386,7 +355,7 @@ int SyntaxAnalysis::checkConditionStructure(int &pos, bool isForLoop)
 			}
 			if (currentType != VALUE)
 			{
-				throw SyntaxError("Can't give an operand after an operand in a condition", pos);
+				throw SyntaxError("cant give an operand after an operand in an if statement", pos);
 			}
 			currentType = OPERAND;
 		}
@@ -394,96 +363,49 @@ int SyntaxAnalysis::checkConditionStructure(int &pos, bool isForLoop)
 	}
 }
 
-int SyntaxAnalysis::checkLoopStructure(int& pos)
+int SyntaxAnalysis::checkFunctionDecleration(int& pos)
 {
-	Tokens_type loopType = _tokens[pos].getType();
+	// move forowerd the (
 	pos++;
-
-	if (loopType != DO_WHILE_LOOP && _tokens[pos].getType() != LPAREN)
+	while (_tokens[pos].getType() == TYPE_DECLERATION)
 	{
-		throw SyntaxError("Missing '(' ", pos);
-	}
-	else if (loopType == DO_WHILE_LOOP && _tokens[pos].getType() != L_CURLY_BRACK)
-	{
-		throw SyntaxError("Missing '{' ", pos);
-	}
-	pos++;
-
-	// while -- just check condition 
-	if (loopType == WHILE_LOOP)
-	{
-		return checkWhileLoopStructure(pos) + 1;
-	}
-	// for -- check identifier --> check condition --> check rotation 
-	else if (loopType == FOR_LOOP)
-	{
-		return checkForLoopStructure(pos) + 1;
-	}
-	// do -- check brackets --> check condition
-	else if (loopType == DO_WHILE_LOOP)
-	{
-		return checkDoWhileStructure(pos) + 1;
-	}
-}
-
-int SyntaxAnalysis::checkIfStructure(int& pos, int chrIndex)
-{
-	pos++; // Move to the next token
-
-	// Ensure the next token is a left parenthesis "("
-	if (_tokens[pos].getType() != LPAREN)
-	{
-		throw SyntaxError("Expected '(' after 'if'", chrIndex);
-	}
-	pos++;
-
-	// Check the actual condition
-	checkConditionStructure(pos);
-
-	// Ensure the next token is a left curly brace "{"
-	if (_tokens[pos].getType() != L_CURLY_BRACK)
-	{
-		throw SyntaxError("Expected '{' after 'if' condition", chrIndex);
-	}
-	pos++;
-	std::pair<int, int> bCheck = findMatchingCurlB(pos);
-	pos = bCheck.first;
-	if (bCheck.second > 0)
-	{
-		throw SyntaxError("Unmatched '{' in 'if' block", chrIndex);
-	}
-}
-
-int SyntaxAnalysis::checkElseStructure(int& pos, int chrIndex)
-{
-	pos++; // Move to the next token
-
-	// Ensure the next token is a left curly brace "{"
-	if (_tokens[pos].getType() != L_CURLY_BRACK)
-	{
-		throw SyntaxError("Expected '{' after 'else'", chrIndex);
-	}
-	pos++;
-	std::pair<int, int> bCheck = findMatchingCurlB(pos);
-	pos = bCheck.first;
-	if (bCheck.second > 0)
-	{
-		throw SyntaxError("Unmatched '{' in 'else' block", chrIndex);
-	}
-}
-
-std::pair<int, int> SyntaxAnalysis::findMatchingCurlB(int& pos)
-{
-	// Find the matching right curly brace "}"
-	int braceCount = 1;
-	while (pos < _tokens.size() && braceCount > 0)
-	{
-		if (_tokens[pos].getType() == L_CURLY_BRACK)
-			braceCount++;
-		else if (_tokens[pos].getType() == R_CURLY_BRACK)
-			braceCount--;
-
+		pos++;
+		if (_tokens[pos].getType() != IDENTIFIER)
+		{
+			throw SyntaxError("Excepted an identifier after type decleration in function decleration");
+		}
+		pos++;
+		if (_tokens[pos].getType() != COMMA || _tokens[pos].getType() != RPAREN)
+		{
+			throw SyntaxError("Excepted a comma or a pran after paramter decleration");
+		}
 		pos++;
 	}
-	return { pos, braceCount };
+	if (_tokens[pos].getType() == RPAREN)
+	{
+		pos++;
+	}
+	return pos;
+}
+
+int SyntaxAnalysis::checkIdentifier(int& pos)
+{
+	// move past the identifier itself
+	pos++;
+	if (_tokens[pos].getType() == LPAREN)
+	{
+		// move past LPRAN
+		pos++;
+		while (_tokens[pos].getType() == INT || _tokens[pos].getType() == FLOAT)
+		{
+			if (_tokens[pos].getType() != COMMA || _tokens[pos].getType() != RPAREN)
+			{
+				throw SyntaxError("Excepted a comma or a ) after argument in function call");
+			}
+			pos++;
+		}
+		if (_tokens[pos].getType() == RPAREN) pos++;
+	}
+	if (_tokens[pos].getType() != SEMICOLUMN) throw SyntaxError("Excepted a semicolumn");
+	return ++pos;
 }
