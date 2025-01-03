@@ -186,7 +186,7 @@ Value* AssignExprAST::codegen() {
 }
 
 Value* IfExprAST::codegen() {
-    Value* CondV = Cond->codegen();
+    Value* CondV = _cond->codegen();
     if (!CondV)
         return nullptr;
 
@@ -201,12 +201,12 @@ Value* IfExprAST::codegen() {
     BasicBlock* MergeBB = BasicBlock::Create(*Helper::TheContext, "ifcont");
 
     BasicBlock* ElseBB = nullptr;
-    if (Else) {
+    if (_else) {
         ElseBB = BasicBlock::Create(*Helper::TheContext, "else", TheFunction);
     }
 
     // Create conditional branch.
-    if (Else) {
+    if (_else) {
         Helper::Builder->CreateCondBr(CondV, ThenBB, ElseBB);
     }
     else {
@@ -215,7 +215,7 @@ Value* IfExprAST::codegen() {
 
     // Emit then value.
     Helper::Builder->SetInsertPoint(ThenBB);
-    Value* ThenV = Then->codegen();
+    Value* ThenV = _then->codegen();
     if (!ThenV)
         return nullptr;
 
@@ -224,10 +224,10 @@ Value* IfExprAST::codegen() {
 
     // Emit else block if it exists.
     Value* ElseV = nullptr;
-    if (Else) {
+    if (_else) {
         TheFunction->insert(TheFunction->end(), ElseBB);
         Helper::Builder->SetInsertPoint(ElseBB);
-        ElseV = Else->codegen();
+        ElseV = _else->codegen();
         if (!ElseV)
             return nullptr;
 
@@ -241,7 +241,7 @@ Value* IfExprAST::codegen() {
 
     PHINode* PN = Helper::Builder->CreatePHI(Type::getDoubleTy(*Helper::TheContext), 2, "iftmp");
     PN->addIncoming(ThenV, ThenBB);
-    if (Else)
+    if (_else)
         PN->addIncoming(ElseV, ElseBB);
 
     return PN;

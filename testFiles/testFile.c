@@ -1,21 +1,29 @@
 //comment
 
 #define HEY 3
+
+
+
 //for (int i = 0; i < 4 i++)
 //{
 //	blabla;
 //	//asdasd
 //}
-// 
-//while (4 > 2)
-//{
-//	sdkjf;
-//}
-// 
-do
+
+
+int x = 4;
+while (x > 2)
 {
-	bip boo;
-} while (true);
+	x = x + 1;
+}
+ 
+
+//do
+//{
+//	bip boo;
+//} while (true);
+ 
+
 //do while for
 //float hey = 3.0 ;    
 //

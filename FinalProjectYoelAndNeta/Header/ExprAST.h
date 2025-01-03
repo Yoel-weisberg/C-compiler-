@@ -159,13 +159,34 @@ public:
 
 class IfExprAST : public ExprAST {
 private:
-	std::unique_ptr<ExprAST> Cond, Then, Else;
+	std::unique_ptr<ExprAST> _cond; // "if condition" content 
+	std::unique_ptr<ExprAST> _then; // "if" content
+	std::unique_ptr<ExprAST> _else; // "else" content 
 public:
-	IfExprAST(std::unique_ptr<ExprAST> Cond, std::unique_ptr<ExprAST> Then,
-		std::unique_ptr<ExprAST> Else)
-		: Cond(std::move(Cond)), Then(std::move(Then)), Else(std::move(Else)) {}
+	IfExprAST(std::unique_ptr<ExprAST> condExpr, std::unique_ptr<ExprAST> thenExpr,
+		std::unique_ptr<ExprAST> elseExpr)
+		: _cond(std::move(condExpr)), _then(std::move(thenExpr)), _else(std::move(elseExpr)) {}
 
 	Value* codegen() override;
+};
+
+
+
+class whileLoopExprAST : public ExprAST
+{
+private:
+	std::unique_ptr<ExprAST> _cond; // "while" loop codition content
+	std::unique_ptr<ExprAST> _content; // loop content
+public:
+	whileLoopExprAST(std::unique_ptr<ExprAST> cond, std::unique_ptr<ExprAST> content) : _cond(std::move(cond)), _content(std::move(content)){}
+	Value* codegen() override;
+
+};
+
+
+class binaryEprAST : public ExprAST
+{
+
 };
 
 class PrototypeAST {
@@ -205,4 +226,3 @@ public:
 
 	Value* codegen() override;
 };
-
