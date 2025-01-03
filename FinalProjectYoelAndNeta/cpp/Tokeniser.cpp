@@ -24,11 +24,7 @@ Tokeniser::Tokeniser(const std::string& raw_code_str)
 			if (!currentLiteral.empty())  this->_tokens.push_back({ currentLiteral, categoriseLiteral(currentLiteral) });
 			i += DIS_BETWEEN_SINGLE_QOUTES; // Skip char initilization 
 			currentLiteral = "";
-		}/*
-		else if (raw_code_str[i] == CURL_BR_L_LIT)
-		{
-
-		}*/
+		}
 		else if ((i == raw_code_str.size() - 1)) // Check if end is reached
 		{
 			currentLiteral += raw_code_str[i];
@@ -56,6 +52,10 @@ Tokens_type Tokeniser::categoriseLiteral(const std::string& literal)
 	if (Helper::literalToType.find(literal) != Helper::literalToType.end())
 	{
 		return Helper::literalToType.find(literal)->second;
+	}
+	else if (Helper::Keywords.find(literal) != Helper::Keywords.end())
+	{
+		return Helper::Keywords.find(literal)->second;
 	}
 	else if (isNumber(literal))
 	{

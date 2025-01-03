@@ -16,6 +16,9 @@ class AssignExprAST;
 class BinaryExprAST;
 class FloatNumberExprAST;
 
+class ParserError;
+
+
 class Parser {
 private:
     std::vector<Token> _tokens;
@@ -39,22 +42,35 @@ public:
 
     // Parse methods
     std::unique_ptr<ExprAST> parse();
+    std::unique_ptr<ExprAST> ParsePrimary();
+    std::unique_ptr<FunctionAST> ParseTopLevelExpr();
+
+    // Assignment parsing 
     std::unique_ptr<ExprAST> parseAssignment();
     std::unique_ptr<ExprAST> ptrAssignmentParsing();
     std::unique_ptr<ExprAST> regularAssignmentParsing();
     std::unique_ptr<ExprAST> arrAssignmentParsing(const std::string& type);
+
+    // Flow control parsing
     std::unique_ptr<ExprAST> parseIfStatement();
-    std::unique_ptr<ExprAST> ParseFloatNumberExpr();
-    std::unique_ptr<ExprAST> ParseParenExpr();
+
+    // Individual parsing
+    std::unique_ptr<ExprAST> parseFloatNumberExpr();
+    std::unique_ptr<ExprAST> parseParenExpr();
     std::unique_ptr<ExprAST> ParseIdentifierExpr();
+
     std::unique_ptr<ExprAST> ParseExpression();
-    std::unique_ptr<ExprAST> ParsePrimary();
-    std::unique_ptr<ExprAST> ParseBinOpRHS(int ExprPrec,
-        std::unique_ptr<ExprAST> LHS);
-    std::unique_ptr<FunctionAST> ParseTopLevelExpr();
+    std::unique_ptr<ExprAST> ParseBinOpRHS(int ExprPrec, std::unique_ptr<ExprAST> LHS);
     std::unique_ptr<PrototypeAST> ParsePrototype();
     std::unique_ptr<FunctionAST> ParseDefinition();
     std::unique_ptr<ExprAST> ParseVoid();
+
+    // Loops parsing
+    std::unique_ptr<ExprAST> parseWhileLoop();
+    std::unique_ptr<ExprAST> parseForLoop();
+    //std::unique_ptr<ExprAST> parseBooleanExpr();
+
+>>>>>>> FinalProjectYoelAndNeta/Header/Parser.h
     // Getter for the root AST
     ExprAST* getAst();
 };

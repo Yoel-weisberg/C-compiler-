@@ -22,18 +22,31 @@ private:
 	void checkParentheses();
 	//void checkAlgebricStructure(); // No use!
 	bool doesVariableFitType(const std::string& type, std::string value);
-	void validSentences(); // a function to check that the code is made from a list of leagel sentences
+	void validSentences(); // a function to check that the code is made from a list of legal sentences
 	// Definitoin checkeing
 	int ptrVariableDefenitionStructure(int pos);
 	int variableDefinitionStructure(int pos);
 	int arrTypeVariableDefinitionStructure(int pos);
-	//bool innerArrInit(int pos, int arrType);
 
-	int checkIfStructure(int& pos);
-	int checkConditionStructure(int& pos);
 	int checkFunctionDecleration(int& pos);
 	int checkIdentifier(int& pos);
 	
 	// a function to check if a decleration is of a function or a varieble
-	// 
+	int checkFlowControlStructure(int& pos);
+	int checkLoopStructure(int& pos);
+
+	// Control Flow checking (if, else...)
+	int checkIfStructure(int& pos, int chrIndex);
+	int checkElseStructure(int& pos, int chrIndex);
+
+	// Loop checking
+	int checkForLoopStructure(int& pos);
+	int checkWhileLoopStructure(int& pos);
+	int checkDoWhileStructure(int& pos);
+	int checkForLoopInitialization(int& pos);
+
+
+	// Helper methods
+	std::pair<int, int> findMatchingCurlB(int& pos);
+	int checkConditionStructure(int& pos, bool ifForLoop = false);
 };

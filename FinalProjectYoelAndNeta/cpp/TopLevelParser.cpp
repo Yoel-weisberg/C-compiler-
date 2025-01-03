@@ -16,14 +16,17 @@ void TopLevelParser::HandleTopLevelExpression()
             // anonymous expression -- that way we can free it after executing.
             auto RT = Helper::TheJIT->getMainJITDylib().createResourceTracker();
 
+            // Add the module to the JIT
             auto TSM = llvm::orc::ThreadSafeModule(std::move(Helper::TheModule), std::move(Helper::TheContext));
             Helper::ExitOnErr(Helper::TheJIT->addModule(std::move(TSM), RT));
 
-            Helper::InitializeModuleAndManagers();
 
             // Search the JIT for the __anon_expr symbol.
             auto ExprSymbol = Helper::ExitOnErr(Helper::TheJIT->lookup("__anon_expr"));
 
+
+            auto SymbolAddr = ExprSymbol.getAddress();
+            llvm::outs() << "__anon_expr Address: " << SymbolAddr << "\n";
             // Get the symbol's address and cast it to the right type (takes no
             // arguments, returns a double) so we can call it as a native function.
             //double (*FP)() = ExprSymbol.getAddress().toPtr<double (*)()>();
@@ -32,6 +35,9 @@ void TopLevelParser::HandleTopLevelExpression()
 
             // Delete the anonymous expression module from the JIT.
             Helper::ExitOnErr(RT->remove());
+
+            Helper::InitializeModuleAndManagers();
+
         }
     }
     else {
