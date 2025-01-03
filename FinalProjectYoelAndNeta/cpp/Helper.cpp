@@ -1,7 +1,7 @@
 #include "../Header/Helper.h"
 
 // Define static members
-std::vector<std::string> Helper::definedTypes = { "float", "int", "char"};
+std::vector<std::string> Helper::definedTypes = { "float", "void", "int", "char"};
 std::map<std::string, Tokens_type> Helper::literalToType = {
     {")", RPAREN},
     {"(", LPAREN},
@@ -293,6 +293,26 @@ std::string Helper::removeSpecialCharacter(std::string str)
         }
     }
     return str;
+}
+
+Type* Helper::getTypeFromString(const std::string type)
+{
+    if (type == "int")
+    {
+        return Type::getInt32Ty(Helper::getContext());
+    }
+    else if (type == "float")
+    {
+        return Type::getDoubleTy(Helper::getContext());
+    }
+    else if (type == "char")
+    {
+        return Type::getInt8Ty(Helper::getContext());
+    }
+    else if(type == "void")
+    {
+        return Type::getVoidTy(Helper::getContext());
+    }
 }
 
 

@@ -37,7 +37,7 @@ public:
     
     bool isFinished() const;
 
-    void consume();
+    void consume(int times = 1);
     Token& currentToken();
 
     // Parse methods
@@ -62,12 +62,15 @@ public:
     std::unique_ptr<ExprAST> ParseExpression();
     std::unique_ptr<ExprAST> ParseBinOpRHS(int ExprPrec, std::unique_ptr<ExprAST> LHS);
     std::unique_ptr<PrototypeAST> ParsePrototype();
+    std::unique_ptr<FunctionAST> ParseDefinition();
+    std::unique_ptr<ExprAST> ParseVoid();
 
     // Loops parsing
     std::unique_ptr<ExprAST> parseWhileLoop();
     std::unique_ptr<ExprAST> parseForLoop();
     //std::unique_ptr<ExprAST> parseBooleanExpr();
 
+>>>>>>> FinalProjectYoelAndNeta/Header/Parser.h
     // Getter for the root AST
     ExprAST* getAst();
 };

@@ -94,9 +94,8 @@ Token& Parser::currentToken()
 }
 
 // Move to the next token
-void Parser::consume()
-{
-	_currentTokenIndex++;
+void Parser::consume(int times) {
+	_currentTokenIndex += times;
 }
 
 // Check if we've reached the end of the token vector
@@ -181,7 +180,7 @@ std::unique_ptr<ExprAST> Parser::regularAssignmentParsing()
 	if (currentToken().getType() == EQUAL_SIGN)
 	{
 		consume(); // Move past '='
-		Helper::addSymbol(varName, type, currentToken().getLiteral());
+		//Helper::addSymbol(varName, type, currentToken().getLiteral());
 		if (type == "float")
 		{
 			auto value_literal = std::make_unique<FloatNumberExprAST>(std::stod(currentToken().getLiteral()), varName);
@@ -199,6 +198,20 @@ std::unique_ptr<ExprAST> Parser::regularAssignmentParsing()
 		else if (type == "int")
 		{
 			auto value_literal = std::make_unique<IntegerNumberExprAST>(std::stod(currentToken().getLiteral()), varName);
+			consume(); // Move past value
+			consume();
+			return std::make_unique<AssignExprAST>(varName, std::move(value_literal), type);
+		}
+		else if (type == "int")
+		{
+			auto value_literal = std::make_unique<IntegerNumberExprAST>(std::stod(currentToken().getLiteral()));
+			consume(); // Move past value
+			consume();
+			return std::make_unique<AssignExprAST>(varName, std::move(value_literal), type);
+		}
+		else if (type == "char")
+		{
+			auto value_literal = std::make_unique<CharExprAST>(std::stod(currentToken().getLiteral()));
 			consume(); // Move past value
 			consume();
 			return std::make_unique<AssignExprAST>(varName, std::move(value_literal), type);
@@ -317,12 +330,13 @@ std::unique_ptr<ExprAST> Parser::parseFloatNumberExpr()
 
 std::unique_ptr<ExprAST> Parser::ParseIdentifierExpr()
 {
-	std::string IdName = _IdentifierStr;
+	std::string IdName = currentToken().getLiteral();
 
 	consume(); // eat identifier.
 
 	if (currentToken().getType() != LPAREN) // Simple variable ref.
 	{
+		if (currentToken().getType() == SEMICOLUMN) consume();
 		return std::make_unique<VariableExprAST>(IdName);
 	}
 
@@ -353,6 +367,8 @@ std::unique_ptr<ExprAST> Parser::ParseIdentifierExpr()
 
 	// Eat the ')'.
 	consume();
+	if (currentToken().getType() == SEMICOLUMN)
+		consume();
 
 	return std::make_unique<CallExprAST>(IdName, std::move(Args));
 }
@@ -400,8 +416,8 @@ std::unique_ptr<ExprAST> Parser::ParsePrimary()
 		return parseWhileLoop();
 	case IDENTIFIER:
 		return ParseIdentifierExpr();
-	//case INT:
-	//	return parseBooleanExpr();
+	case RETURN_STATEMENT:
+		return nullptr;
 	default:
 		throw SyntaxError("Undefined Sentence begining");
 	}
@@ -410,21 +426,64 @@ std::unique_ptr<ExprAST> Parser::ParsePrimary()
 
 std::unique_ptr<PrototypeAST> Parser::ParsePrototype()
 {
-	std::string FnName = _IdentifierStr;
+	// were starting on the type
+	std::string returnType = currentToken().getLiteral();
 	consume();
-
-	std::vector<std::string> ArgNames;
-	consume();
-	while (currentToken().getType() == IDENTIFIER)
+	std::string FnName = currentToken().getLiteral();
+	consume(2);
+	// consume the (
+	std::vector<FuncArg> argsTypesAndNames;
+	while (currentToken().getType() == TYPE_DECLERATION)
 	{
-		ArgNames.push_back(_IdentifierStr);
+		std::string type = currentToken().getLiteral();
 		consume();
+		std::string name = currentToken().getLiteral();
+		consume();
+		if (currentToken().getType() == COMMA)
+			consume();
+		
+		argsTypesAndNames.push_back({ type, name });
 	}
 		
 	// success.
-	consume(); // eat ')'.
+	consume(2); // eat ') and { or ;
+	return std::make_unique<PrototypeAST>(FnName, std::move(argsTypesAndNames), returnType);
+}
 
-	return std::make_unique<PrototypeAST>(FnName, std::move(ArgNames));
+std::unique_ptr<FunctionAST> Parser::ParseDefinition()
+{
+	auto Proto = ParsePrototype();
+	if (!Proto)
+		return nullptr;
+	std::string type = Proto.get()->getReturnType();
+
+	if (auto E = ParseExpression())
+	{
+		if (currentToken().getType() == RETURN_STATEMENT)
+		{
+			consume();
+			auto returnStatement = ParseExpression();
+			
+			return std::make_unique<FunctionAST>(std::move(Proto), std::move(E), std::move(returnStatement), type);
+		}
+		else if (Proto.get()->getReturnType() == "void")
+		{
+			// it dosent realy matter 
+			auto voidRet = ParseVoid();
+			return std::make_unique<FunctionAST>(std::move(Proto), std::move(E), std::move(voidRet), type);
+		}
+		else
+		{
+			throw SyntaxError("Excepted a return statement");
+		}
+
+	}
+	return nullptr;
+}
+
+std::unique_ptr<ExprAST> Parser::ParseVoid()
+{
+	return std::make_unique<VoidAst>();
 }
 
 std::unique_ptr<ExprAST> Parser::parseWhileLoop()
@@ -457,8 +516,9 @@ std::unique_ptr<FunctionAST> Parser::ParseTopLevelExpr()
 	if (auto E = ParseExpression()) {
 		// Make an anonymous proto.
 		auto Proto = std::make_unique<PrototypeAST>("__anon_expr",
-			std::vector<std::string>());
-		return std::make_unique<FunctionAST>(std::move(Proto), std::move(E));
+			std::vector<FuncArg>(),
+			"void");
+		return std::make_unique<FunctionAST>(std::move(Proto), std::move(E), nullptr, "void");
 	}
 	return nullptr;
 }

@@ -29,6 +29,11 @@
 
 class Helper;
 
+struct FuncArg
+{
+	std::string Type;
+	std::string Name;
+};
 
 using namespace llvm;
 
@@ -191,25 +196,30 @@ class binaryEprAST : public ExprAST
 
 class PrototypeAST {
 	std::string Name;
-	std::vector<std::string> Args;
-
+	std::vector<FuncArg> Args;
+	std::string returnType;
 public:
-	PrototypeAST(const std::string& Name, std::vector<std::string> Args)
-		: Name(Name), Args(std::move(Args)) {}
+	PrototypeAST(const std::string& Name, std::vector<FuncArg> Args, std::string returnType)
+		: Name(Name), Args(std::move(Args)), returnType(returnType) {}
 
 	Function* codegen();
 	const std::string& getName() const { return Name; }
+	const std::string& getReturnType() const { return returnType; }
 };
 
 /// FunctionAST - This class represents a function definition itself.
 class FunctionAST {
 	std::unique_ptr<PrototypeAST> Proto;
 	std::unique_ptr<ExprAST> Body;
+	std::unique_ptr<ExprAST> ReturnValue;
+	std::string returnType;
 
 public:
 	FunctionAST(std::unique_ptr<PrototypeAST> Proto,
-		std::unique_ptr<ExprAST> Body)
-		: Proto(std::move(Proto)), Body(std::move(Body)) {}
+		std::unique_ptr<ExprAST> Body,
+		std::unique_ptr<ExprAST> ReturnValue,
+		std::string ReturnType)
+		: Proto(std::move(Proto)), Body(std::move(Body)), returnType(ReturnType), ReturnValue(std::move(ReturnValue)) {}
 
 	Function* codegen();
 };
@@ -226,3 +236,14 @@ public:
 
 	Value* codegen() override;
 };
+
+class VoidAst : public ExprAST {
+public:
+	Value* codegen();
+};
+
+// code like a = 5;
+//class RedefinitionExprAst : public ExprAST
+//{
+//
+//};

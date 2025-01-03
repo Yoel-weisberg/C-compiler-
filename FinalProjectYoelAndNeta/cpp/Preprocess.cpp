@@ -73,49 +73,90 @@ void Preprocess::handleMacroVariables() {
             if (macroName == "define") {
                 std::string macroKey, macroValue;
                 bool multiLine = false, gotEnd = false;
-
+                macroTableEntry entry;
                 // Skip spaces before macro key
                 while (pos < _fileRawContent.size() && (ch = _fileRawContent[pos]) == ' ') pos++;
 
                 // Get macro key
-                while (pos < _fileRawContent.size() && (ch = _fileRawContent[pos]) != ' ' && ch != '\n') {
+                while (pos < _fileRawContent.size() && (ch = _fileRawContent[pos]) != ' ' && ch != '\n' && ch != '(') {
                     macroKey += ch;
                     pos++;
                 }
+                
+                // if its a function like macro
+                if (ch == '(')
+                {
+                    pos++;
+                    std::string currentArg;
+                    std::vector<std::string> Args;
+                    std::string functionBody;
+                    // getting args:
+                    while (ch != ')'  && pos < _fileRawContent.size())
+                    {
+                        ch = _fileRawContent[pos++];
+                        if (ch == ',' || ch == ')')
+                        {
+                            if (!currentArg.empty())
+                            {
+                                if (!Helper::checkIdentifier(currentArg)) throw SyntaxError("Argument undefined in functioon like macro", pos);
+                                Args.push_back(currentArg);
+                                currentArg.clear();
+                            }
+                        }
+                        else if (ch != ' ')
+                        {
+                            currentArg += ch;
+                        }
+                    }
+                    if (ch != ')') throw SyntaxError("Excepted a )", pos);
 
-                // Skip spaces before macro value
-                while (pos < _fileRawContent.size() && (ch = _fileRawContent[pos]) == ' ') pos++;
-
-                // Get macro value
-                while (pos < _fileRawContent.size() && !gotEnd) {
-                    ch = _fileRawContent[pos++];
-
-                    // Check for multi-line definition
-                    if (ch == '\\') {
-                        multiLine = true;
-                        continue; // Skip the '\' character
+                    // reding the function until end line
+                    while (ch != '\n' && pos < _fileRawContent.size())
+                    {
+                        ch = _fileRawContent[pos++];
+                        functionBody += ch;
                     }
 
-                    if (ch == '\n') {
-                        currentLine++;
-                        if (!multiLine) gotEnd = true; // End if not a multi-line macro
-                        multiLine = false; // Reset multi-line flag
-                    }
-                    else {
-                        macroValue += ch;
-                    }
+                    entry = { macroKey, functionBody, true, Args };
                 }
 
-                // Check key and value validity
-                if (!Helper::checkIdentifier(macroKey)) {
-                    throw SyntaxError("Macro key not valid", currentLine);
-                }
-                if (!checkMacroValueValidity(macroValue)) {
-                    throw SyntaxError("Macro value not valid", currentLine);
-                }
+                else
+                {
+                    // Skip spaces before macro value
+                    while (pos < _fileRawContent.size() && (ch = _fileRawContent[pos]) == ' ') pos++;
 
-                // Add to macro table
-                _macroTable[macroKey] = macroValue;
+                    // Get macro value
+                    while (pos < _fileRawContent.size() && !gotEnd) {
+                        ch = _fileRawContent[pos++];
+
+                        // Check for multi-line definition
+                        if (ch == '\\') {
+                            multiLine = true;
+                            continue; // Skip the '\' character
+                        }
+
+                        if (ch == '\n') {
+                            currentLine++;
+                            if (!multiLine) gotEnd = true; // End if not a multi-line macro
+                            multiLine = false; // Reset multi-line flag
+                        }
+                        else {
+                            macroValue += ch;
+                        }
+                    }
+
+                    // Check key and value validity
+                    if (!Helper::checkIdentifier(macroKey)) {
+                        throw SyntaxError("Macro key not valid", currentLine);
+                    }
+                    if (!checkMacroValueValidity(macroValue)) {
+                        throw SyntaxError("Macro value not valid", currentLine);
+                    }
+
+                    entry = { macroKey, macroValue, false };
+                }
+                
+                _macroTable.push_back(entry);
             }
             else if (macroName == "include")
             {
@@ -147,25 +188,39 @@ std::string Preprocess::replaceMacro() {
     std::string codeStream;
     std::string currentBlock;
     bool isThereQuotes = false, singleQuote = false;
-
-    for (size_t pos = 0; pos < _fileRawContent.size(); pos++) {
-        char ch = _fileRawContent[pos];
+    for (_pos = 0; _pos < _fileRawContent.size(); _pos++) {
+        char ch = _fileRawContent[_pos];
+        bool isAdded = false;
 
         (ch == '"' && !singleQuote) ? isThereQuotes = !isThereQuotes : true;
         (ch == '\'' && !isThereQuotes) ? singleQuote = !singleQuote : true;
 
-        if (((ch == ' ' || ch == '\n') && !isThereQuotes)) {
-            if (currentBlock.empty()) continue;
-
-            auto it = _macroTable.find(currentBlock);
-            if (it != _macroTable.end()) {
-                codeStream += getFinalValue(it->first) + ' ';
-            } else {
-                codeStream += currentBlock + ' ';
+        if (((ch == ' ' || ch == '\n' || ch == '(' || ch == ',') && !isThereQuotes && !currentBlock.empty())) {
+            
+            codeStream += ch;
+            macroTableEntry entry;
+            // searching macro
+            for (auto it : _macroTable)
+            {
+                if (it.key == currentBlock)
+                {
+                    if (it.isFunction)
+                    {
+                        codeStream += handleFunctionReplacement(it);
+                    }
+                    else
+                    {
+                        codeStream += getFinalValue(it.value);
+                    }
+                    isAdded = true;
+                }
             }
+
+            if (!isAdded) codeStream += currentBlock;
+            
             currentBlock.clear();
         }
-        else if (pos == _fileRawContent.size() - 1)
+        else if (_pos == _fileRawContent.size() - 1)
         {
             currentBlock += ch;
             codeStream += currentBlock;
@@ -177,7 +232,66 @@ std::string Preprocess::replaceMacro() {
     return codeStream;
 }
 
-bool Preprocess::checkMacroValueValidity(const std::string &macroValue)
+std::string Preprocess::handleFunctionReplacement(macroTableEntry entry)
+{
+    std::vector<std::string> Args;
+    std::string currentArg = "";
+    char ch = _fileRawContent[_pos];
+    int amountOfArgs = 0;
+    std::string codeStream = "";
+
+    if (_fileRawContent[_pos++] != '(') throw SyntaxError("Excepted a ( in function like macro");
+
+    // reading the argument list 
+    while (ch != ')' && _pos < _fileRawContent.size())
+    {
+        ch = _fileRawContent[_pos++];
+        if (ch == ',' || ch == ')')
+        {
+            if (!currentArg.empty())
+            {
+                Args.push_back(currentArg);
+                amountOfArgs++;
+                currentArg.clear();
+            }
+        }
+        else if (ch != ' ')
+        {
+            currentArg += ch;
+        }
+    }
+    if (amountOfArgs != entry.args.size()) throw SyntaxError("Unmatched amount of arguments to function like macro");
+
+    currentArg = "";
+    for (auto ch : entry.value)
+    {
+        if (ch == ' '|| ch == '(' || ch == ')')
+        {
+            if (!currentArg.empty())
+            {
+                auto location = std::find(entry.args.begin(), entry.args.end(), currentArg);
+                if (location != entry.args.end())
+                {
+                    codeStream += Args[location - entry.args.begin()];
+                }
+                else
+                {
+                    codeStream += currentArg;
+                }
+                currentArg.clear();
+            }
+            if (ch == '(' || ch == ')') codeStream += ch;
+        }
+        else
+        {
+            currentArg += ch;
+        }
+    }
+
+    return codeStream;
+}
+
+bool Preprocess::checkMacroValueValidity(std::string &macroValue)
 {
     if (macroValue.empty()) { return false; }
 
@@ -222,7 +336,7 @@ bool Preprocess::checkMacroValueValidity(const std::string &macroValue)
         return false;
     }
     // a macro can hold a different macro
-    if (_macroTable.find(macroValue) != _macroTable.end()) { return true; }
+    if (getFromVector(macroValue) != nullptr) return true;
     return false;
 }
 
@@ -233,12 +347,24 @@ bool Preprocess::isNumber(const std::string &number)
 
 std::string Preprocess::getFinalValue(std::string key)
 {
-    if (_macroTable.find(_macroTable.find(key)->second) == _macroTable.end())
+    if (getFromVector(getFromVector(key)->value) == nullptr)
     {
-        return _macroTable.find(key)->second;
+        return getFromVector(key)->value;
     }
     else
     {
-        return getFinalValue(_macroTable.find(key)->second);
+        return getFinalValue(getFromVector(key)->value);
     }
+}
+
+macroTableEntry* Preprocess::getFromVector(std::string key)
+{
+    for (auto it : _macroTable)
+    {
+        if (it.key == key)
+        {
+            return &it;
+        }
+    }
+    return nullptr;
 }

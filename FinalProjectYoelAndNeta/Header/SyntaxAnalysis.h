@@ -28,6 +28,10 @@ private:
 	int variableDefinitionStructure(int pos);
 	int arrTypeVariableDefinitionStructure(int pos);
 
+	int checkFunctionDecleration(int& pos);
+	int checkIdentifier(int& pos);
+	
+	// a function to check if a decleration is of a function or a varieble
 	int checkFlowControlStructure(int& pos);
 	int checkLoopStructure(int& pos);
 
