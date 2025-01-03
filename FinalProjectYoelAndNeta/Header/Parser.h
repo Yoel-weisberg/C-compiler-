@@ -70,7 +70,6 @@ public:
     std::unique_ptr<ExprAST> parseForLoop();
     //std::unique_ptr<ExprAST> parseBooleanExpr();
 
->>>>>>> FinalProjectYoelAndNeta/Header/Parser.h
     // Getter for the root AST
     ExprAST* getAst();
 };

@@ -40,10 +40,10 @@ Parser::Parser(const std::vector<Token>& tokens)
 	_BinopPrecedence[DIVISION] = 30;
 }
 
-ExprAST* Parser::getAst()
-{
-	return _head.get();
-}
+//ExprAST* Parser::getAst()
+//{
+//	return _head.get();
+//}
 
 std::unique_ptr<ExprAST> Parser::ParseBinOpRHS(int ExprPrec, std::unique_ptr<ExprAST> LHS)
 {
@@ -180,7 +180,7 @@ std::unique_ptr<ExprAST> Parser::regularAssignmentParsing()
 	if (currentToken().getType() == EQUAL_SIGN)
 	{
 		consume(); // Move past '='
-		//Helper::addSymbol(varName, type, currentToken().getLiteral());
+		Helper::addSymbol(varName, type, currentToken().getLiteral());
 		if (type == "float")
 		{
 			auto value_literal = std::make_unique<FloatNumberExprAST>(std::stod(currentToken().getLiteral()), varName);
@@ -202,23 +202,10 @@ std::unique_ptr<ExprAST> Parser::regularAssignmentParsing()
 			consume();
 			return std::make_unique<AssignExprAST>(varName, std::move(value_literal), type);
 		}
-		else if (type == "int")
-		{
-			auto value_literal = std::make_unique<IntegerNumberExprAST>(std::stod(currentToken().getLiteral()));
-			consume(); // Move past value
-			consume();
-			return std::make_unique<AssignExprAST>(varName, std::move(value_literal), type);
-		}
-		else if (type == "char")
-		{
-			auto value_literal = std::make_unique<CharExprAST>(std::stod(currentToken().getLiteral()));
-			consume(); // Move past value
-			consume();
-			return std::make_unique<AssignExprAST>(varName, std::move(value_literal), type);
-		}
 	}
 	return nullptr;
 }
+
 
 std::unique_ptr<ExprAST> Parser::arrAssignmentParsing(const std::string& type)
 {

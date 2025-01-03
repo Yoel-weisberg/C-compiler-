@@ -90,7 +90,7 @@ void TopLevelParser::mainLoop()
                 HandeleDefinition();
             }
             break;
-        case R_CURLY_PRAN:
+        case R_CURLY_BRACK:
             parser.consume();
             break;
         default:
