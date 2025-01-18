@@ -30,14 +30,14 @@ Parser::Parser(const std::vector<Token>& tokens)
 	: _tokens(tokens), _currentTokenIndex(0) {
 
 	// comparing operaters
-	_BinopPrecedence[OR] = 2;
-	_BinopPrecedence[AND] = 3;
-	_BinopPrecedence[LOWER_THEN] = 4;
-	_BinopPrecedence[HIGHER_THEN] = 5;
-	_BinopPrecedence[ADDITION] = 20;
-	_BinopPrecedence[SUBTRACTION] = 20;
-	_BinopPrecedence[MULTIPLICATION] = 30;
-	_BinopPrecedence[DIVISION] = 30;
+	_BinopPrecedence[OR] = PRECEDENCE_OR;
+	_BinopPrecedence[AND] = PRECEDENCE_AND;
+	_BinopPrecedence[LOWER_THEN] = PRECEDENCE_LOWER_THEN;
+	_BinopPrecedence[HIGHER_THEN] = PRECEDENCE_HIGHER_THEN;
+	_BinopPrecedence[ADDITION] = PRECEDENCE_ADDITION;
+	_BinopPrecedence[SUBTRACTION] = PRECEDENCE_SUBTRACTION;
+	_BinopPrecedence[MULTIPLICATION] = PRECEDENCE_MULTIPLICATION;
+	_BinopPrecedence[DIVISION] = PRECEDENCE_DIVISION;
 }
 
 ExprAST* Parser::getAst()
@@ -168,21 +168,21 @@ std::unique_ptr<ExprAST> Parser::regularAssignmentParsing()
 	if (currentToken().getType() == EQUAL_SIGN) {
 		consume(); // Move past '='
 		//Helper::addSymbol(varName, type, currentToken().getLiteral());
-		if (type == "float")
+		if (type == FLOAT_TYPE_LIT )
 		{
 			auto value_literal = std::make_unique<FloatNumberExprAST>(std::stod(currentToken().getLiteral()));
 			consume(); // Move past value
 			consume();
 			return std::make_unique<AssignExprAST>(varName, std::move(value_literal), type);
 		}
-		else if (type == "int")
+		else if (type == INT_TYPE_LIT )
 		{
 			auto value_literal = std::make_unique<IntegerNumberExprAST>(std::stod(currentToken().getLiteral()));
 			consume(); // Move past value
 			consume();
 			return std::make_unique<AssignExprAST>(varName, std::move(value_literal), type);
 		}
-		else if (type == "char")
+		else if (type == CHAR_TYPE_LIT)
 		{
 			auto value_literal = std::make_unique<CharExprAST>(std::stod(currentToken().getLiteral()));
 			consume(); // Move past value
@@ -195,7 +195,7 @@ std::unique_ptr<ExprAST> Parser::regularAssignmentParsing()
 
 std::unique_ptr<ExprAST> Parser::arrAssignmentParsing(const std::string& type)
 {
-	std::string currVal = "";
+	std::string currVal = EMPTY_STR;
 	int len = 0; // Length of the created array
 	std::string varName = currentToken().getLiteral().substr(0, currentToken().getLiteral().size() - 2); // Cut out '[]'
 	consume();
@@ -205,44 +205,44 @@ std::unique_ptr<ExprAST> Parser::arrAssignmentParsing(const std::string& type)
 	try
 	{
 		// Guide to the solution --> https://stackoverflow.com/questions/7844049/how-are-c-arrays-represented-in-memory	
-		if (init[0] == ',')
+		if (init[0] == COMMA_LITERAL)
 		{
 			throw ParserError("Value missing");
 		}
 
 		for (int i = 0; i < init.size(); i++)
 		{
-			if (init[i] == ',')
+			if (init[i] == COMMA_LITERAL)
 			{
 				throw ParserError("Empty initilization");
 			}
-			while (init[i] != ',' && (i != init.size()))
+			while (init[i] != COMMA_LITERAL && (i != init.size()))
 			{
 				currVal += init[i];
 				i++;
 			}
-			if (type == "int")
+			if (type == INT_TYPE_LIT )
 			{
 				if (!Helper::isInteger(currVal))
 				{
 					throw ParserError("Invalid type, supposd to be " + type);
 				}
 			}
-			else if (type == "float")
+			else if (type == FLOAT_TYPE_LIT )
 			{
 				if (!Helper::isFloat(currVal))
 				{
 					throw ParserError("Invalid type, supposd to be " + type);
 				}
 			}
-			else if (type == "char")
+			else if (type == CHAR_TYPE_LIT)
 			{
 				if (!Helper::isChar(currVal))
 				{
 					throw ParserError("Invalid type, supposd to be " + type);
 				}
 			}
-			currVal = "";
+			currVal = EMPTY_STR;
 			len++;
 		}
 		consume();
@@ -429,7 +429,7 @@ std::unique_ptr<FunctionAST> Parser::ParseDefinition()
 			
 			return std::make_unique<FunctionAST>(std::move(Proto), std::move(E), std::move(returnStatement), type);
 		}
-		else if (Proto.get()->getReturnType() == "void")
+		else if (Proto.get()->getReturnType() == VOID_TYPE_LIT)
 		{
 			// it dosent realy matter 
 			auto voidRet = ParseVoid();
@@ -453,10 +453,10 @@ std::unique_ptr<FunctionAST> Parser::ParseTopLevelExpr()
 {
 	if (auto E = ParseExpression()) {
 		// Make an anonymous proto.
-		auto Proto = std::make_unique<PrototypeAST>("__anon_expr",
+		auto Proto = std::make_unique<PrototypeAST>(ANNONIMUS_FUNC_LIT,
 			std::vector<FuncArg>(),
-			"void");
-		return std::make_unique<FunctionAST>(std::move(Proto), std::move(E), nullptr, "void");
+			VOID_TYPE_LIT);
+		return std::make_unique<FunctionAST>(std::move(Proto), std::move(E), nullptr, VOID_TYPE_LIT);
 	}
 	return nullptr;
 }

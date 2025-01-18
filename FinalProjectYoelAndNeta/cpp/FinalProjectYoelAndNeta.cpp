@@ -60,7 +60,6 @@ int main(int argc, char* argv[]) {
 	}
 	catch (const SyntaxError& err)
 	{
-		if (true && )
 		std::cout << err.what();
 	}
 	return 0;

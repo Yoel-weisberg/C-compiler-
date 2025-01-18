@@ -76,7 +76,7 @@ public:
     static void createAnonymousFunction();
     static Function* getFunction(std::string Name);
     static llvm::AllocaInst* allocForNewSymbol(std::string var_name, std::string var_type, const int size, const std::string& pTT);
-    static bool addSymbol(std::string var_name, std::string var_type, const std::string& pTT = "", const int size = 1);
+    static bool addSymbol(std::string var_name, std::string var_type, const std::string& pTT = EMPTY_STR, const int size = 1);
     
 
     // Utility methods
@@ -103,4 +103,8 @@ public:
     // memory related 
     static llvm::Function* MallocFunc;
     static void defineMalloc();
+
+    // user input
+    static llvm::Function* ScanfFunc;
+    static void defineScanf();
 };

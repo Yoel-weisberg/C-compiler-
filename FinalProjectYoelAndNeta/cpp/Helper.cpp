@@ -1,7 +1,7 @@
 #include "../Header/Helper.h"
 
 // Define static members
-std::vector<std::string> Helper::definedTypes = { "float", "void", "int", "char"};
+std::vector<std::string> Helper::definedTypes = { FLOAT_TYPE_LIT , VOID_TYPE_LIT, INT_TYPE_LIT , CHAR_TYPE_LIT};
 std::map<std::string, Tokens_type> Helper::literalToType = {
     {")", RPAREN},
     {"(", LPAREN},
@@ -18,7 +18,7 @@ std::map<std::string, Tokens_type> Helper::literalToType = {
     {">", HIGHER_THEN},
     {"<", LOWER_THEN},
     {"==", EQUELS_CMP},
-    {",", COMMA},
+    {COMMA_LITERAL, COMMA},
     {"&", AMPERSAND},
     {"[", SQR_BR_L},
     {"]", SQR_BR_R}
@@ -41,6 +41,7 @@ std::unique_ptr<llvm::StandardInstrumentations> Helper::TheSI = nullptr;
 std::map<std::string, std::unique_ptr<PrototypeAST>> Helper::FunctionProtos;
 llvm::ExitOnError Helper::ExitOnErr;
 llvm::Function* Helper::MallocFunc = nullptr;
+llvm::Function* Helper::ScanfFunc = nullptr;
 
 void Helper::InitializeModuleAndManagers()
 {
@@ -80,6 +81,7 @@ void Helper::InitializeModuleAndManagers()
     PB.crossRegisterProxies(*TheLAM, *TheFAM, *TheCGAM, *TheMAM);
 
     defineMalloc();
+    defineScanf();
 }
 
 
@@ -182,13 +184,13 @@ llvm::Type* Helper::getLLVMType(std::string var_type, llvm::LLVMContext& Context
 {
     // Determine the type of the array elements from pTT
     llvm::Type* elementType;
-    if (var_type == "int") {
+    if (var_type == INT_TYPE_LIT ) {
         elementType = llvm::Type::getInt32Ty(Context);
     }
-    else if (var_type == "float") {
+    else if (var_type == FLOAT_TYPE_LIT ) {
         elementType = llvm::Type::getFloatTy(Context);
     }
-    else if (var_type == "char") {
+    else if (var_type == CHAR_TYPE_LIT) {
         elementType = llvm::Type::getInt8Ty(Context);
     }
     else {
@@ -198,54 +200,46 @@ llvm::Type* Helper::getLLVMType(std::string var_type, llvm::LLVMContext& Context
     return elementType;
 }
 
-void Helper::defineMalloc()
-{
-
-    llvm::Function* ExistingMalloc = getModule().getFunction("malloc");
-    if (ExistingMalloc) {
-        // If malloc is already defined, do nothing
-        llvm::outs() << "malloc function already exists.\n";
+void Helper::defineMalloc() {
+    // Check if malloc is already declared
+    if (MallocFunc != nullptr) {
         return;
     }
 
-    // setting up the malloc function
+    // Declare malloc in the module
     MallocFunc = llvm::cast<llvm::Function>(
-        TheModule->getOrInsertFunction("malloc", Builder.get()->getInt32Ty(), Builder.get()->getInt32Ty()).getCallee()
+        TheModule->getOrInsertFunction(
+            "malloc",                                   // Function name
+            PointerType::get(Type::getInt8Ty(getContext()), 0),                   // Return type: void*
+            Builder->getInt32Ty()                      // Parameter type: int
+        ).getCallee()
     );
 
-    // Create a Function Signature
-    llvm::FunctionType* FuncType = llvm::FunctionType::get(
-        getBuilder().getInt32Ty(), // Return type: int32
-        { getBuilder().getInt32Ty()}, // Parameter types: (int, int)
-        false // IsVarArg: false (not variadic)
-    );
-
-    // Add the Function to the Module
-    llvm::Function* AddFunction = llvm::Function::Create(
-        FuncType,
-        llvm::Function::ExternalLinkage,
-        "malloc", // Function name
-        getModule()
-    );
-
-    // Name the function parameters
-    llvm::Function::arg_iterator Args = AddFunction->arg_begin();
-    llvm::Value* AmountOfMemory = Args++;
-    AmountOfMemory->setName("amountToAllocate");
-
-    // Step 4: Define the Function's Body
-    llvm::BasicBlock* EntryBlock = llvm::BasicBlock::Create(getContext(), "entry", AddFunction);
-    getBuilder().SetInsertPoint(EntryBlock);
-
-    // Call malloc to allocate space for an int (4 bytes)
-    llvm::Value* HeapMemory = Helper::getBuilder().CreateCall(Helper::MallocFunc, AmountOfMemory, "heap_int");
-
-    // Return the result
-    getBuilder().CreateRet(HeapMemory);
-
-    // Print the module's IR
-    getModule().print(llvm::outs(), nullptr);
+    // Print confirmation
+    llvm::outs() << "Declared malloc function.\n";
 }
+
+void Helper::defineScanf() {
+    // Check if scanf is already declared
+    if (ScanfFunc != nullptr) {
+        return;
+    }
+
+    // Declare scanf in the module
+    ScanfFunc = llvm::cast<llvm::Function>(
+        TheModule->getOrInsertFunction(
+            "scanf",                                           // Function name
+            Builder->getInt32Ty(),                             // Return type: int
+            llvm::PointerType::get(llvm::Type::getInt8Ty(getContext()), 0) // Parameter type: char* (format string)
+        ).getCallee()
+    );
+
+    // Print confirmation
+    llvm::outs() << "Declared scanf function.\n";
+}
+
+
+
 
     
 llvm::AllocaInst* Helper::allocForNewSymbol(std::string var_name, std::string var_type, const int size, const std::string& pTT)
@@ -259,13 +253,13 @@ llvm::AllocaInst* Helper::allocForNewSymbol(std::string var_name, std::string va
     }
     var_type = Helper::removeSpecialCharacter(var_type);
     // Map variable type to LLVM type
-    if (var_type == "int") {
+    if (var_type == INT_TYPE_LIT ) {
         llvmType = llvm::Type::getInt32Ty(Context);
     }
-    else if (var_type == "float") {
+    else if (var_type == FLOAT_TYPE_LIT ) {
         llvmType = llvm::Type::getFloatTy(Context);
     }
-    else if (var_type == "char") {
+    else if (var_type == CHAR_TYPE_LIT) {
         llvmType = llvm::Type::getInt8Ty(Context);
     }
     else if (var_type == "arr") {
@@ -349,19 +343,19 @@ std::string Helper::removeSpecialCharacter(std::string str)
 
 Type* Helper::getTypeFromString(const std::string type)
 {
-    if (type == "int")
+    if (type == INT_TYPE_LIT )
     {
         return Type::getInt32Ty(Helper::getContext());
     }
-    else if (type == "float")
+    else if (type == FLOAT_TYPE_LIT )
     {
         return Type::getDoubleTy(Helper::getContext());
     }
-    else if (type == "char")
+    else if (type == CHAR_TYPE_LIT)
     {
         return Type::getInt8Ty(Helper::getContext());
     }
-    else if(type == "void")
+    else if(type == VOID_TYPE_LIT)
     {
         return Type::getVoidTy(Helper::getContext());
     }

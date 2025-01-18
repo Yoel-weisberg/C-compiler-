@@ -38,7 +38,7 @@ public:
     SymbolTable();
 
     // Add a new symbol to the table
-    void add(const std::string& name, const std::string& type, llvm::Value* llvmValue, std::string& val, const std::string& pTT = "");
+    void add(const std::string& name, const std::string& type, llvm::Value* llvmValue, std::string& val, const std::string& pTT = EMPTY_STR);
 
     // Find a symbol by name
     std::optional<std::reference_wrapper<Symbol>> findSymbol(const std::string& name);

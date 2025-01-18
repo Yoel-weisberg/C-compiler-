@@ -47,7 +47,7 @@ arrExprAST::arrExprAST(const std::string& type, std::string& size, const std::st
     std::vector<uint64_t> parsedData;
     std::stringstream ss(val);
     std::string token;
-    while (std::getline(ss, token, ',')) {
+    while (std::getline(ss, token, COMMA_LITERAL)) {
         parsedData.push_back(std::stoull(token));
     }
     _data = llvm::ArrayRef<uint64_t>(parsedData);
@@ -83,13 +83,13 @@ Value* arrExprAST::codegen() {
 void arrExprAST::assignLLVMType(const std::string& type) {
     LLVMContext& context = Helper::getContext(); // Access the global LLVM context
 
-    if (type == "int") {
+    if (type == INT_TYPE_LIT ) {
         _type = llvm::Type::getInt32Ty(context); // 32-bit integer
     }
-    else if (type == "float") {
+    else if (type == FLOAT_TYPE_LIT) {
         _type = llvm::Type::getFloatTy(context); // 32-bit float
     }
-    else if (type == "char") {
+    else if (type == CHAR_TYPE_LIT) {
         _type = llvm::Type::getInt8Ty(context); // 8-bit integer
     }
     else {
@@ -104,7 +104,7 @@ void arrExprAST::initArrayRef(const std::string& val, const std::string& type)
     std::vector<std::variant<int, float, char>> values;
     for (size_t i = 0; i < val.size(); i++) // No need to check types or validation,
     {                                       // So we can just add it to 'values'
-        if (val[i] == ',')
+        if (val[i] == COMMA_LITERAL)
         {
             continue;
         }
@@ -284,7 +284,7 @@ Function* FunctionAST::codegen()
         Value* RetVal = ReturnValue->codegen();
 
         // Finish off the function.
-        if (returnType == "void")
+        if (returnType == VOID_TYPE_LIT)
         {
             Helper::Builder->CreateRetVoid();
         }
@@ -317,21 +317,21 @@ Value* BinaryExprAST::codegen()
 
     switch (Op) {
     case ADDITION:
-        return Helper::Builder->CreateFAdd(L, R, "addtmp");
+        return Helper::Builder->CreateFAdd(L, R, ADD_TMP);
     case SUBTRACTION:
-        return Helper::Builder->CreateFSub(L, R, "subtmp");
+        return Helper::Builder->CreateFSub(L, R, SUB_TMP);
     case MULTIPLICATION:
-        return Helper::Builder->CreateFMul(L, R, "multmp");
+        return Helper::Builder->CreateFMul(L, R, MUL_TMP);
     case LOWER_THEN:
-        L = Helper::Builder->CreateFCmpULT(L, R, "cmptmp");
+        L = Helper::Builder->CreateFCmpULT(L, R, CMP_TMP);
         // Convert bool 0/1 to double 0.0 or 1.0
-        return Helper::Builder->CreateUIToFP(L, Type::getDoubleTy(Helper::getContext()), "booltmp");
+        return Helper::Builder->CreateUIToFP(L, Type::getDoubleTy(Helper::getContext()), BOOL_TMP);
     case HIGHER_THEN:
-        L = Helper::Builder->CreateFCmpUGT(L, R, "cmptmp");
-        return Helper::Builder->CreateUIToFP(L, Type::getDoubleTy(Helper::getContext()), "booltmp");
+        L = Helper::Builder->CreateFCmpUGT(L, R, CMP_TMP);
+        return Helper::Builder->CreateUIToFP(L, Type::getDoubleTy(Helper::getContext()), BOOL_TMP);
     case EQUELS_CMP:
-        L = Helper::Builder->CreateFCmpUEQ(L, R, "cmptmp");
-        return Helper::Builder->CreateUIToFP(L, Type::getDoubleTy(Helper::getContext()), "booltmp");
+        L = Helper::Builder->CreateFCmpUEQ(L, R, CMP_TMP);
+        return Helper::Builder->CreateUIToFP(L, Type::getDoubleTy(Helper::getContext()), BOOL_TMP);
     default:
         throw SyntaxError("invalid binary operator");
     }
@@ -359,7 +359,7 @@ Value* CallExprAST::codegen()
         return Helper::Builder->CreateCall(CalleeF, ArgsV);
 
     }
-    return Helper::Builder->CreateCall(CalleeF, ArgsV, "calltmp");
+    return Helper::Builder->CreateCall(CalleeF, ArgsV, CALL_TMP);
 }
 
 Value* VoidAst::codegen()

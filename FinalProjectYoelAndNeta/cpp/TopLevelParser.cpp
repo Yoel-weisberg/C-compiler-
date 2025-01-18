@@ -58,7 +58,7 @@ void TopLevelParser::HandeleDefinition()
         if (auto* FnIR = FnAST->codegen()) {
             fprintf(stderr, "Read function definition:");
             FnIR->print(errs());
-            fprintf(stderr, "\n");
+            fprintf(stderr, NEW_LINE_STR);
             Helper::ExitOnErr(Helper::TheJIT->addModule(
                 llvm::orc::ThreadSafeModule(std::move(Helper::TheModule), std::move(Helper::TheContext))));
             Helper::InitializeModuleAndManagers();
