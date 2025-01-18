@@ -39,7 +39,9 @@ int main(int argc, char* argv[]) {
 
 		// ----     Parser                         ----
 		TopLevelParser parser = TopLevelParser(tokeniser.getTokens());
+		
 		Helper::TheJIT = Helper::ExitOnErr(llvm::orc::KaleidoscopeJIT::Create());
+
 		Helper::InitializeModuleAndManagers();
 		parser.mainLoop();
 
@@ -58,6 +60,7 @@ int main(int argc, char* argv[]) {
 	}
 	catch (const SyntaxError& err)
 	{
+		if (true && )
 		std::cout << err.what();
 	}
 	return 0;
