@@ -2,6 +2,16 @@
 
 // Define static members
 std::vector<std::string> Helper::definedTypes = { "float", "void", "int", "char"};
+
+std::map<std::string, Tokens_type> Helper::Keywords = {
+    {"if", IF_WORD},
+    {"else", ELSE},
+    {"do", DO_WHILE_LOOP},
+    {"while", WHILE_LOOP},
+    {"for", FOR_LOOP},
+    {"return", RETURN}
+};
+
 std::map<std::string, Tokens_type> Helper::literalToType = {
     {")", RPAREN},
     {"(", LPAREN},
@@ -79,7 +89,7 @@ void Helper::InitializeModuleAndManagers()
     PB.registerFunctionAnalyses(*TheFAM);
     PB.crossRegisterProxies(*TheLAM, *TheFAM, *TheCGAM, *TheMAM);
 
-    defineMalloc();
+    //defineMalloc();
 }
 
 

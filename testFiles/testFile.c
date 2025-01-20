@@ -10,5 +10,10 @@ int foo ()
 
 void main ()
 {
+    int x = 4;
+    while (x > 0)
+    {
+        blabla;
+    }
     foo();
 }
