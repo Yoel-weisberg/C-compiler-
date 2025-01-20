@@ -18,8 +18,8 @@ enum Tokens_type {
 	IF_WORD,
 	AND,
 	OR,
-	L_CURLY_PRAN,
-	R_CURLY_PRAN,
+	L_CURLY_BRACK,
+	R_CURLY_BRACK,
 	ELSE, 
 	LOWER_THEN,
 	HIGHER_THEN,
@@ -35,7 +35,6 @@ enum Tokens_type {
 	DO_WHILE_LOOP,
 	WHILE_LOOP,
 	FOR_LOOP,
-	RETURN
 };
 
 // Other

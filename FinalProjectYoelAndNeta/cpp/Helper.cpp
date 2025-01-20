@@ -9,7 +9,7 @@ std::map<std::string, Tokens_type> Helper::Keywords = {
     {"do", DO_WHILE_LOOP},
     {"while", WHILE_LOOP},
     {"for", FOR_LOOP},
-    {"return", RETURN}
+    {"return", RETURN_STATEMENT}
 };
 
 std::map<std::string, Tokens_type> Helper::literalToType = {
@@ -23,8 +23,8 @@ std::map<std::string, Tokens_type> Helper::literalToType = {
     {";", SEMICOLUMN},
     {"&&", AND},
     {"||", OR},
-    {"{", L_CURLY_PRAN},
-    {"}", R_CURLY_PRAN},
+    {"{", L_CURLY_BRACK},
+    {"}", R_CURLY_BRACK},
     {">", HIGHER_THEN},
     {"<", LOWER_THEN},
     {"==", EQUELS_CMP},
