@@ -1,3 +1,20 @@
 ; ModuleID = 'Yoel and neta JIT'
 source_filename = "Yoel and neta JIT"
-target datalayout = "e-m:w-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128"
+
+declare ptr @malloc(i32)
+
+declare i32 @scanf(ptr)
+
+define i32 @foo() {
+entry:
+  %hey = alloca i32, align 4
+  store i32 3, ptr %hey, align 4
+  %hey1 = load i32, ptr %hey, align 4
+  ret i32 %hey1
+}
+
+define void @main() {
+entry:
+  %calltmp = call i32 @foo()
+  ret void
+}

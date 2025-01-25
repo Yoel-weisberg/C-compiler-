@@ -18,7 +18,7 @@ std::map<std::string, Tokens_type> Helper::literalToType = {
     {">", HIGHER_THEN},
     {"<", LOWER_THEN},
     {"==", EQUELS_CMP},
-    {COMMA_LITERAL, COMMA},
+    {",", COMMA},
     {"&", AMPERSAND},
     {"[", SQR_BR_L},
     {"]", SQR_BR_R}
@@ -48,7 +48,7 @@ void Helper::InitializeModuleAndManagers()
     // Open a new context and module.
     TheContext = std::make_unique<LLVMContext>();
     TheModule = std::make_unique<Module>("Yoel and neta JIT", *TheContext);
-    TheModule->setDataLayout(TheJIT->getDataLayout());
+    //TheModule->setDataLayout(TheJIT->getDataLayout());
 
     // Create a new builder for the module.
     Builder = std::make_unique<IRBuilder<>>(*TheContext);
@@ -237,6 +237,57 @@ void Helper::defineScanf() {
     // Print confirmation
     llvm::outs() << "Declared scanf function.\n";
 }
+
+void Helper::builfObjectFile()
+{
+    // finding the machines attributes
+    auto TargetTriple = sys::getDefaultTargetTriple();
+    TheModule->setTargetTriple(TargetTriple);
+
+    std::string Error;
+    auto Target = TargetRegistry::lookupTarget(TargetTriple, Error);
+
+    // Print an error and exit if we couldn't find the requested target.
+    // This generally occurs if we've forgotten to initialise the
+    // TargetRegistry or we have a bogus target triple.
+    if (!Target) {
+        errs() << Error;
+        return;
+    }
+
+    auto CPU = "generic";
+    auto Features = "";
+
+    TargetOptions opt;
+    auto TheTargetMachine = Target->createTargetMachine(
+        TargetTriple, CPU, Features, opt, Reloc::PIC_);
+
+    TheModule->setDataLayout(TheTargetMachine->createDataLayout());
+
+    auto Filename = OBJECT_FILE_LOC;
+    std::error_code EC;
+    raw_fd_ostream dest(Filename, EC, sys::fs::OF_None);
+
+    if (EC) {
+        errs() << "Could not open file: " << EC.message();
+        return;
+    }
+
+    legacy::PassManager pass;
+    auto FileType = CodeGenFileType::ObjectFile;
+
+    if (TheTargetMachine->addPassesToEmitFile(pass, dest, nullptr, FileType)) {
+        errs() << "TheTargetMachine can't emit a file of this type";
+        return;
+    }
+
+    pass.run(*TheModule);
+    dest.flush();
+
+    outs() << "Wrote " << Filename << "\n";
+
+}
+
 
 
 

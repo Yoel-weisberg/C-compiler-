@@ -58,14 +58,12 @@ void TopLevelParser::HandeleDefinition()
         if (auto* FnIR = FnAST->codegen()) {
             fprintf(stderr, "Read function definition:");
             FnIR->print(errs());
-            fprintf(stderr, NEW_LINE_STR);
-            Helper::ExitOnErr(Helper::TheJIT->addModule(
-                llvm::orc::ThreadSafeModule(std::move(Helper::TheModule), std::move(Helper::TheContext))));
-            Helper::InitializeModuleAndManagers();
+            fprintf(stderr, "\n");
         }
     }
     else {
         // Skip token for error recovery.
+        
         parser.consume();
     }
 }

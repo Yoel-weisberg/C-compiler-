@@ -8,6 +8,7 @@
 #include <optional>
 #include <iostream>
 #include <algorithm>
+#include "Constants.h"
 
 class Symbol {
 public:

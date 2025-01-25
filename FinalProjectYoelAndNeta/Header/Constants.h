@@ -68,3 +68,7 @@ enum Tokens_type {
 #define BLANK ' ' // Empty space
 #define DIS_BETWEEN_SINGLE_QOUTES 2
 #define NEW_LINE_STR "\n"
+
+#define OBJECT_FILE_LOC "object.o"
+#define EXE_FILE_LOC "executable.exe"
+#define LLD_FILE "ld.lld.exe"

@@ -37,8 +37,20 @@
 #include "llvm/Transforms/Scalar/GVN.h"
 #include "llvm/Transforms/Scalar/Reassociate.h"
 #include "llvm/Transforms/Scalar/SimplifyCFG.h"
-
 #include "llvm/IR/ValueSymbolTable.h"
+#include "llvm/Support/TargetSelect.h"
+#include "llvm/Support/raw_ostream.h"
+#include "llvm/Target/TargetMachine.h"
+#include "llvm/Target/TargetOptions.h"
+#include "llvm/TargetParser/Host.h"
+#include "llvm/MC/TargetRegistry.h"
+#include "llvm/IR/LegacyPassManager.h"
+#include <llvm/Support/raw_ostream.h>
+#include <llvm/Support/FileSystem.h>
+#include <llvm/Support/CommandLine.h>
+#include <llvm/Support/InitLLVM.h>
+#include <llvm/Support/Program.h>
+#include <llvm/Support/WithColor.h>
 
 
 #include "Constants.h"
@@ -107,4 +119,7 @@ public:
     // user input
     static llvm::Function* ScanfFunc;
     static void defineScanf();
+
+    // compiling files
+    static void builfObjectFile();
 };
