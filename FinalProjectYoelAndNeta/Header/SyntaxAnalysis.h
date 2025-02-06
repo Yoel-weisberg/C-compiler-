@@ -48,6 +48,7 @@ private:
 	int checkDoWhileStructure(int& pos);
 	int checkForLoopInitialization(int& pos);
 	
+	int checkStructStructure(int& pos);
 
 	// Helper methods
 	std::pair<int, int> findMatchingCurlB(int& pos);

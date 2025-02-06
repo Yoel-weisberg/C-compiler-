@@ -9,7 +9,8 @@ std::map<std::string, Tokens_type> Helper::Keywords = {
     {"do", DO_WHILE_LOOP},
     {"while", WHILE_LOOP},
     {"for", FOR_LOOP},
-    {"return", RETURN_STATEMENT}
+    {"return", RETURN_STATEMENT},
+    {"struct", STRUCT}
 };
 
 std::map<std::string, Tokens_type> Helper::literalToType = {

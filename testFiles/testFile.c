@@ -12,8 +12,15 @@
 //    return hey;
 //}
 
+struct firstStruct
+{
+    int num;
+    char ch;
+};
+
 void main()
 {
+    struct firstStruct f1;
     int x = 4;
     //for (int a = 0; a < 5; x++)
     //{

@@ -181,6 +181,10 @@ void SyntaxAnalysis::validSentences()
 			{
 				pos = checkLoopStructure(pos);
 			}
+			else if (_tokens[pos].getType() == STRUCT)
+			{
+				pos = checkStructStructure(pos);
+			}
 			// TODO - checking if the sentence just a defined identifier (like just 3; or somthing like that)
 			// TODO - need to check if its a redefinition of t a symbol
 			// TODO - need to check if the sentnce is an algebric sentnece
@@ -555,6 +559,34 @@ int SyntaxAnalysis::checkForLoopInitialization(int& pos)
 	if (_tokens[pos].getType() != SEMICOLUMN)
 	{
 		throw SyntaxError("Expected ';' ", pos);
+	}
+	return pos;
+}
+
+int SyntaxAnalysis::checkStructStructure(int& pos)
+{
+	std::cout << "Syntax for struct!!" << std::endl;
+
+	pos++;
+
+	if (_tokens[pos].getType() != IDENTIFIER)
+	{
+		throw SyntaxError("Expected identifier ", pos);
+	}
+
+	pos++;
+	// Ensure the next token is a left curly brace "{"
+	if (_tokens[pos].getType() != L_CURLY_BRACK)
+	{
+		throw SyntaxError("Expected '{' after 'else'", pos);
+	}
+
+	pos++;
+	std::pair<int, int> bCheck = findMatchingCurlB(pos);
+	pos = bCheck.first;
+	if (bCheck.second > 0)
+	{
+		throw SyntaxError("Unmatched '{' in 'structure' block", pos);
 	}
 	return pos;
 }
