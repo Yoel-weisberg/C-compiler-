@@ -29,17 +29,19 @@ std::map<std::string, Tokens_type> Helper::literalToType = {
     {"<", LOWER_THEN},
     {"==", EQUELS_CMP},
     {",", COMMA},
-    {"&", AMPERSAND},
     {"[", SQR_BR_L},
-    {"]", SQR_BR_R}
+    {"]", SQR_BR_R},
+    // Unary Operators:
+    {"&", AMPERSAND},
+    {"++", INCREMENT},
+    {"--", DECREMENT}
 };
 
-SymbolTable Helper::symbolTable;
 
 std::unique_ptr<llvm::LLVMContext> Helper::TheContext = nullptr;
 std::unique_ptr<llvm::Module> Helper::TheModule = nullptr;
 std::unique_ptr<llvm::IRBuilder<>> Helper::Builder = nullptr;
-std::map<std::string, llvm::AllocaInst*> Helper::NamedValues = {};
+std::map<std::string, llvm::AllocaInst*> Helper::SymboTable = {}; // Symbol Table
 std::unique_ptr<llvm::orc::KaleidoscopeJIT> Helper::TheJIT = nullptr;
 std::unique_ptr<llvm::FunctionPassManager> Helper::TheFPM = nullptr;
 std::unique_ptr<llvm::LoopAnalysisManager> Helper::TheLAM = nullptr;
@@ -327,14 +329,14 @@ llvm::Value* Helper::getSymbolValue(const std::string& var_name)
 
 bool Helper::addSymbol(std::string var_name, std::string var_type,const std::string& pTT, const int size)
 {
-    if (symbolTable.findSymbol(var_name)) { // NOTE: THIS STATEMENT DOESN'T CONSIDER SCOPES 
+    if (SymboTable.find(var_name) != SymboTable.end()) { // NOTE: THIS STATEMENT DOESN'T CONSIDER SCOPES 
                                             // (YET TO BE IMPLEMENTED)
         std::cerr << "Error: Symbol '" << var_name << "' already exists.\n";
         return false; // Symbol already exists
     }
     llvm::AllocaInst* var_address = allocForNewSymbol(var_name, var_type, size, pTT);
 
-    Helper::NamedValues[var_name] = var_address; // Add to symbol table 
+    Helper::SymboTable[var_name] = var_address; // Add to symbol table 
     printLLVMSymbolTable();
     return true;
 }
@@ -384,7 +386,7 @@ void Helper::printLLVMSymbolTable() {
     std::cout << "| Variable Name | Type    | Address |\n";
     std::cout << "----------------------------------\n";
 
-    for (const auto& entry : Helper::NamedValues) {
+    for (const auto& entry : Helper::SymboTable) {
         const std::string& varName = entry.first;
         llvm::AllocaInst* allocaInst = entry.second;
 

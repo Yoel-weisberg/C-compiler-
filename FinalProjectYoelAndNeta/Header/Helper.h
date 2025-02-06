@@ -52,12 +52,12 @@ using namespace llvm;
 class Helper
 {
 public:
-    // llvm related
+    // LLVM related
     static void InitializeModuleAndManagers();
     static std::unique_ptr<LLVMContext> TheContext;
     static std::unique_ptr<Module> TheModule;
     static std::unique_ptr<IRBuilder<>> Builder;
-    static std::map<std::string, AllocaInst*> NamedValues;
+    static std::map<std::string, AllocaInst*> SymboTable; // Symbol Table
     static std::unique_ptr<llvm::orc::KaleidoscopeJIT> TheJIT;
     static std::unique_ptr<FunctionPassManager> TheFPM;
     static std::unique_ptr<LoopAnalysisManager> TheLAM;
@@ -98,7 +98,7 @@ public:
     // Data members
     static std::vector<std::string> definedTypes;
     static std::map<std::string, Tokens_type> literalToType;
-    static SymbolTable symbolTable;
+    //static SymbolTable symbolTable;
     static std::map<std::string, Tokens_type> Keywords;
 
     // memory related 

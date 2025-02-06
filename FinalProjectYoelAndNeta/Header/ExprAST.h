@@ -129,7 +129,17 @@ public:
 	Value* codegen() override;
 };
 
-/// VariableExprAST - Expression class for referencing a variable, like "a".
+class UnaryOpExprAST : public ExprAST
+{
+private:
+	Tokens_type _op; // Operators used in the code
+	std::unique_ptr<ExprAST> _LHS; // Only handling postfix, so only the LHS is needed
+public:
+	UnaryOpExprAST(Tokens_type operators, std::unique_ptr<ExprAST> LHS) : _op(operators), _LHS(std::move(LHS)) {}
+	llvm::Value* codegen() override;
+};
+
+// VariableExprAST - Expression class for referencing a variable, like "a".
 class VariableExprAST : public ExprAST
 {
 	std::string _name;
@@ -156,7 +166,8 @@ public:
 };
 
 
-class IfExprAST : public ExprAST {
+class IfExprAST : public ExprAST
+{
 private:
 	std::unique_ptr<ExprAST> Cond, Then, Else;
 public:
@@ -167,7 +178,44 @@ public:
 	Value* codegen() override;
 };
 
-class PrototypeAST {
+class WhileLoopAST : public ExprAST
+{
+private:
+	std::unique_ptr<ExprAST> _condition;
+	std::vector<std::unique_ptr<ExprAST>> _body;
+public:
+	WhileLoopAST(std::unique_ptr<ExprAST> condition, std::vector<std::unique_ptr<ExprAST>> body) : _condition(std::move(condition)), _body(std::move(body)) {}
+	llvm::Value* codegen() override;
+	//llvm::PHINode* processBody();
+};
+
+
+class DoWhileLoopAST : public ExprAST
+{
+private:
+	std::unique_ptr<ExprAST> _condition;
+	std::vector<std::unique_ptr<ExprAST>> _body;
+public:
+	DoWhileLoopAST(std::unique_ptr<ExprAST> condition, std::vector<std::unique_ptr<ExprAST>> body) : _condition(std::move(condition)), _body(std::move(body)) {}
+	llvm::Value* codegen() override;
+};
+
+
+class ForLoopAST : public ExprAST
+{
+private:
+	std::vector<std::unique_ptr<ExprAST>> _body;
+	// ---- Condition Parts ----
+	std::unique_ptr<ExprAST> _condInit; // Initilization
+	std::unique_ptr<ExprAST> _condC; // Condition 
+	std::unique_ptr<ExprAST> _condStep;	// Increasement / Decreasement or any other change... 
+public:
+	ForLoopAST(std::vector<std::unique_ptr<ExprAST>> body, std::unique_ptr<ExprAST> condInit, std::unique_ptr<ExprAST> condC, std::unique_ptr<ExprAST> condInc) : _body(std::move(body)), _condInit(std::move(condInit)), _condC(std::move(condC)), _condStep(std::move(condInc)) {}
+	llvm::Value* codegen() override;
+};
+
+class PrototypeAST
+{
 	std::string Name;
 	std::vector<FuncArg> Args;
 	std::string returnType;
@@ -175,7 +223,7 @@ public:
 	PrototypeAST(const std::string& Name, std::vector<FuncArg> Args, std::string returnType)
 		: Name(Name), Args(std::move(Args)), returnType(returnType) {}
 
-	Function* codegen();
+	llvm::Function* codegen();
 	const std::string& getName() const { return Name; }
 	const std::string& getReturnType() const { return returnType; }
 };
@@ -183,16 +231,16 @@ public:
 /// FunctionAST - This class represents a function definition itself.
 class FunctionAST {
 	std::unique_ptr<PrototypeAST> Proto;
-	std::unique_ptr<ExprAST> Body;
+	std::vector<std::unique_ptr<ExprAST>> Body;
 	std::unique_ptr<ExprAST> ReturnValue;
 	std::string returnType;
 
 public:
 	FunctionAST(std::unique_ptr<PrototypeAST> Proto,
-		std::unique_ptr<ExprAST> Body,
+		std::vector<std::unique_ptr<ExprAST>> Body,
 		std::unique_ptr<ExprAST> ReturnValue,
 		std::string ReturnType)
-		: Proto(std::move(Proto)), Body(std::move(Body)), returnType(ReturnType), ReturnValue(std::move(ReturnValue)) {}
+		: Proto(std::move(Proto)), Body(std::move(Body)),  ReturnValue(std::move(ReturnValue)) ,returnType(ReturnType){}
 
 	Function* codegen();
 };

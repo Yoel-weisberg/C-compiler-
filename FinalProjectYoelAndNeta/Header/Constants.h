@@ -35,12 +35,19 @@ enum Tokens_type {
 	DO_WHILE_LOOP,
 	WHILE_LOOP,
 	FOR_LOOP,
+	INCREMENT,
+	DECREMENT,
+	// YET TO BE SUPPORTED:
+	NOT,
+	UNARY_MINUS,
+	SIZE_OF
 };
 
 // Other
 #define CHAR_DEC_LEN 3
 #define	HEX_VAL 55
 #define HEX_BASE 16
+#define MIN_ARR_ID_LEN 3
 
 // Variable Sizes
 #define INTEGER_AND_FLOAT_SIZE 32

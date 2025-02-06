@@ -27,7 +27,8 @@ int Parser::getTokenPrecedence()
 
 // Constructor for Parser
 Parser::Parser(const std::vector<Token>& tokens)
-	: _tokens(tokens), _currentTokenIndex(0) {
+	: _tokens(tokens), _currentTokenIndex(0) 
+{
 
 	// comparing operaters
 	_BinopPrecedence[OR] = 2;
@@ -45,10 +46,26 @@ ExprAST* Parser::getAst()
 	return _head.get();
 }
 
-std::unique_ptr<ExprAST> Parser::ParseBinOpRHS(int ExprPrec, std::unique_ptr<ExprAST> LHS)
+bool Parser::isUnaryOp()
+{
+	if (currentToken().getType() == ADDITION) // ex: '++'
+	{
+		consume();
+		return currentToken().getType() == ADDITION ? true : false;
+	}
+	else if (currentToken().getType() == SUBTRACTION) // ex: '--'
+	{
+		consume();
+		return currentToken().getType() == SUBTRACTION ? true : false;
+	}
+	return false;
+}
+
+std::unique_ptr<ExprAST> Parser::parseBinOpRHS(int ExprPrec, std::unique_ptr<ExprAST> LHS)
 {
 	// If this is a binop, find its precedence.
-	while (true) {
+	while (true) 
+	{
 		int TokPrec = getTokenPrecedence();
 
 		// If this is a binop that binds at least as tightly as the current binop,
@@ -61,7 +78,7 @@ std::unique_ptr<ExprAST> Parser::ParseBinOpRHS(int ExprPrec, std::unique_ptr<Exp
 		consume(); // eat binop
 
 		// Parse the primary expression after the binary operator.
-		auto RHS = ParsePrimary();
+		auto RHS = parsePrimary();
 		if (!RHS)
 			return nullptr;
 
@@ -69,7 +86,7 @@ std::unique_ptr<ExprAST> Parser::ParseBinOpRHS(int ExprPrec, std::unique_ptr<Exp
 		// the pending operator take RHS as its LHS.
 		int NextPrec = getTokenPrecedence();
 		if (TokPrec < NextPrec) {
-			RHS = ParseBinOpRHS(TokPrec + 1, std::move(RHS));
+			RHS = parseBinOpRHS(TokPrec + 1, std::move(RHS));
 			if (!RHS)
 				return nullptr;
 		}
@@ -77,6 +94,12 @@ std::unique_ptr<ExprAST> Parser::ParseBinOpRHS(int ExprPrec, std::unique_ptr<Exp
 		// Merge LHS/RHS.
 		LHS = std::make_unique<BinaryExprAST>(BinOp, std::move(LHS), std::move(RHS));
 	}
+}
+
+std::unique_ptr<ExprAST> Parser::parseUnaryOp(std::unique_ptr<ExprAST> LHS)
+{
+	Tokens_type op = currentToken().getType();
+	return std::make_unique<UnaryOpExprAST>(op, std::move(LHS));
 }
 
 // Current token getter
@@ -96,7 +119,7 @@ bool Parser::isAtEnd() {
 
 // Main entry point to parse tokens and build an AST
 std::unique_ptr<ExprAST> Parser::parse() {
-	return ParsePrimary();
+	return parsePrimary();
 }
 
 
@@ -126,12 +149,12 @@ std::unique_ptr<ExprAST> Parser::ptrAssignmentParsing()
 		consume(); 
 
 		std::string pointedToVar = Helper::removeSpecialCharacter(currentToken().getLiteral());
-		auto PTVit = Helper::NamedValues.find(pointedToVar);
-		if (Helper::NamedValues.end() == PTVit)
+		auto PTVit = Helper::SymboTable.find(pointedToVar);
+		if (Helper::SymboTable.end() == PTVit)
 		{
 			throw ParserError("can't point to non-existing variable --> " + pointedToVar);
 		}
-		llvm::AllocaInst* allocInst = Helper::NamedValues[pointedToVar];
+		llvm::AllocaInst* allocInst = Helper::SymboTable[pointedToVar];
 
 		Helper::addSymbol(var_name, type);
 
@@ -157,7 +180,7 @@ std::unique_ptr<ExprAST> Parser::regularAssignmentParsing()
 	consume();
 
 	// Check for arrays 
-	if (currentToken().getLiteral().substr(currentToken().getLiteral().size() - 2, currentToken().getLiteral().size()) == "[]")
+	if (currentToken().getLiteral().size() >= MIN_ARR_ID_LEN && currentToken().getLiteral().substr(currentToken().getLiteral().size() - 2, currentToken().getLiteral().size()) == "[]")
 	{
 		return arrAssignmentParsing(Helper::removeSpecialCharacter(type));
 	}
@@ -267,44 +290,55 @@ std::unique_ptr<ExprAST> Parser::parseIfStatement() {
 	consume(); // eat the if.
 	std::unique_ptr<ExprAST> Else = nullptr;
 	// condition.
-	auto Cond = ParseExpression();
+	auto Cond = parseExpression();
 	if (!Cond)
+	{
 		return nullptr;
+	}
 
 	
 	consume(); // eat the {
 
-	auto Then = ParseExpression();
+	// TODO: construct 'Then' with multiple expressions
+	auto Then = parseExpression();
 	if (!Then)
+	{
 		return nullptr;
+	}
 	
-	consume(); // eat the }
+	consume(); 
 
 	if (currentToken().getType() == ELSE)
-		Else = ParseExpression();
+	{
+		Else = parseExpression();
+	}
 
+	consume(3); // Get to next expression
 
 	return std::make_unique<IfExprAST>(std::move(Cond), std::move(Then),
 		std::move(Else));
 
 }
 
-std::unique_ptr<ExprAST> Parser::ParseFloatNumberExpr()
+std::unique_ptr<ExprAST> Parser::parseFloatNumberExpr()
 {
 	auto Result = std::make_unique<FloatNumberExprAST>(std::stof(currentToken().getLiteral()));
 	consume();
-	if (currentToken().getType() == SEMICOLUMN) consume();
+	if (currentToken().getType() == SEMICOLUMN)
+	{
+		consume();
+	}
 	return std::move(Result);
 }
 
-std::unique_ptr<ExprAST> Parser::ParseIntagerNumberExpr()
+std::unique_ptr<ExprAST> Parser::parseIntagerNumberExpr()
 {
 	auto Result = std::make_unique<IntegerNumberExprAST>(std::stof(currentToken().getLiteral()));
 	consume();
 	return std::move(Result);
 }
 
-std::unique_ptr<ExprAST> Parser::ParseIdentifierExpr()
+std::unique_ptr<ExprAST> Parser::parseIdentifierExpr()
 {
 	std::string IdName = currentToken().getLiteral();
 
@@ -312,22 +346,33 @@ std::unique_ptr<ExprAST> Parser::ParseIdentifierExpr()
 
 	if (currentToken().getType() != LPAREN) // Simple variable ref.
 	{
-		if (currentToken().getType() == SEMICOLUMN) consume();
+		if (currentToken().getType() == SEMICOLUMN) 
+		{
+			consume();
+		}
 		return std::make_unique<VariableExprAST>(IdName);
 	}
 
 	// Call.
 	consume(); // eat (
 	std::vector<std::unique_ptr<ExprAST>> Args;
-	if (currentToken().getType() != RPAREN) {
-		while (true) {
-			if (auto Arg = ParseExpression())
+	if (currentToken().getType() != RPAREN)
+	{
+		while (true)
+		{
+			if (auto Arg = parseExpression())
+			{
 				Args.push_back(std::move(Arg));
+			}
 			else
+			{
 				return nullptr;
+			}
 
 			if (currentToken().getType() == RPAREN)
+			{
 				break;
+			}
 
 			consume();
 		}
@@ -336,63 +381,187 @@ std::unique_ptr<ExprAST> Parser::ParseIdentifierExpr()
 	// Eat the ')'.
 	consume();
 	if (currentToken().getType() == SEMICOLUMN)
+	{
 		consume();
+	}
 
 	return std::make_unique<CallExprAST>(IdName, std::move(Args));
 }
 
-std::unique_ptr<ExprAST> Parser::ParseParenExpr()
+std::unique_ptr<ExprAST> Parser::parseParenExpr()
 {
 	consume(); // eat (.
-	auto V = ParseExpression();
+	auto V = parseExpression();
 	if (!V)
+	{
 		return nullptr;
+	}
 
 	consume(); // eat ).
 	return V;
 }
 
 //Parse general expressions (addition, subtraction, etc.)
-std::unique_ptr<ExprAST> Parser::ParseExpression() {
-	auto LHS = ParsePrimary();
+std::unique_ptr<ExprAST> Parser::parseExpression() {
+	auto LHS = parsePrimary();
 	if (!LHS)
+	{
 		return nullptr;
-
-	return ParseBinOpRHS(0, std::move(LHS));
+	}
+	if (isUnaryOp()) // Currently handling only Postfix Ops. Such as "x++" and not "++x"
+	{
+		return parseUnaryOp(std::move(LHS));
+	}
+	return parseBinOpRHS(0, std::move(LHS));
 }
 
 
-// this is like the sentence switch but for the parser
-std::unique_ptr<ExprAST> Parser::ParsePrimary()
+/*
+* Main function for parsing each sentence (expression)
+*/
+std::unique_ptr<ExprAST> Parser::parsePrimary()
 {
 	switch (currentToken().getType())
 	{
 	case TYPE_DECLERATION:
 		return this->parseAssignment();
 	case LPAREN:
-		return ParseParenExpr();
+		return parseParenExpr();
 	case IF_WORD:
 		return parseIfStatement();
 	case FLOAT:
-		return ParseFloatNumberExpr();
+		return parseFloatNumberExpr();
 	case IDENTIFIER:
-		return ParseIdentifierExpr();
+		return parseIdentifierExpr();
+	// TODO: parse return statement  (return VariableExprAST)
 	case RETURN_STATEMENT:
 		return nullptr;
 	case INT:
-		return ParseIntagerNumberExpr();
+		return parseIntagerNumberExpr();
+	case WHILE_LOOP:
+		return parseWhileLoop();
+	case DO_WHILE_LOOP:
+		return parseDoWhileLoop();
+	case FOR_LOOP:
+		return parseForLoop();
 	default:
 		throw SyntaxError("Undefined Sentence begining");
 	}
 }
 
 
-std::unique_ptr<PrototypeAST> Parser::ParsePrototype()
+std::unique_ptr<ExprAST> Parser::parseWhileLoop()
+{
+	consume(); // Move past 'while'
+
+	// Parse condition
+	auto condition = parseExpression();
+	if (!condition)
+	{
+		return nullptr;
+	}
+
+	consume(); // Move past '{'
+
+	// Parse body
+	std::vector<std::unique_ptr<ExprAST>> body;
+	while (currentToken().getType() != R_CURLY_BRACK)
+	{
+		auto expr = parseExpression();
+		if (!expr)
+		{
+			return nullptr;
+		}
+		body.emplace_back(std::move(expr));
+	}
+	consume(); // Move past '}'
+
+	return std::make_unique<WhileLoopAST>(std::move(condition), std::move(body));
+}
+
+std::unique_ptr<ExprAST> Parser::parseDoWhileLoop()
+{
+	consume(2); // Move past "do" and "{"
+
+	// Parse body
+	std::vector<std::unique_ptr<ExprAST>> body;
+	while (currentToken().getType() != R_CURLY_BRACK)
+	{
+		auto expr = parseExpression();
+		if (!expr)
+		{
+			return nullptr;
+		}
+		body.emplace_back(std::move(expr));
+	}
+
+	consume(2);
+	// Parse condition
+	auto condition = parseExpression();
+	if (!condition)
+	{
+		return nullptr;
+	}
+
+	consume(); // Move past ';'
+	return std::make_unique<DoWhileLoopAST>(std::move(condition), std::move(body));
+}
+
+std::unique_ptr<ExprAST> Parser::parseForLoop()
+{
+	consume(2); // Move past 'for' and '('
+	// Parse condition
+	auto condInit = parseExpression();
+	if (!condInit)
+	{
+		return nullptr;
+	}
+	
+	auto condC = parseExpression();
+	if (!condC)
+	{
+		return nullptr;
+	}
+
+	consume(); // Move past ';'
+	auto condInc = parseExpression();
+	if (!condInc)
+	{
+		return nullptr;
+	}
+	consume(3);
+	// Parse body
+	std::vector<std::unique_ptr<ExprAST>> body;
+	while (currentToken().getType() != R_CURLY_BRACK)
+	{
+		auto expr = parseExpression();
+		if (!expr)
+		{
+			return nullptr;
+		}
+		body.emplace_back(std::move(expr));
+	}
+	consume(); // Move past '}' 
+	return std::make_unique<ForLoopAST>(std::move(body), std::move(condInit), std::move(condC), std::move(condInc));
+}
+
+//std::unique_ptr<ExprAST> Parser::parseForLoopCondition()
+//{
+//	// Parse evaluation
+//	
+//	// Parse condition
+//	
+//	// Parse modification
+//}
+
+
+std::unique_ptr<PrototypeAST> Parser::parsePrototype()
 {
 	// were starting on the type
 	std::string returnType = currentToken().getLiteral();
 	consume();
 	std::string FnName = currentToken().getLiteral();
+	std::cout << "NEW FUNC --> " << FnName << " <--" << std::endl;
 	consume(2);
 	// consume the (
 	std::vector<FuncArg> argsTypesAndNames;
@@ -413,50 +582,65 @@ std::unique_ptr<PrototypeAST> Parser::ParsePrototype()
 	return std::make_unique<PrototypeAST>(FnName, std::move(argsTypesAndNames), returnType);
 }
 
-std::unique_ptr<FunctionAST> Parser::ParseDefinition()
+std::unique_ptr<FunctionAST> Parser::parseDefinition()
 {
-	auto Proto = ParsePrototype();
+	auto Proto = parsePrototype();
 	if (!Proto)
-		return nullptr;
-	std::string type = Proto.get()->getReturnType();
-
-	if (auto E = ParseExpression())
 	{
-		if (currentToken().getType() == RETURN_STATEMENT)
-		{
-			consume();
-			auto returnStatement = ParseExpression();
-			
-			return std::make_unique<FunctionAST>(std::move(Proto), std::move(E), std::move(returnStatement), type);
-		}
-		else if (Proto.get()->getReturnType() == "void")
-		{
-			// it dosent realy matter 
-			auto voidRet = ParseVoid();
-			return std::make_unique<FunctionAST>(std::move(Proto), std::move(E), std::move(voidRet), type);
-		}
-		else
-		{
-			throw SyntaxError("Excepted a return statement");
-		}
-
+		return nullptr;
 	}
+	std::string funcType = Proto.get()->getReturnType();
+
+	std::vector<std::unique_ptr<ExprAST>> funcBody;
+
+	// Iterate through function and parse it
+	while (currentToken().getType() != RETURN_STATEMENT && currentToken().getType() != R_CURLY_BRACK)
+	{
+		std::unique_ptr<ExprAST> expr = parseExpression();
+		if (!expr)
+		{
+			return nullptr;
+		}
+		funcBody.emplace_back(std::move(expr));
+	}
+
+	std::unique_ptr<ExprAST> returnStatement = nullptr;
+	if (currentToken().getType() == RETURN_STATEMENT)
+	{
+		//consume();
+		returnStatement = parseExpression();
+		return std::make_unique<FunctionAST>(std::move(Proto), std::move(funcBody), std::move(returnStatement), funcType);
+	}
+	else if (Proto.get()->getReturnType() == "void")
+	{
+		auto voidRet = parseVoid();
+		return std::make_unique<FunctionAST>(std::move(Proto), std::move(funcBody), std::move(returnStatement), funcType);
+	}
+	else
+	{
+		throw SyntaxError("Excepted a return statement");
+	}
+
 	return nullptr;
 }
 
-std::unique_ptr<ExprAST> Parser::ParseVoid()
+std::unique_ptr<ExprAST> Parser::parseVoid()
 {
 	return std::make_unique<VoidAst>();
 }
 
-std::unique_ptr<FunctionAST> Parser::ParseTopLevelExpr()
+std::unique_ptr<FunctionAST> Parser::parseTopLevelExpr()
 {
-	if (auto E = ParseExpression()) {
-		// Make an anonymous proto.
-		auto Proto = std::make_unique<PrototypeAST>("__anon_expr",
-			std::vector<FuncArg>(),
-			"void");
-		return std::make_unique<FunctionAST>(std::move(Proto), std::move(E), nullptr, "void");
-	}
+	//std::vector<std::unique_ptr<ExprAST>> exprs;
+	//auto E = parseExpression();
+	//if (E) 
+	//{
+	//	// Make an anonymous proto.
+	//	auto Proto = std::make_unique<PrototypeAST>("__anon_expr",
+	//		std::vector<FuncArg>(),
+	//		"void");
+	//	exprs.push_back(std::move(E));
+	//	return std::make_unique<FunctionAST>(std::move(Proto), std::move(exprs), nullptr, "void");
+	//}
 	return nullptr;
 }

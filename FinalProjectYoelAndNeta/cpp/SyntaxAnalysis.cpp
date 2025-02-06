@@ -72,10 +72,10 @@ int SyntaxAnalysis::variableDefinitionStructure(int pos)
 			throw SyntaxError("Variable type dosent fit decleration");
 		}
 		pos + MAX_NUM_OF_OPERATIONS_FOR_DECLERATION >= _tokens.size() ? throw SyntaxError("excepted a semicolon") : true;
-		if (!_tokens[pos + MAX_NUM_OF_OPERATIONS_FOR_DECLERATION].getType() == SEMICOLUMN)
-		{
-			throw SyntaxError("excepted a semicolon");
-		}
+		//if (!_tokens[pos + MAX_NUM_OF_OPERATIONS_FOR_DECLERATION].getType() == SEMICOLUMN)
+		//{
+		//	throw SyntaxError("excepted a semicolon");
+		//}
 		// advancing pos by 4 to get to the next action
 		return pos + MAX_NUM_OF_OPERATIONS_FOR_DECLERATION;
 	}
@@ -286,7 +286,7 @@ int SyntaxAnalysis::checkIdentifier(int& pos)
 		}
 		if (_tokens[pos].getType() == RPAREN) pos++;
 	}
-	if (_tokens[pos].getType() != SEMICOLUMN) throw SyntaxError("Excepted a semicolumn");
+	if (_tokens[pos].getType() != SEMICOLUMN && pos < _tokens.size()) throw SyntaxError("Excepted a semicolumn");
 	return ++pos;
 }
 

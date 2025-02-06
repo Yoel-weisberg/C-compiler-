@@ -19,7 +19,7 @@ Value* CharExprAST::codegen()
 
 Value* ptrExprAST::codegen()
 {
-    auto it = Helper::NamedValues.find(_valAsStr);
+    auto it = Helper::SymboTable.find(_valAsStr);
     llvm::AllocaInst* allocaInst = it->second;
 
     if (!allocaInst) {
@@ -55,7 +55,7 @@ arrExprAST::arrExprAST(const std::string& type, std::string& size, const std::st
 
 Value* arrExprAST::codegen() {
     // Retrieve the pointer to the allocated array
-    AllocaInst* arrayPtr = Helper::NamedValues[_name]; 
+    AllocaInst* arrayPtr = Helper::SymboTable[_name]; 
     if (!arrayPtr) {
         throw std::runtime_error("Array pointer not found in symbol table.");
     }
@@ -138,8 +138,9 @@ void arrExprAST::initArrayRef(const std::string& val, const std::string& type)
 Value* VariableExprAST::codegen()
 {
     // Lookup the variable in the symbol table
-    AllocaInst* variable = Helper::NamedValues[_name];
-    if (!variable) {
+    AllocaInst* variable = Helper::SymboTable[_name];
+    if (!variable)
+    {
         throw std::runtime_error("Unknown variable name: " + _name);
     }
 
@@ -150,17 +151,20 @@ Value* VariableExprAST::codegen()
 
 
 // code like int a = 5;
-Value* AssignExprAST::codegen() {
+Value* AssignExprAST::codegen()
+{
     Helper::addSymbol(_varName, _varType, _varType);
 
     llvm::Value* varAlloca = Helper::getSymbolValue(_varName);
-    if (!varAlloca) {
+    if (!varAlloca)
+    {
         std::cerr << "Error: Variable '" << _varName << "' not found in symbol table.\n";
         return nullptr;
     }
 
     llvm::Value* value = _value->codegen();
-    if (!value) {
+    if (!value)
+    {
         std::cerr << "Error: Unable to generate code for assigned value.\n";
         return nullptr;
     }
@@ -169,10 +173,13 @@ Value* AssignExprAST::codegen() {
     return value;
 }
 
-Value* IfExprAST::codegen() {
+Value* IfExprAST::codegen() 
+{
     Value* CondV = Cond->codegen();
     if (!CondV)
+    {
         return nullptr;
+    }
 
     // Convert condition to a bool by comparing non-equal to 0.0.
     CondV = Helper::Builder->CreateFCmpONE(
@@ -185,15 +192,18 @@ Value* IfExprAST::codegen() {
     BasicBlock* MergeBB = BasicBlock::Create(*Helper::TheContext, "ifcont");
 
     BasicBlock* ElseBB = nullptr;
-    if (Else) {
+    if (Else) 
+    {
         ElseBB = BasicBlock::Create(*Helper::TheContext, "else", TheFunction);
     }
 
     // Create conditional branch.
-    if (Else) {
+    if (Else) 
+    {
         Helper::Builder->CreateCondBr(CondV, ThenBB, ElseBB);
     }
-    else {
+    else 
+    {
         Helper::Builder->CreateCondBr(CondV, ThenBB, MergeBB);
     }
 
@@ -201,14 +211,17 @@ Value* IfExprAST::codegen() {
     Helper::Builder->SetInsertPoint(ThenBB);
     Value* ThenV = Then->codegen();
     if (!ThenV)
+    {
         return nullptr;
+    }
 
     Helper::Builder->CreateBr(MergeBB);
     ThenBB = Helper::Builder->GetInsertBlock();
 
     // Emit else block if it exists.
     Value* ElseV = nullptr;
-    if (Else) {
+    if (Else) 
+    {
         TheFunction->insert(TheFunction->end(), ElseBB);
         Helper::Builder->SetInsertPoint(ElseBB);
         ElseV = Else->codegen();
@@ -219,11 +232,11 @@ Value* IfExprAST::codegen() {
         ElseBB = Helper::Builder->GetInsertBlock();
     }
 
-    // Emit merge block.
+    // Emit merge block
     TheFunction->insert(TheFunction->end(), MergeBB);
     Helper::Builder->SetInsertPoint(MergeBB);
 
-    PHINode* PN = Helper::Builder->CreatePHI(Type::getDoubleTy(*Helper::TheContext), 2, "iftmp");
+    PHINode* PN = Helper::Builder->CreatePHI(Type::getInt32Ty(*Helper::TheContext), 2, "iftmp");
     PN->addIncoming(ThenV, ThenBB);
     if (Else)
         PN->addIncoming(ElseV, ElseBB);
@@ -231,8 +244,194 @@ Value* IfExprAST::codegen() {
     return PN;
 }
 
+/*
+* Generates LLVM IR code for a while loop:
+* Starting with the condition and moving on to the inner part,
+* which is processed similarly to a function.
+*/
+llvm::Value* WhileLoopAST::codegen()
+{
+    llvm::Function* currentFunction = Helper::Builder->GetInsertBlock()->getParent();
+    // Create the basic blocks for the loop 
+    llvm::BasicBlock* conditionB = llvm::BasicBlock::Create(*Helper::TheContext, "while.cond", currentFunction);
+    llvm::BasicBlock* bodyB = llvm::BasicBlock::Create(*Helper::TheContext, "while.body", currentFunction);
+    llvm::BasicBlock* exitB = llvm::BasicBlock::Create(*Helper::TheContext, "while.exit", currentFunction);
 
-Function* PrototypeAST::codegen()
+    // Branch to the condition block to start the loop
+    Helper::Builder->CreateBr(conditionB);
+    
+    // Insert code into the condition block 
+    Helper::Builder->SetInsertPoint(conditionB);
+    
+    // Generate condition code
+    llvm::Value* condition = _condition->codegen();
+    if (!condition)
+    {
+        return nullptr;
+    }
+
+    // Convert condition to a bool expression 
+    condition = Helper::Builder->CreateFCmpONE(condition, ConstantFP::get(*Helper::TheContext, APFloat(0.0)), "whilecond");
+
+    // Branch based on the condition: true -> body, false -> exit 
+    Helper::Builder->CreateCondBr(condition, bodyB, exitB);
+
+
+    // Generate code for loop body
+    Helper::Builder->SetInsertPoint(bodyB);
+
+    // MAKE IT WORK WITH A VECTOR CONTAINER!
+    llvm::Value* bodyV = _body[0]->codegen(); // TEMPORARY!!!!!!!!!!!!!
+    if (!bodyB)
+    {
+        return nullptr;
+    }
+    llvm::Type* bodyT = bodyV->getType();
+
+    // Create PHI node 
+    llvm::PHINode* result = Helper::Builder->CreatePHI(bodyT, 2, "looptmp");
+
+    result->addIncoming(bodyV, Helper::Builder->GetInsertBlock());
+    
+    // Jump back to condition block 
+    Helper::Builder->CreateBr(conditionB);
+
+    // Insert code into exit code 
+    Helper::Builder->SetInsertPoint(exitB);
+
+    return result;
+}
+
+llvm::Value* DoWhileLoopAST::codegen()
+{
+    llvm::Function* currentFunction = Helper::Builder->GetInsertBlock()->getParent();
+
+    // Create basic blocks for loops' body, condition and exit
+    llvm::BasicBlock* bodyB = llvm::BasicBlock::Create(*Helper::TheContext, "dowhile.body", currentFunction);
+    llvm::BasicBlock* conditionB = llvm::BasicBlock::Create(*Helper::TheContext, "dowhile.cond", currentFunction);
+    llvm::BasicBlock* exitB = llvm::BasicBlock::Create(*Helper::TheContext, "dowhile.exit", currentFunction);
+
+    // Create banch for loops' body
+    Helper::Builder->CreateBr(bodyB);
+
+    // Insert body code
+    Helper::Builder->SetInsertPoint(bodyB);
+
+    // Generate body code
+    llvm::Value* bodyV = _body[0]->codegen(); // TEMPORARY!!!!!!!!!!!!!!!!
+    if (!bodyB)
+    {
+        return nullptr;
+    }
+    llvm::Type* bodyT = bodyV->getType();
+
+    llvm::PHINode* result = Helper::Builder->CreatePHI(bodyT, 2, "dolooptmp");
+    result->addIncoming(bodyV, Helper::Builder->GetInsertBlock());
+
+    // Handle condition 
+    // Create branch for loops' condition
+    Helper::Builder->CreateBr(conditionB);
+
+    // Insert code
+    Helper::Builder->SetInsertPoint(conditionB);
+
+    // Generate code
+    llvm::Value* conditionV = _condition->codegen();
+    if (!conditionB)
+    {
+        return nullptr;
+    }
+
+    conditionV = Helper::Builder->CreateFCmpONE(conditionV, ConstantFP::get(*Helper::TheContext, APFloat(0.0)), "dowhilecond");
+
+    // Branch based on the condition: true -> body, false -> exit 
+    Helper::Builder->CreateCondBr(conditionV, bodyB, exitB);
+
+    // Insert code into exit code 
+    Helper::Builder->SetInsertPoint(exitB);
+
+    return result;
+}
+
+llvm::Value* ForLoopAST::codegen()
+{
+    llvm::Function* currentFunction = Helper::Builder->GetInsertBlock()->getParent();
+
+    // Create basic blocks for loops' body, condition and exit
+    llvm::BasicBlock* headerB = llvm::BasicBlock::Create(*Helper::TheContext, "for.header", currentFunction);
+    llvm::BasicBlock* exitB = llvm::BasicBlock::Create(*Helper::TheContext, "for.exit", currentFunction);
+    llvm::BasicBlock* bodyB = llvm::BasicBlock::Create(*Helper::TheContext, "for.body", currentFunction);
+    llvm::BasicBlock* latchB = llvm::BasicBlock::Create(*Helper::TheContext, "for.latch", currentFunction);
+
+    // Create branch for loop
+    Helper::Builder->CreateBr(headerB);
+    // Insert entry code
+    Helper::Builder->SetInsertPoint(headerB);
+
+    // Generate code for loops' header: initilization and condition
+    llvm::Value* initV = _condInit->codegen();
+    if (!initV)
+    {
+        return nullptr;
+    }
+
+    // Create PHI node for loop iterator
+    llvm::Type* initT = initV->getType();
+    llvm::PHINode* iterator = Helper::Builder->CreatePHI(initT, 2, "fortmpit");
+    iterator->addIncoming(initV, headerB); // Initial value comes from entry block 
+
+
+    llvm::Value* condV = _condC->codegen();
+    if (!condV)
+    {
+        return nullptr;
+    }
+
+    // Convert condition to a boolean value
+    condV = Helper::Builder->CreateFCmpONE(condV, ConstantFP::get(*Helper::TheContext, APFloat(0.0)), "forcond");
+
+
+    // Create conditional branch: true -> body, false -> exit
+    Helper::Builder->CreateCondBr(condV, bodyB, exitB);
+
+    // Insert code into the body block
+    Helper::Builder->SetInsertPoint(bodyB);
+
+    llvm::Value* bodyV = _body[0]->codegen(); // TEMPORARY!!!!
+    if (!bodyV)
+    {
+        return nullptr;
+    }
+
+    // After executing body, go to latch block
+    Helper::Builder->CreateBr(latchB);
+
+    // Insert code into latch block 
+    Helper::Builder->SetInsertPoint(latchB);
+
+    llvm::Value* condStepV = _condStep->codegen();
+    if (!condStepV)
+    {
+        return nullptr;
+    }
+
+    // Compute the new iterator value
+    llvm::Value* nextVal = Helper::Builder->CreateAdd(iterator, condStepV, "nextVal"); // !NOTE! Only supports increment for now
+        
+    // Add new value to PHI node
+    iterator->addIncoming(nextVal, latchB);
+    
+    // Jump back to header to re-evaluate the condition
+    Helper::Builder->CreateBr(headerB);
+
+    // Insert code into exit block 
+    Helper::Builder->SetInsertPoint(exitB);
+    // Handle return value!!! need to return something in order to print anything!
+    return bodyV;
+}
+
+
+llvm::Function* PrototypeAST::codegen()
 {
     // TO-DO make that it would not only work eith double
     // Make the function type:  double(double,double) etc.
@@ -266,46 +465,50 @@ Function* FunctionAST::codegen()
     Helper::FunctionProtos[Proto->getName()] = std::move(Proto);
     Function* TheFunction = Helper::getFunction(P.getName());
     if (!TheFunction)
+    {
         return nullptr;
+    }
 
     // Create a new basic block to start insertion into.
     BasicBlock* BB = BasicBlock::Create(Helper::getContext(), "entry", TheFunction);
     Helper::getBuilder().SetInsertPoint(BB);
 
-
-    // Record the function arguments in the NamedValues map.
-    // TODO - add scope to variebles
-    //for (auto& Arg : TheFunction->args())
-    //    Symbol newSymbol = Symbol(std::string(Arg.getName()), &Arg)
-    //    SymbolTable   = &Arg;
-
-    if (Value* functionBodeyIR = Body->codegen()) {
-
-        Value* RetVal = ReturnValue->codegen();
-
-        // Finish off the function.
-        if (returnType == "void")
+    for (const auto& expr : Body)
+    {
+        if (!expr->codegen())
         {
-            Helper::Builder->CreateRetVoid();
+            TheFunction->eraseFromParent();
+            return nullptr;
         }
-        else
-        {
-            Helper::Builder->CreateRet(RetVal);
-        }
-
-        // Validate the generated code, checking for consistency.
-        verifyFunction(*TheFunction);
-
-        // Run the optimizer on the function.
-        // not now for debugging porpuses
-        // Helper::TheFPM->run(*TheFunction, *Helper::TheFAM);
-
-        return TheFunction;
     }
 
-    // Error reading body, remove function.
-    TheFunction->eraseFromParent();
-    return nullptr;
+    llvm::Value* retVal = nullptr;
+    if (ReturnValue)
+    {
+        retVal = ReturnValue->codegen();
+        if (!retVal)
+        {
+            TheFunction->eraseFromParent();
+            return nullptr;
+        }
+    }
+    
+    if (returnType == "void")
+    {
+        Helper::getBuilder().CreateRetVoid();
+    }
+    else if (retVal)
+    {
+        Helper::getBuilder().CreateRet(retVal);
+    }
+    else
+    {
+        TheFunction->eraseFromParent();
+        throw std::runtime_error("Non-void function missing a return value");
+    }
+
+    llvm::verifyFunction(*TheFunction);
+    return TheFunction;
 }
 
 Value* BinaryExprAST::codegen()
@@ -337,6 +540,38 @@ Value* BinaryExprAST::codegen()
     }
 }
 
+llvm::Value* UnaryOpExprAST::codegen()
+{
+    llvm::Value* L = _LHS->codegen(); 
+    if (!L)
+    {
+        return nullptr;
+    }
+
+    //llvm::Value* oldV = nullptr;
+    // parse unary operator
+    switch (_op)
+    {
+    case ADDITION:
+        // Save the current value (used in the expression result)
+        //oldV = L;
+
+        // Increment variable
+        return Helper::Builder->CreateAdd(L, llvm::ConstantInt::get(L->getType(), 1), "increment");
+        //return oldV;
+    case SUBTRACTION:       
+        // Save the current value (used in the expression result)
+        //oldV = L;
+
+        // Decrese variable
+        return Helper::Builder->CreateAdd(L, llvm::ConstantInt::get(L->getType(), 1), "decrement");
+        //return oldV;
+    default:
+        throw SyntaxError("Invalid unary oprator");
+    }
+    return nullptr;
+}
+
 Value* CallExprAST::codegen()
 {
     // Look up the name in the global module table.
@@ -366,3 +601,5 @@ Value* VoidAst::codegen()
 {
     return nullptr;
 }
+
+

@@ -9,7 +9,7 @@ TopLevelParser::TopLevelParser(const std::vector<Token>& tokens) :
 void TopLevelParser::HandleTopLevelExpression()
 {
     // Evaluate a top-level expression into an anonymous function.
-    if (auto FnAST = parser.ParseTopLevelExpr()) {
+    if (auto FnAST = parser.parseTopLevelExpr()) {
         if (FnAST->codegen()) {
             Helper::TheModule->print(llvm::errs(), nullptr); // Print IR here
             // Create a ResourceTracker to track JIT'd memory allocated to our
@@ -52,9 +52,9 @@ bool TopLevelParser::isFunctionDecleration()
     return false;
 }
 
-void TopLevelParser::HandeleDefinition()
+void TopLevelParser::HandleDefinition()
 {
-    if (auto FnAST = parser.ParseDefinition()) {
+    if (auto FnAST = parser.parseDefinition()) {
         if (auto* FnIR = FnAST->codegen()) {
             fprintf(stderr, "Read function definition:");
             FnIR->print(errs());
@@ -81,14 +81,15 @@ void TopLevelParser::mainLoop()
         case TYPE_DECLERATION:
             if (isFunctionDecleration())
             {
-                HandeleDefinition();
+                HandleDefinition();
             }
             break;
         case R_CURLY_BRACK:
             parser.consume();
             break;
         default:
-            HandleTopLevelExpression();
+            std::cerr << "WTF is wrong now ?!" << std::endl;
+            //HandleTopLevelExpression();
         }
     }
 }
