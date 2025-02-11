@@ -54,7 +54,7 @@ bool TopLevelParser::isFunctionDecleration()
 
 void TopLevelParser::HandleDefinition()
 {
-    if (auto FnAST = parser.parseDefinition()) {
+    if (auto FnAST = parser.parseFunctionDefinition()) {
         if (auto* FnIR = FnAST->codegen()) {
             fprintf(stderr, "Read function definition:");
             FnIR->print(errs());
@@ -65,6 +65,37 @@ void TopLevelParser::HandleDefinition()
         }
     }
     else {
+        // Skip token for error recovery.
+        parser.consume();
+    }
+}
+
+bool TopLevelParser::isStructDefinition()
+{
+    parser.consume(2); // Move past 'struct' and its' name
+    if (parser.currentToken().getType() == L_CURLY_BRACK)
+    {
+        parser.consume(-2);
+        return true;
+    }
+    parser.consume(-2);
+    return false;
+}
+
+void TopLevelParser::HandleStructDefinition()
+{
+    if (auto structAST = parser.parseStructDefinition())
+    {
+        if (auto* structIR = structAST->codegen())
+        {
+            fprintf(stderr, "Read function definition:");
+            fprintf(stderr, "\n");
+            Helper::ExitOnErr(Helper::TheJIT->addModule(
+                llvm::orc::ThreadSafeModule(std::move(Helper::TheModule), std::move(Helper::TheContext))));
+        }
+    }
+    else
+    {
         // Skip token for error recovery.
         parser.consume();
     }
@@ -86,6 +117,12 @@ void TopLevelParser::mainLoop()
             break;
         case R_CURLY_BRACK:
             parser.consume();
+            break;
+        case STRUCT:
+            if (isStructDefinition())
+            {
+                HandleStructDefinition();
+            }
             break;
         default:
             std::cerr << "WTF is wrong now ?!" << std::endl;

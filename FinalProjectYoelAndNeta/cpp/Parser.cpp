@@ -149,12 +149,12 @@ std::unique_ptr<ExprAST> Parser::ptrAssignmentParsing()
 		consume(); 
 
 		std::string pointedToVar = Helper::removeSpecialCharacter(currentToken().getLiteral());
-		auto PTVit = Helper::SymboTable.find(pointedToVar);
-		if (Helper::SymboTable.end() == PTVit)
+		auto PTVit = Helper::SymbolTable.find(pointedToVar);
+		if (Helper::SymbolTable.end() == PTVit)
 		{
 			throw ParserError("can't point to non-existing variable --> " + pointedToVar);
 		}
-		llvm::AllocaInst* allocInst = Helper::SymboTable[pointedToVar];
+		llvm::AllocaInst* allocInst = Helper::SymbolTable[pointedToVar];
 
 		Helper::addSymbol(var_name, type);
 
@@ -338,9 +338,28 @@ std::unique_ptr<ExprAST> Parser::parseIntagerNumberExpr()
 	return std::move(Result);
 }
 
+bool Parser::isStructVariable(const std::string& varName) {
+	auto it = Helper::SymbolTable.find(varName);
+	if (it == Helper::SymbolTable.end()) {
+		return false;  // Variable not found
+	}
+
+	llvm::AllocaInst* alloca = it->second;
+	llvm::Type* varType = alloca->getAllocatedType();
+
+	return varType->isStructTy();  // Check if it's a struct type
+}
+
 std::unique_ptr<ExprAST> Parser::parseIdentifierExpr()
 {
 	std::string IdName = currentToken().getLiteral();
+	
+	// Check for struct
+	if (isStructVariable(IdName))
+	{
+		// Handle struct
+		return parseStructAssignment();
+	}
 
 	consume(); // eat identifier.
 
@@ -444,6 +463,8 @@ std::unique_ptr<ExprAST> Parser::parsePrimary()
 		return parseDoWhileLoop();
 	case FOR_LOOP:
 		return parseForLoop();
+	case STRUCT:
+		return parseStruct();
 	default:
 		throw SyntaxError("Undefined Sentence begining");
 	}
@@ -545,14 +566,61 @@ std::unique_ptr<ExprAST> Parser::parseForLoop()
 	return std::make_unique<ForLoopAST>(std::move(body), std::move(condInit), std::move(condC), std::move(condInc));
 }
 
-//std::unique_ptr<ExprAST> Parser::parseForLoopCondition()
-//{
-//	// Parse evaluation
-//	
-//	// Parse condition
-//	
-//	// Parse modification
-//}
+std::unique_ptr<ExprAST> Parser::parseStructDefinition()
+{
+	consume();
+	std::string name = currentToken().getLiteral(); // Name of struct
+	std::string type;
+	std::string nameM; // New struct member name
+
+	consume(2); // Move past name and '{'
+
+	// Get struct members
+	std::vector<Field> members;
+
+	while (currentToken().getType() != R_CURLY_BRACK)
+	{
+		if (std::find(Helper::definedTypes.begin(), Helper::definedTypes.end(), currentToken().getLiteral()) != Helper::definedTypes.end())
+		{
+			std::string type = currentToken().getLiteral();
+			consume();
+			std::string name = currentToken().getLiteral();
+			consume();
+			if (currentToken().getType() == SEMICOLUMN)
+				consume();
+
+			members.push_back({ type, name });
+		}
+		//consume();
+	}
+	consume(2);
+	return std::make_unique<StructDefinitionExprAST>(name, members);
+}
+
+std::unique_ptr<ExprAST> Parser::parseStruct()
+{
+	consume(); // Move past 'struct'
+
+	std::string structT = currentToken().getLiteral();
+	// Check that struct exists
+	if (Helper::StructTable.find(structT) == Helper::StructTable.end())
+	{
+		SyntaxError("Non-existing struct");
+	}
+	consume(); // Move past struct type
+
+	std::string name = currentToken().getLiteral();
+	consume(2); // Move past name and ';'
+
+	return std::make_unique<StructDeclerationExprAST>(structT, name); // LATER
+}
+
+std::unique_ptr<ExprAST> Parser::parseStructAssignment()
+{
+	
+	return std::unique_ptr<ExprAST>();
+}
+
 
 
 std::unique_ptr<PrototypeAST> Parser::parsePrototype()
@@ -564,7 +632,7 @@ std::unique_ptr<PrototypeAST> Parser::parsePrototype()
 	std::cout << "NEW FUNC --> " << FnName << " <--" << std::endl;
 	consume(2);
 	// consume the (
-	std::vector<FuncArg> argsTypesAndNames;
+	std::vector<Field> argsTypesAndNames;
 	while (currentToken().getType() == TYPE_DECLERATION)
 	{
 		std::string type = currentToken().getLiteral();
@@ -582,7 +650,7 @@ std::unique_ptr<PrototypeAST> Parser::parsePrototype()
 	return std::make_unique<PrototypeAST>(FnName, std::move(argsTypesAndNames), returnType);
 }
 
-std::unique_ptr<FunctionAST> Parser::parseDefinition()
+std::unique_ptr<FunctionAST> Parser::parseFunctionDefinition()
 {
 	auto Proto = parsePrototype();
 	if (!Proto)

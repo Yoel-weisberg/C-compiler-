@@ -19,7 +19,7 @@ Value* CharExprAST::codegen()
 
 Value* ptrExprAST::codegen()
 {
-    auto it = Helper::SymboTable.find(_valAsStr);
+    auto it = Helper::SymbolTable.find(_valAsStr);
     llvm::AllocaInst* allocaInst = it->second;
 
     if (!allocaInst) {
@@ -55,7 +55,7 @@ arrExprAST::arrExprAST(const std::string& type, std::string& size, const std::st
 
 Value* arrExprAST::codegen() {
     // Retrieve the pointer to the allocated array
-    AllocaInst* arrayPtr = Helper::SymboTable[_name]; 
+    AllocaInst* arrayPtr = Helper::SymbolTable[_name]; 
     if (!arrayPtr) {
         throw std::runtime_error("Array pointer not found in symbol table.");
     }
@@ -138,7 +138,7 @@ void arrExprAST::initArrayRef(const std::string& val, const std::string& type)
 Value* VariableExprAST::codegen()
 {
     // Lookup the variable in the symbol table
-    AllocaInst* variable = Helper::SymboTable[_name];
+    AllocaInst* variable = Helper::SymbolTable[_name];
     if (!variable)
     {
         throw std::runtime_error("Unknown variable name: " + _name);
@@ -602,4 +602,36 @@ Value* VoidAst::codegen()
     return nullptr;
 }
 
+llvm::Value* StructDefinitionExprAST::codegen()
+{
+    llvm::LLVMContext& Context = Helper::getContext();
 
+    // Collect field types
+    std::vector<llvm::Type*> memberTypes;
+    for (const auto& field : _members) {
+        llvm::Type* fieldType = Helper::getLLVMType(field.Type, Context);
+        memberTypes.push_back(fieldType);
+    }
+
+    // Create the struct type
+    llvm::StructType* structType = llvm::StructType::create(Context, memberTypes, _name);
+
+    // Store in symbol table (for future reference)
+    Helper::StructTable[_name] = structType;
+    structType->print(errs());
+    return nullptr;
+}
+
+llvm::Value* StructDeclerationExprAST::codegen()
+{
+    llvm::LLVMContext& Context = Helper::getContext();
+    llvm::IRBuilder<>& builder = Helper::getBuilder();
+
+    auto it = Helper::StructTable.find(_type);
+    llvm::StructType* type = it->second;
+
+    llvm::AllocaInst* alloca = builder.CreateAlloca(type, nullptr, _name);
+
+    Helper::SymbolTable[_name] = alloca;
+    return alloca;
+}

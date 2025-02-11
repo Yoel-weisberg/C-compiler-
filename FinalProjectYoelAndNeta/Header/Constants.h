@@ -38,6 +38,7 @@ enum Tokens_type {
 	INCREMENT,
 	DECREMENT,
 	STRUCT,
+	DOT,
 	// YET TO BE SUPPORTED:
 	NOT,
 	UNARY_MINUS,

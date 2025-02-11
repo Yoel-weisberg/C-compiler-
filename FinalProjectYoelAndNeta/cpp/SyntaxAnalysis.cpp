@@ -274,6 +274,12 @@ int SyntaxAnalysis::checkFunctionDecleration(int& pos)
 
 int SyntaxAnalysis::checkIdentifier(int& pos)
 {
+	// Check for struct member assignment
+	if (_tokens[pos].getLiteral().find(".") != std::string::npos)
+	{
+		return 0;
+	}
+
 	// move past the identifier itself
 	pos++;
 	if (_tokens[pos].getType() == LPAREN)
@@ -575,10 +581,15 @@ int SyntaxAnalysis::checkStructStructure(int& pos)
 	}
 
 	pos++;
-	// Ensure the next token is a left curly brace "{"
-	if (_tokens[pos].getType() != L_CURLY_BRACK)
+	// Check for struct Allocation
+	if (_tokens[pos].getType() == IDENTIFIER && _tokens[pos + 1].getType() == SEMICOLUMN)
 	{
-		throw SyntaxError("Expected '{' after 'else'", pos);
+		return pos + 2; 
+	}
+	// Ensure the next token is a left curly brace "{"
+	else if (_tokens[pos].getType() != L_CURLY_BRACK)
+	{
+		throw SyntaxError("Expected '{' after 'struct'", pos);
 	}
 
 	pos++;
@@ -588,5 +599,5 @@ int SyntaxAnalysis::checkStructStructure(int& pos)
 	{
 		throw SyntaxError("Unmatched '{' in 'structure' block", pos);
 	}
-	return pos;
+	return pos + 1;
 }

@@ -9,5 +9,8 @@ private:
 	void HandleTopLevelExpression();
 	bool isFunctionDecleration();
 	void HandleDefinition();
+
+	bool isStructDefinition();
+	void HandleStructDefinition();
 	Parser parser;
 };

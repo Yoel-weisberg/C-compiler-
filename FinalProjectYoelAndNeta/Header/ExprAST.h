@@ -29,8 +29,9 @@
 #include "Helper.h"
 
 class Helper;
-
-struct FuncArg
+ 
+// Used for both function arguments and struct members
+struct Field
 {
 	std::string Type;
 	std::string Name;
@@ -217,10 +218,10 @@ public:
 class PrototypeAST
 {
 	std::string Name;
-	std::vector<FuncArg> Args;
+	std::vector<Field> Args;
 	std::string returnType;
 public:
-	PrototypeAST(const std::string& Name, std::vector<FuncArg> Args, std::string returnType)
+	PrototypeAST(const std::string& Name, std::vector<Field> Args, std::string returnType)
 		: Name(Name), Args(std::move(Args)), returnType(returnType) {}
 
 	llvm::Function* codegen();
@@ -264,6 +265,25 @@ public:
 };
 
 
+class StructDefinitionExprAST : public ExprAST
+{
+	std::string _name; // Struct name
+	std::vector<Field> _members; // Struct members
+	
+public:
+	StructDefinitionExprAST(const std::string& name, std::vector<Field> members) : _name(name), _members(members){}
+	llvm::Value* codegen() override;
+};
+
+
+class StructDeclerationExprAST : public ExprAST
+{
+	std::string _name;
+	std::string _type;
+public:
+	StructDeclerationExprAST(const std::string& type, const std::string& name) : _type(type), _name(name){}
+	llvm::Value* codegen() override;
+};
 // code like a = 5;
 //class RedefinitionExprAst : public ExprAST
 //{
