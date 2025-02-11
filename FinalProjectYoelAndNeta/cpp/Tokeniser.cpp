@@ -53,9 +53,14 @@ std::vector<Token> Tokeniser::getTokens() const
 
 Tokens_type Tokeniser::categoriseLiteral(const std::string& literal)
 {
+	std::cout << "Literal: " << literal << std::endl;
 	if (Helper::literalToType.find(literal) != Helper::literalToType.end())
 	{
 		return Helper::literalToType.find(literal)->second;
+	}
+	else if (Helper::Keywords.find(literal) != Helper::Keywords.end())
+	{
+		return Helper::Keywords.find(literal)->second;
 	}
 	else if (isNumber(literal))
 	{
@@ -69,18 +74,6 @@ Tokens_type Tokeniser::categoriseLiteral(const std::string& literal)
 	else if (std::find(Helper::definedTypes.begin(), Helper::definedTypes.end(), literal) != Helper::definedTypes.end())
 	{
 		return TYPE_DECLERATION;
-	}
-	else if (literal == "if")
-	{
-		return IF_WORD;
-	}
-	else if (literal == "else")
-	{
-		return ELSE;
-	}
-	else if(literal == "return")
-	{
-		return RETURN_STATEMENT;
 	}
 	else if (!literal.empty())
 	{

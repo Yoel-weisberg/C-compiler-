@@ -29,11 +29,31 @@ private:
 	int arrTypeVariableDefinitionStructure(int pos);
 	//bool innerArrInit(int pos, int arrType);
 
-	int checkIfStructure(int& pos);
-	int checkConditionStructure(int& pos);
+
 	int checkFunctionDecleration(int& pos);
 	int checkIdentifier(int& pos);
+
+
+	// a function to check if a decleration is of a function or a varieble
+	int checkFlowControlStructure(int& pos);
+	int checkLoopStructure(int& pos);
+
+	// Control Flow checking (if, else...)
+	int checkIfStructure(int& pos, int chrIndex);
+	int checkElseStructure(int& pos, int chrIndex);
+
+	// Loop checking
+	int checkForLoopStructure(int& pos);
+	int checkWhileLoopStructure(int& pos);
+	int checkDoWhileStructure(int& pos);
+	int checkForLoopInitialization(int& pos);
 	
+	int checkStructStructure(int& pos);
+
+	// Helper methods
+	std::pair<int, int> findMatchingCurlB(int& pos);
+	int checkConditionStructure(int& pos, bool ifForLoop = false);
+
 	// a function to check if a decleration is of a function or a varieble
 	// 
 };

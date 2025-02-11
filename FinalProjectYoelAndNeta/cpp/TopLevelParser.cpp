@@ -9,7 +9,7 @@ TopLevelParser::TopLevelParser(const std::vector<Token>& tokens) :
 void TopLevelParser::HandleTopLevelExpression()
 {
     // Evaluate a top-level expression into an anonymous function.
-    if (auto FnAST = parser.ParseTopLevelExpr()) {
+    if (auto FnAST = parser.parseTopLevelExpr()) {
         if (FnAST->codegen()) {
             Helper::TheModule->print(llvm::errs(), nullptr); // Print IR here
             // Create a ResourceTracker to track JIT'd memory allocated to our
@@ -52,9 +52,9 @@ bool TopLevelParser::isFunctionDecleration()
     return false;
 }
 
-void TopLevelParser::HandeleDefinition()
+void TopLevelParser::HandleDefinition()
 {
-    if (auto FnAST = parser.ParseDefinition()) {
+    if (auto FnAST = parser.parseFunctionDefinition()) {
         if (auto* FnIR = FnAST->codegen()) {
             fprintf(stderr, "Read function definition:");
             FnIR->print(errs());
@@ -64,6 +64,37 @@ void TopLevelParser::HandeleDefinition()
     else {
         // Skip token for error recovery.
         
+        parser.consume();
+    }
+}
+
+bool TopLevelParser::isStructDefinition()
+{
+    parser.consume(2); // Move past 'struct' and its' name
+    if (parser.currentToken().getType() == L_CURLY_BRACK)
+    {
+        parser.consume(-2);
+        return true;
+    }
+    parser.consume(-2);
+    return false;
+}
+
+void TopLevelParser::HandleStructDefinition()
+{
+    if (auto structAST = parser.parseStructDefinition())
+    {
+        if (auto* structIR = structAST->codegen())
+        {
+            fprintf(stderr, "Read function definition:");
+            fprintf(stderr, "\n");
+            Helper::ExitOnErr(Helper::TheJIT->addModule(
+                llvm::orc::ThreadSafeModule(std::move(Helper::TheModule), std::move(Helper::TheContext))));
+        }
+    }
+    else
+    {
+        // Skip token for error recovery.
         parser.consume();
     }
 }
@@ -79,14 +110,21 @@ void TopLevelParser::mainLoop()
         case TYPE_DECLERATION:
             if (isFunctionDecleration())
             {
-                HandeleDefinition();
+                HandleDefinition();
             }
             break;
-        case R_CURLY_PRAN:
+        case R_CURLY_BRACK:
             parser.consume();
             break;
+        case STRUCT:
+            if (isStructDefinition())
+            {
+                HandleStructDefinition();
+            }
+            break;
         default:
-            HandleTopLevelExpression();
+            std::cerr << "WTF is wrong now ?!" << std::endl;
+            //HandleTopLevelExpression();
         }
     }
 }

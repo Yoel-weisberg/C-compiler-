@@ -57,6 +57,7 @@
 #include "SymbolTable.h"
 
 class PrototypeAST;
+class StructDefinitionExprAST;
 
 
 using namespace llvm;
@@ -64,12 +65,13 @@ using namespace llvm;
 class Helper
 {
 public:
-    // llvm related
-    static void InitializeModuleAndManagers();
+    // LLVM related
+    static void InitializeModuleAndManagers();  
     static std::unique_ptr<LLVMContext> TheContext;
     static std::unique_ptr<Module> TheModule;
     static std::unique_ptr<IRBuilder<>> Builder;
-    static std::map<std::string, AllocaInst*> NamedValues;
+    static std::map<std::string, AllocaInst*> SymbolTable; // Symbol Table
+    static std::map<std::string, llvm::StructType*> StructTable;
     static std::unique_ptr<llvm::orc::KaleidoscopeJIT> TheJIT;
     static std::unique_ptr<FunctionPassManager> TheFPM;
     static std::unique_ptr<LoopAnalysisManager> TheLAM;
@@ -110,7 +112,8 @@ public:
     // Data members
     static std::vector<std::string> definedTypes;
     static std::map<std::string, Tokens_type> literalToType;
-    static SymbolTable symbolTable;
+    //static SymbolTable symbolTable;
+    static std::map<std::string, Tokens_type> Keywords;
 
     // memory related 
     static llvm::Function* MallocFunc;

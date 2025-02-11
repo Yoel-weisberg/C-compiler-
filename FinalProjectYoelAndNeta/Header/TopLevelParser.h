@@ -8,6 +8,9 @@ public:
 private:
 	void HandleTopLevelExpression();
 	bool isFunctionDecleration();
-	void HandeleDefinition();
+	void HandleDefinition();
+
+	bool isStructDefinition();
+	void HandleStructDefinition();
 	Parser parser;
 };
