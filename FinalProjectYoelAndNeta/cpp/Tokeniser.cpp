@@ -7,34 +7,38 @@ Tokeniser::Tokeniser(const std::string& raw_code_str)
 
 	for (int i = 0; i < raw_code_str.size(); i++)
 	{
-		if ((raw_code_str[i] == BLANK || raw_code_str[i] == '\n') && !currentLiteral.empty()) // If it's a seperator 
+		if ((raw_code_str[i] == BLANK || raw_code_str[i] == NEW_LINE_CHAR) && !currentLiteral.empty()) // If it's a seperator 
 		{
 			this->_tokens.push_back({ currentLiteral, categoriseLiteral(currentLiteral) });
-			currentLiteral = "";
+			currentLiteral = EMPTY_STR;
 		} // Any other valid char except for a digit
 		else if (Helper::literalToType.find(std::string(1, raw_code_str[i])) != Helper::literalToType.end())
 		{
 			if (!currentLiteral.empty())  this->_tokens.push_back({ currentLiteral, categoriseLiteral(currentLiteral) });
 			this->_tokens.push_back({ std::string(1, raw_code_str[i]), categoriseLiteral(std::string(1, raw_code_str[i])) });
-			currentLiteral = "";
+			currentLiteral = EMPTY_STR;
 		}
 		else if (Helper::literalToType.find(std::string(1, raw_code_str[i])) != Helper::literalToType.end())
 		{
 			currentLiteral = raw_code_str.substr(i, DIS_BETWEEN_SINGLE_QOUTES + 1);
 			if (!currentLiteral.empty())  this->_tokens.push_back({ currentLiteral, categoriseLiteral(currentLiteral) });
 			i += DIS_BETWEEN_SINGLE_QOUTES; // Skip char initilization 
-			currentLiteral = "";
-		}
+			currentLiteral = EMPTY_STR;
+		}/*
+		else if (raw_code_str[i] == CURL_BR_L_LIT)
+		{
+
+		}*/
 		else if ((i == raw_code_str.size() - 1)) // Check if end is reached
 		{
 			currentLiteral += raw_code_str[i];
 			if (!(currentLiteral.empty() || currentLiteral[0] == BLANK)) // If not empty
 			{
 				this->_tokens.push_back({ currentLiteral, categoriseLiteral(currentLiteral) });
-				currentLiteral = "";
+				currentLiteral = EMPTY_STR;
 			}
 		}
-		else if (raw_code_str[i] != ' ' && raw_code_str[i] != '\n')
+		else if (raw_code_str[i] != BLANK && raw_code_str[i] != NEW_LINE_CHAR)
 		{
 			currentLiteral += raw_code_str[i];
 		}

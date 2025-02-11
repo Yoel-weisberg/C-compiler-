@@ -54,7 +54,7 @@ else()
     endif()
 endif()
 
-message(STATUS "Using LLVM in: "${LLVM_DIR}"")
+message(STATUS "Using LLVM in: "${LLVM_DIR}EMPTY_STR)
 
 # Locate LLVMConfig.cmake
 find_package(LLVM REQUIRED CONFIG PATHS "${LLVM_DIR}/lib/cmake/llvm")

@@ -22,7 +22,7 @@ void Preprocess::removeComments()
         if (_fileRawContent[pos] == '/' && _fileRawContent[pos + 1] == '/')
         {
             // Skip until end of line
-            while (pos < _fileRawContent.size() && _fileRawContent[pos] != '\n') pos++;
+            while (pos < _fileRawContent.size() && _fileRawContent[pos] != NEW_LINE_CHAR) pos++;
         }
         // multi-line comment
         else if (_fileRawContent[pos] == '/' && _fileRawContent[pos + 1] == '*') {
@@ -66,7 +66,7 @@ void Preprocess::handleMacroVariables() {
             std::string macroName;
 
             // Extract the macro name
-            while (pos < _fileRawContent.size() && (ch = _fileRawContent[pos++]) != ' ' && ch != '\n') {
+            while (pos < _fileRawContent.size() && (ch = _fileRawContent[pos++]) != ' ' && ch != NEW_LINE_CHAR) {
                 macroName += ch;
             }
 
@@ -78,7 +78,7 @@ void Preprocess::handleMacroVariables() {
                 while (pos < _fileRawContent.size() && (ch = _fileRawContent[pos]) == ' ') pos++;
 
                 // Get macro key
-                while (pos < _fileRawContent.size() && (ch = _fileRawContent[pos]) != ' ' && ch != '\n' && ch != '(') {
+                while (pos < _fileRawContent.size() && (ch = _fileRawContent[pos]) != ' ' && ch != NEW_LINE_CHAR && ch != '(') {
                     macroKey += ch;
                     pos++;
                 }
@@ -94,7 +94,7 @@ void Preprocess::handleMacroVariables() {
                     while (ch != ')'  && pos < _fileRawContent.size())
                     {
                         ch = _fileRawContent[pos++];
-                        if (ch == ',' || ch == ')')
+                        if (ch == COMMA_LITERAL || ch == ')')
                         {
                             if (!currentArg.empty())
                             {
@@ -111,7 +111,7 @@ void Preprocess::handleMacroVariables() {
                     if (ch != ')') throw SyntaxError("Excepted a )", pos);
 
                     // reding the function until end line
-                    while (ch != '\n' && pos < _fileRawContent.size())
+                    while (ch != NEW_LINE_CHAR && pos < _fileRawContent.size())
                     {
                         ch = _fileRawContent[pos++];
                         functionBody += ch;
@@ -135,7 +135,7 @@ void Preprocess::handleMacroVariables() {
                             continue; // Skip the '\' character
                         }
 
-                        if (ch == '\n') {
+                        if (ch == NEW_LINE_CHAR) {
                             currentLine++;
                             if (!multiLine) gotEnd = true; // End if not a multi-line macro
                             multiLine = false; // Reset multi-line flag
@@ -165,7 +165,7 @@ void Preprocess::handleMacroVariables() {
                 while (pos < _fileRawContent.size() && (ch = _fileRawContent[pos]) == ' ') pos++;
 
                 // Get file name
-                while (pos < _fileRawContent.size() && (ch = _fileRawContent[pos++]) != ' ' && ch != '\n') {
+                while (pos < _fileRawContent.size() && (ch = _fileRawContent[pos++]) != ' ' && ch != NEW_LINE_CHAR) {
                     file_name += ch;
                 }
                 file_content = manageIncludes(file_name);
@@ -195,7 +195,7 @@ std::string Preprocess::replaceMacro() {
         (ch == '"' && !singleQuote) ? isThereQuotes = !isThereQuotes : true;
         (ch == '\'' && !isThereQuotes) ? singleQuote = !singleQuote : true;
 
-        if (((ch == ' ' || ch == '\n') && !isThereQuotes && !currentBlock.empty()) || Helper::literalToType.find(std::string(ch, 1)) != Helper::literalToType.end()) {
+        if (((ch == ' ' || ch == NEW_LINE_CHAR) && !isThereQuotes && !currentBlock.empty()) || Helper::literalToType.find(std::string(ch, 1)) != Helper::literalToType.end()) {
             
             codeStream += ch;
             macroTableEntry entry;
@@ -235,10 +235,10 @@ std::string Preprocess::replaceMacro() {
 std::string Preprocess::handleFunctionReplacement(macroTableEntry entry)
 {
     std::vector<std::string> Args;
-    std::string currentArg = "";
+    std::string currentArg = EMPTY_STR;
     char ch = _fileRawContent[_pos];
     int amountOfArgs = 0;
-    std::string codeStream = "";
+    std::string codeStream = EMPTY_STR;
 
     if (_fileRawContent[_pos++] != '(') throw SyntaxError("Excepted a ( in function like macro");
 
@@ -246,7 +246,7 @@ std::string Preprocess::handleFunctionReplacement(macroTableEntry entry)
     while (ch != ')' && _pos < _fileRawContent.size())
     {
         ch = _fileRawContent[_pos++];
-        if (ch == ',' || ch == ')')
+        if (ch == COMMA_LITERAL || ch == ')')
         {
             if (!currentArg.empty())
             {
@@ -262,7 +262,7 @@ std::string Preprocess::handleFunctionReplacement(macroTableEntry entry)
     }
     if (amountOfArgs != entry.args.size()) throw SyntaxError("Unmatched amount of arguments to function like macro");
 
-    currentArg = "";
+    currentArg = EMPTY_STR;
     for (auto ch : entry.value)
     {
         if (ch == ' '|| ch == '(' || ch == ')')

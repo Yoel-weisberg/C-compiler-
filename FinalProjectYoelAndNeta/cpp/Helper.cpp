@@ -1,18 +1,7 @@
 #include "../Header/Helper.h"
 
 // Define static members
-std::vector<std::string> Helper::definedTypes = { "float", "void", "int", "char"};
-
-std::map<std::string, Tokens_type> Helper::Keywords = {
-    {"if", IF_WORD},
-    {"else", ELSE},
-    {"do", DO_WHILE_LOOP},
-    {"while", WHILE_LOOP},
-    {"for", FOR_LOOP},
-    {"return", RETURN_STATEMENT},
-    {"struct", STRUCT}
-};
-
+std::vector<std::string> Helper::definedTypes = { FLOAT_TYPE_LIT , VOID_TYPE_LIT, INT_TYPE_LIT , CHAR_TYPE_LIT};
 std::map<std::string, Tokens_type> Helper::literalToType = {
     {")", RPAREN},
     {"(", LPAREN},
@@ -56,13 +45,14 @@ std::unique_ptr<llvm::StandardInstrumentations> Helper::TheSI = nullptr;
 std::map<std::string, std::unique_ptr<PrototypeAST>> Helper::FunctionProtos;
 llvm::ExitOnError Helper::ExitOnErr;
 llvm::Function* Helper::MallocFunc = nullptr;
+llvm::Function* Helper::ScanfFunc = nullptr;
 
 void Helper::InitializeModuleAndManagers()
 {
     // Open a new context and module.
     TheContext = std::make_unique<LLVMContext>();
     TheModule = std::make_unique<Module>("Yoel and neta JIT", *TheContext);
-    TheModule->setDataLayout(TheJIT->getDataLayout());
+    //TheModule->setDataLayout(TheJIT->getDataLayout());
 
     // Create a new builder for the module.
     Builder = std::make_unique<IRBuilder<>>(*TheContext);
@@ -94,7 +84,8 @@ void Helper::InitializeModuleAndManagers()
     PB.registerFunctionAnalyses(*TheFAM);
     PB.crossRegisterProxies(*TheLAM, *TheFAM, *TheCGAM, *TheMAM);
 
-    //defineMalloc();
+    defineMalloc();
+    defineScanf();
 }
 
 
@@ -177,13 +168,13 @@ llvm::Type* Helper::getLLVMType(std::string var_type, llvm::LLVMContext& Context
 {
     // Determine the type of the array elements from pTT
     llvm::Type* elementType;
-    if (var_type == "int") {
+    if (var_type == INT_TYPE_LIT ) {
         elementType = llvm::Type::getInt32Ty(Context);
     }
-    else if (var_type == "float") {
+    else if (var_type == FLOAT_TYPE_LIT ) {
         elementType = llvm::Type::getFloatTy(Context);
     }
-    else if (var_type == "char") {
+    else if (var_type == CHAR_TYPE_LIT) {
         elementType = llvm::Type::getInt8Ty(Context);
     }
     else {
@@ -193,54 +184,97 @@ llvm::Type* Helper::getLLVMType(std::string var_type, llvm::LLVMContext& Context
     return elementType;
 }
 
-void Helper::defineMalloc()
-{
-
-    llvm::Function* ExistingMalloc = getModule().getFunction("malloc");
-    if (ExistingMalloc) {
-        // If malloc is already defined, do nothing
-        llvm::outs() << "malloc function already exists.\n";
+void Helper::defineMalloc() {
+    // Check if malloc is already declared
+    if (MallocFunc != nullptr) {
         return;
     }
 
-    // setting up the malloc function
+    // Declare malloc in the module
     MallocFunc = llvm::cast<llvm::Function>(
-        TheModule->getOrInsertFunction("malloc", Builder.get()->getInt32Ty(), Builder.get()->getInt32Ty()).getCallee()
+        TheModule->getOrInsertFunction(
+            "malloc",                                   // Function name
+            PointerType::get(Type::getInt8Ty(getContext()), 0),                   // Return type: void*
+            Builder->getInt32Ty()                      // Parameter type: int
+        ).getCallee()
     );
 
-    // Create a Function Signature
-    llvm::FunctionType* FuncType = llvm::FunctionType::get(
-        getBuilder().getInt32Ty(), // Return type: int32
-        { getBuilder().getInt32Ty()}, // Parameter types: (int, int)
-        false // IsVarArg: false (not variadic)
-    );
-
-    // Add the Function to the Module
-    llvm::Function* AddFunction = llvm::Function::Create(
-        FuncType,
-        llvm::Function::ExternalLinkage,
-        "malloc", // Function name
-        getModule()
-    );
-
-    // Name the function parameters
-    llvm::Function::arg_iterator Args = AddFunction->arg_begin();
-    llvm::Value* AmountOfMemory = Args++;
-    AmountOfMemory->setName("amountToAllocate");
-
-    // Step 4: Define the Function's Body
-    llvm::BasicBlock* EntryBlock = llvm::BasicBlock::Create(getContext(), "entry", AddFunction);
-    getBuilder().SetInsertPoint(EntryBlock);
-
-    // Call malloc to allocate space for an int (4 bytes)
-    llvm::Value* HeapMemory = Helper::getBuilder().CreateCall(Helper::MallocFunc, AmountOfMemory, "heap_int");
-
-    // Return the result
-    getBuilder().CreateRet(HeapMemory);
-
-    // Print the module's IR
-    getModule().print(llvm::outs(), nullptr);
+    // Print confirmation
+    llvm::outs() << "Declared malloc function.\n";
 }
+
+void Helper::defineScanf() {
+    // Check if scanf is already declared
+    if (ScanfFunc != nullptr) {
+        return;
+    }
+
+    // Declare scanf in the module
+    ScanfFunc = llvm::cast<llvm::Function>(
+        TheModule->getOrInsertFunction(
+            "scanf",                                           // Function name
+            Builder->getInt32Ty(),                             // Return type: int
+            llvm::PointerType::get(llvm::Type::getInt8Ty(getContext()), 0) // Parameter type: char* (format string)
+        ).getCallee()
+    );
+
+    // Print confirmation
+    llvm::outs() << "Declared scanf function.\n";
+}
+
+void Helper::builfObjectFile()
+{
+    // finding the machines attributes
+    auto TargetTriple = sys::getDefaultTargetTriple();
+    TheModule->setTargetTriple(TargetTriple);
+
+    std::string Error;
+    auto Target = TargetRegistry::lookupTarget(TargetTriple, Error);
+
+    // Print an error and exit if we couldn't find the requested target.
+    // This generally occurs if we've forgotten to initialise the
+    // TargetRegistry or we have a bogus target triple.
+    if (!Target) {
+        errs() << Error;
+        return;
+    }
+
+    auto CPU = "generic";
+    auto Features = "";
+
+    TargetOptions opt;
+    auto TheTargetMachine = Target->createTargetMachine(
+        TargetTriple, CPU, Features, opt, Reloc::PIC_);
+
+    TheModule->setDataLayout(TheTargetMachine->createDataLayout());
+
+    auto Filename = OBJECT_FILE_LOC;
+    std::error_code EC;
+    raw_fd_ostream dest(Filename, EC, sys::fs::OF_None);
+
+    if (EC) {
+        errs() << "Could not open file: " << EC.message();
+        return;
+    }
+
+    legacy::PassManager pass;
+    auto FileType = CodeGenFileType::ObjectFile;
+
+    if (TheTargetMachine->addPassesToEmitFile(pass, dest, nullptr, FileType)) {
+        errs() << "TheTargetMachine can't emit a file of this type";
+        return;
+    }
+
+    pass.run(*TheModule);
+    dest.flush();
+
+    outs() << "Wrote " << Filename << "\n";
+
+}
+
+
+
+
 
     
 llvm::AllocaInst* Helper::allocForNewSymbol(std::string var_name, std::string var_type, const int size, const std::string& pTT)
@@ -254,13 +288,13 @@ llvm::AllocaInst* Helper::allocForNewSymbol(std::string var_name, std::string va
     }
     var_type = Helper::removeSpecialCharacter(var_type);
     // Map variable type to LLVM type
-    if (var_type == "int") {
+    if (var_type == INT_TYPE_LIT ) {
         llvmType = llvm::Type::getInt32Ty(Context);
     }
-    else if (var_type == "float") {
+    else if (var_type == FLOAT_TYPE_LIT ) {
         llvmType = llvm::Type::getFloatTy(Context);
     }
-    else if (var_type == "char") {
+    else if (var_type == CHAR_TYPE_LIT) {
         llvmType = llvm::Type::getInt8Ty(Context);
     }
     else if (var_type == "arr") {
@@ -344,19 +378,19 @@ std::string Helper::removeSpecialCharacter(std::string str)
 
 Type* Helper::getTypeFromString(const std::string type)
 {
-    if (type == "int")
+    if (type == INT_TYPE_LIT )
     {
         return Type::getInt32Ty(Helper::getContext());
     }
-    else if (type == "float")
+    else if (type == FLOAT_TYPE_LIT )
     {
         return Type::getDoubleTy(Helper::getContext());
     }
-    else if (type == "char")
+    else if (type == CHAR_TYPE_LIT)
     {
         return Type::getInt8Ty(Helper::getContext());
     }
-    else if(type == "void")
+    else if(type == VOID_TYPE_LIT)
     {
         return Type::getVoidTy(Helper::getContext());
     }

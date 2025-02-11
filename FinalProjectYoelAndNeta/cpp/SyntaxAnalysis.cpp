@@ -125,15 +125,15 @@ int SyntaxAnalysis::arrTypeVariableDefinitionStructure(int pos)
 
 bool SyntaxAnalysis::doesVariableFitType(const std::string &type, std::string value)
 {
-	if (type == "float")
+	if (type == FLOAT_TYPE_LIT )
 	{
 		return Helper::isFloat(value);
 	}
-	else if (type == "int")
+	else if (type == INT_TYPE_LIT )
 	{
 		return Helper::isInteger(value);
 	}
-	else if (type == "char")
+	else if (type == CHAR_TYPE_LIT)
 	{
 		return Helper::isChar(value);
 	}

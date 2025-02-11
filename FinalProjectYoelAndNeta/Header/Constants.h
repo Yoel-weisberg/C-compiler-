@@ -55,3 +55,32 @@ enum Tokens_type {
 #define INTEGER_AND_FLOAT_SIZE 32
 #define CHAR_SIZE 8
 
+#define COMMA_LITERAL ','
+#define INT_TYPE_LIT "int"
+#define CHAR_TYPE_LIT "char"
+#define FLOAT_TYPE_LIT "float"
+#define VOID_TYPE_LIT "void"
+#define ADD_TMP "addtmp"
+#define SUB_TMP "subtmp"
+#define MUL_TMP "multmp"
+#define CMP_TMP "cmptmp"
+#define BOOL_TMP "booltmp"
+#define CALL_TMP "calltmp"
+#define PRECEDENCE_OR 2
+#define PRECEDENCE_AND 3
+#define PRECEDENCE_LOWER_THEN 4
+#define PRECEDENCE_HIGHER_THEN 5
+#define PRECEDENCE_ADDITION 20
+#define PRECEDENCE_SUBTRACTION 20
+#define PRECEDENCE_MULTIPLICATION 30
+#define PRECEDENCE_DIVISION 30
+#define ANNONIMUS_FUNC_LIT "__anon_expr"
+#define EMPTY_STR ""
+#define NEW_LINE_CHAR '\n'
+#define BLANK ' ' // Empty space
+#define DIS_BETWEEN_SINGLE_QOUTES 2
+#define NEW_LINE_STR "\n"
+
+#define OBJECT_FILE_LOC "object.o"
+#define EXE_FILE_LOC "executable.exe"
+#define LLD_FILE "ld.lld.exe"

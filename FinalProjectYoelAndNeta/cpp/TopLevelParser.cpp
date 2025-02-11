@@ -59,13 +59,11 @@ void TopLevelParser::HandleDefinition()
             fprintf(stderr, "Read function definition:");
             FnIR->print(errs());
             fprintf(stderr, "\n");
-            Helper::ExitOnErr(Helper::TheJIT->addModule(
-                llvm::orc::ThreadSafeModule(std::move(Helper::TheModule), std::move(Helper::TheContext))));
-            Helper::InitializeModuleAndManagers();
         }
     }
     else {
         // Skip token for error recovery.
+        
         parser.consume();
     }
 }
