@@ -29,6 +29,16 @@ std::map<std::string, Tokens_type> Helper::literalToType = {
 };
 
 
+std::map<std::string, Tokens_type> Helper::Keywords = {
+    {"if", IF_WORD},
+    {"else", ELSE},
+    {"do", DO_WHILE_LOOP},
+    {"while", WHILE_LOOP},
+    {"for", FOR_LOOP},
+    {"return", RETURN_STATEMENT},
+    {"struct", STRUCT}
+};
+
 std::unique_ptr<llvm::LLVMContext> Helper::TheContext = nullptr;
 std::unique_ptr<llvm::Module> Helper::TheModule = nullptr;
 std::unique_ptr<llvm::IRBuilder<>> Helper::Builder = nullptr;
