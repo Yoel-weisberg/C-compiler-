@@ -13,23 +13,27 @@ std::map<std::string, Tokens_type> Helper::literalToType = {
     {";", SEMICOLUMN},
     {"&&", AND},
     {"||", OR},
-    {"{", L_CURLY_PRAN},
-    {"}", R_CURLY_PRAN},
+    {"{", L_CURLY_BRACK},
+    {"}", R_CURLY_BRACK},
     {">", HIGHER_THEN},
     {"<", LOWER_THEN},
     {"==", EQUELS_CMP},
     {",", COMMA},
-    {"&", AMPERSAND},
     {"[", SQR_BR_L},
-    {"]", SQR_BR_R}
+    {"]", SQR_BR_R},
+    {".", DOT},
+    // Unary Operators:
+    {"&", AMPERSAND},
+    {"++", INCREMENT},
+    {"--", DECREMENT}
 };
 
-SymbolTable Helper::symbolTable;
 
 std::unique_ptr<llvm::LLVMContext> Helper::TheContext = nullptr;
 std::unique_ptr<llvm::Module> Helper::TheModule = nullptr;
 std::unique_ptr<llvm::IRBuilder<>> Helper::Builder = nullptr;
-std::map<std::string, llvm::AllocaInst*> Helper::NamedValues = {};
+std::map<std::string, llvm::AllocaInst*> Helper::SymbolTable = {}; // Symbol Table
+std::map<std::string, llvm::StructType*> Helper::StructTable = {};
 std::unique_ptr<llvm::orc::KaleidoscopeJIT> Helper::TheJIT = nullptr;
 std::unique_ptr<llvm::FunctionPassManager> Helper::TheFPM = nullptr;
 std::unique_ptr<llvm::LoopAnalysisManager> Helper::TheLAM = nullptr;
@@ -158,27 +162,7 @@ uint64_t Helper::hexToDec(std::string& str)
     return res;
 }
 
-//llvm::Type* Helper::getLLVMptrType(std::string var_type, llvm::LLVMContext& Context, std::string var_name)
-//{
-//    llvm::PointerType* llvm_type;
-//    if (var_type == INTEGER)
-//    {
-//        return llvm_type = llvm::PointerType::get(llvm::IntegerType::get(Context, INTEGER_AND_FLOAT_SIZE), 0);
-//    }
-//    else if (var_type == FLOAT)
-//    {
-//        return llvm_type = llvm::PointerType::get(Context, 0);
-//    }
-//    else if (var_type == CHAR)
-//    {
-//        return llvm_type = llvm::PointerType::get(llvm::IntegerType::get(Context, CHAR_SIZE), 0);
-//    }
-//    else
-//    {
-//        std::cerr << "Error: Unsupported variable type '" << var_type << "'.\n";
-//        return nullptr;
-//    }
-//}
+
 
 llvm::Type* Helper::getLLVMType(std::string var_type, llvm::LLVMContext& Context)
 {
@@ -362,14 +346,14 @@ llvm::Value* Helper::getSymbolValue(const std::string& var_name)
 
 bool Helper::addSymbol(std::string var_name, std::string var_type,const std::string& pTT, const int size)
 {
-    if (symbolTable.findSymbol(var_name)) { // NOTE: THIS STATEMENT DOESN'T CONSIDER SCOPES 
+    if (SymbolTable.find(var_name) != SymbolTable.end()) { // NOTE: THIS STATEMENT DOESN'T CONSIDER SCOPES 
                                             // (YET TO BE IMPLEMENTED)
         std::cerr << "Error: Symbol '" << var_name << "' already exists.\n";
         return false; // Symbol already exists
     }
     llvm::AllocaInst* var_address = allocForNewSymbol(var_name, var_type, size, pTT);
 
-    Helper::NamedValues[var_name] = var_address; // Add to symbol table 
+    Helper::SymbolTable[var_name] = var_address; // Add to symbol table 
     printLLVMSymbolTable();
     return true;
 }
@@ -419,7 +403,7 @@ void Helper::printLLVMSymbolTable() {
     std::cout << "| Variable Name | Type    | Address |\n";
     std::cout << "----------------------------------\n";
 
-    for (const auto& entry : Helper::NamedValues) {
+    for (const auto& entry : Helper::SymbolTable) {
         const std::string& varName = entry.first;
         llvm::AllocaInst* allocaInst = entry.second;
 

@@ -39,25 +39,44 @@ public:
 
     // Parse methods
     std::unique_ptr<ExprAST> parse();
+
     std::unique_ptr<ExprAST> parseAssignment();
     std::unique_ptr<ExprAST> ptrAssignmentParsing();
     std::unique_ptr<ExprAST> regularAssignmentParsing();
+
     std::unique_ptr<ExprAST> arrAssignmentParsing(const std::string& type);
+
     std::unique_ptr<ExprAST> parseIfStatement();
-    std::unique_ptr<ExprAST> ParseFloatNumberExpr();
-    std::unique_ptr<ExprAST> ParseIntagerNumberExpr();
-    std::unique_ptr<ExprAST> ParseParenExpr();
-    std::unique_ptr<ExprAST> ParseIdentifierExpr();
-    std::unique_ptr<ExprAST> ParseExpression();
-    std::unique_ptr<ExprAST> ParsePrimary();
-    std::unique_ptr<ExprAST> ParseBinOpRHS(int ExprPrec,
+
+    std::unique_ptr<ExprAST> parseFloatNumberExpr();
+    std::unique_ptr<ExprAST> parseIntagerNumberExpr();
+
+    std::unique_ptr<ExprAST> parseParenExpr();
+    std::unique_ptr<ExprAST> parseIdentifierExpr();
+    std::unique_ptr<ExprAST> parseExpression();
+
+    std::unique_ptr<ExprAST> parsePrimary();
+
+    std::unique_ptr<ExprAST> parseWhileLoop();
+    std::unique_ptr<ExprAST> parseDoWhileLoop();
+    std::unique_ptr<ExprAST> parseForLoop();
+
+    std::unique_ptr<ExprAST> parseStructDefinition();
+    std::unique_ptr<ExprAST> parseStruct();
+    std::unique_ptr<ExprAST> parseStructAssignment();
+    bool isStructVariable(const std::string& varName);
+
+    std::unique_ptr<ExprAST> parseBinOpRHS(int ExprPrec,
         std::unique_ptr<ExprAST> LHS);
-    std::unique_ptr<FunctionAST> ParseTopLevelExpr();
-    std::unique_ptr<PrototypeAST> ParsePrototype();
-    std::unique_ptr<FunctionAST> ParseDefinition();
-    std::unique_ptr<ExprAST> ParseVoid();
+    std::unique_ptr<ExprAST> parseUnaryOp(std::unique_ptr<ExprAST> LHS);
+    std::unique_ptr<FunctionAST> parseTopLevelExpr();
+    std::unique_ptr<PrototypeAST> parsePrototype();
+    std::unique_ptr<FunctionAST> parseFunctionDefinition();
+    std::unique_ptr<ExprAST> parseVoid();
     // Getter for the root AST
     ExprAST* getAst();
+
+    bool isUnaryOp();
 };
 
 #endif // PARSER_H
