@@ -12,9 +12,12 @@ class Server {
 
     getCurrentMouseLocation() {
       // return the current mouse location of the user
+      // reurns the mouse location in a string format  using the 
+      // toJson function on the mouse location
     }
 
     monitorChangesOnMonaco() {
-        
+        // this function would get the return the changes dont to the open file 
+        // or if the window had changed
     }
 }
