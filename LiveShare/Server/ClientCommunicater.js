@@ -1,4 +1,4 @@
-class ClientCommunicater {
+export default class ClientCommunicater {
     constructor(conn, server) {
         this.conn = conn;
         this.server = server;
