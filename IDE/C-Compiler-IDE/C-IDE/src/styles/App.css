@@ -1,0 +1,13 @@
+html, body, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Prevents scrolling issues */
+  }
+  
+  /* Make the app-container flex to fill the screen */
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Take full viewport height */
+ }

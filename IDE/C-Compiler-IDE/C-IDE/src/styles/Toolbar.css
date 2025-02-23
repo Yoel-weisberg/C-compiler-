@@ -1,0 +1,74 @@
+.toolbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color:rgb(43, 43, 43);
+    color: white;
+    /* padding: 10px; */
+    text-align: left;
+    z-index: 1000; /* Ensures it stays above other elements */
+}
+
+.toolbar-button {
+    background: transparent;
+    border: 1px solid rgb(43, 43, 43); /* Subtle border */
+    color: rgb(152, 150, 150);
+    font-size: 16px;
+    font-family: Sans-serif;
+    font: Arial;
+    /* padding: 5px 10px; */
+    /* margin: 0 5px; */
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s ease-in-out;
+}
+
+.toolbar-button:hover {
+    background: rgba(255, 255, 255, 0.2); /* Light hover effect */
+    /* border-color: rgba(20, 15, 68, 0.936); */
+}
+
+.dropdown {
+  position: relative; /* Ensure button is the reference for absolute positioning */
+  display: inline-block; /* Keeps button width tight */
+}
+
+.dropdown-list {
+    position: absolute;
+    background-color:rgb(43, 43, 43);
+    border: 1px solid #a19898;
+    list-style-type: none;
+    /* padding: 5px; */
+    margin-top: 0px;
+    min-width: 100px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 10; /* Ensure dropdown appears above other content */
+    padding: 0; /* Remove any extra padding from the list */
+    margin: 0; 
+  }
+  
+  .dropdown-list li {
+    color: white; /* Set text color */
+    padding: 5px 10px;
+    border: 1px solid  #a19898;
+    cursor: pointer; 
+    /* Change cursor to pointer on hover */
+  }
+  
+  /* Add a hover effect to the list items */
+  .dropdown-list li:hover {
+    background-color: rgba(20, 15, 68, 0.936);
+  }
+
+  .dropdown-list li button {
+    background: none;  /* Remove button background */
+    border: none;      /* Remove button border */
+    color: rgb(152, 150, 150);
+    font-family: Sans-serif;
+    font: Arial;
+    text-align: left;  /* Align text to the left */
+    padding: 0;        /* Remove button padding */
+    cursor: pointer;  /* Keep pointer cursor on hover */
+    white-space: nowrap; /* Prevent text from wrapping to the next line */
+}
