@@ -3,11 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <script type="module" src="Client.js"></script>
-    <script type="module=" src="main.js"></script>
+    <title>Client</title>
+    <script type="module">
+        import {Peer} from "https://esm.sh/peerjs@1.5.4?bundle-deps"
+        window.Peer = Peer;  // Make Peer available globally
+    </script>    
+      <script type="module" src="main.js"></script>
 </head>
 <body>
-    <input />
+    <form id="form" >
+        <input type="text" id="inputBox" placeholder="Enter something" required>
+        <button type="submit">Submit</button>
+        <p id="counter-display"></p>
+    </form>
 </body>
 </html>
