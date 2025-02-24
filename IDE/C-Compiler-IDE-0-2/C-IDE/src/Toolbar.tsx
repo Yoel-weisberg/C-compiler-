@@ -1,12 +1,12 @@
 import "./styles/Toolbar.css";
 import React, { useState } from 'react';
-import { useFileContext } from "./FileEventsHandler";
+// import { useFileContext } from "./FileEventsHandler";
 import { useFileOperations } from './FileEventsHandler'; 
 import { openFile, saveFile } from './FileEventsHandler';
 import { handleCompile} from "./Compile";
 
 export const Toolbar: React.FC = () => {
-    const { setFileList } = useFileContext();
+    // const { setFileList } = useFileContext();
     const { fileContent, setFileContent } = useFileOperations();
 
     const [visibleDropdown, setVisibleDropdown] = useState<string | null>(null);

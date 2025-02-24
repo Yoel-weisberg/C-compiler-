@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import Editor from "@monaco-editor/react";
-import { useFileContext, useFileOperations } from "./FileEventsHandler";
+import { useFileOperations } from "./FileEventsHandler";
 
 export const CodeEditor: React.FC = () => {
-    const { fileList } = useFileContext();
+    // const { fileList } = useFileContext();
+
     const { fileContent, setFileContent } = useFileOperations();
     const [editorContent, setEditorContent] = useState<string>(fileContent || "");
   
