@@ -1,13 +1,8 @@
 import "./styles/Toolbar.css";
 import React, { useState } from 'react';
-import { useFileContext } from "./FileEventsHandler";
-import { useFileOperations } from './FileEventsHandler'; 
-import { openFile, saveFile } from './FileEventsHandler';
-import { handleCompile} from "./Compile";
+import {  openFile, useFilesContext } from "./FileManager";
 
 export const Toolbar: React.FC = () => {
-    const { setFileList } = useFileContext();
-    const { fileContent, setFileContent } = useFileOperations();
 
     const [visibleDropdown, setVisibleDropdown] = useState<string | null>(null);
 
@@ -19,17 +14,24 @@ export const Toolbar: React.FC = () => {
         setVisibleDropdown(null);
     };
 
+    const {addFile} = useFilesContext();
     const handleOpenFile = async () => {
-        const file = await openFile();
-        if (file && file.content) {
-            setFileContent(file.content);
+        console.log("Handling OpenFile!!!!!!!!!!!!!!!")
+        const result = await openFile(addFile);  // Call openFile and wait for the result
+        if (result) {
+            // Optionally, add any additional logic after the file is opened
+            console.log("File opened successfully:", result);
         }
     };
 
-    const handleSaveFile = async () => {
-        await saveFile(fileContent);
+    const handleSaveFile = () => {
+        // Implement save functionality here
     };
 
+    const handleCompile = () => {
+        // Implement compile functionality here
+    };
+    
     return (
         <div className="toolbar">
             {/* File Dropdown */}
@@ -79,4 +81,3 @@ export const Toolbar: React.FC = () => {
         </div>
     );
 };
-

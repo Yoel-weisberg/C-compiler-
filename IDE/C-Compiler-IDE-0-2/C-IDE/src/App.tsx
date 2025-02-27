@@ -1,16 +1,17 @@
 import "./styles/App.css";
 import {Toolbar} from "./Toolbar";
 import { CodeEditor } from "./Editor";
-import {FileProvider} from "./FileEventsHandler";
+import { FilesProvider } from "./FileManager";
 
 function App() {
+
   return (
-    <FileProvider>
+    <FilesProvider>
       <div className="app-container">
         <Toolbar/>
         <CodeEditor/>
       </div>
-    </FileProvider>
+    </FilesProvider>
   )
 }
 
