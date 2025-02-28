@@ -3,7 +3,7 @@ import { save } from '@tauri-apps/plugin-dialog';
 import { open } from '@tauri-apps/plugin-dialog';
 import { readTextFile } from '@tauri-apps/plugin-fs';
 import { writeTextFile } from '@tauri-apps/plugin-fs';
-
+import { useLiveShare } from './FileContentContext';
 export async function openFile() {
   // Open a file using the dialog
   const filePath = await open({
@@ -52,8 +52,8 @@ interface FileState {
 
 interface FileOperationsContextType {
     saveFile: () => void;
-    setFileContent: (content: string) => void;
-    fileContent: string;
+    setFileData: (content: string) => void;
+    fileData: string;
 }
 
 const FileOperationsContext = createContext<FileOperationsContextType | undefined>(undefined);
@@ -84,12 +84,12 @@ interface FileProviderProps {
 
 export const FileProvider: React.FC<FileProviderProps> = ({ children }) => {
     const [fileList, setFileList] = useState<FileList | null>(null);
-    const [fileContent, setFileContent] = useState<string>("");
+    const {fileData, setFileData} = useLiveShare();
 
     // Save file functionality
     const saveFile = () => {
-        if (!fileContent) return;
-        const file = new Blob([fileContent], { type: 'text/plain' });
+        if (!fileData) return;
+        const file = new Blob([fileData], { type: 'text/plain' });
         const fileURL = URL.createObjectURL(file);
         const a = document.createElement('a');
         a.href = fileURL;
@@ -100,7 +100,7 @@ export const FileProvider: React.FC<FileProviderProps> = ({ children }) => {
 
     return (
         <FileContext.Provider value={{ fileList, setFileList }}>
-            <FileOperationsContext.Provider value={{ saveFile, setFileContent, fileContent }}>
+            <FileOperationsContext.Provider value={{ saveFile, setFileData, fileData }}>
                 {children}
             </FileOperationsContext.Provider>
         </FileContext.Provider>

@@ -5,19 +5,19 @@ import { useFileOperations } from "./FileEventsHandler";
 export const CodeEditor: React.FC = () => {
     // const { fileList } = useFileContext();
 
-    const { fileContent, setFileContent } = useFileOperations();
-    const [editorContent, setEditorContent] = useState<string>(fileContent || "");
+    const { fileData, setFileData } = useFileOperations();
+    const [editorContent, setEditorContent] = useState<string>(fileData || "");
   
     // Update editor content when a new file is loaded
     useEffect(() => {
-      if (fileContent) {
-        setEditorContent(fileContent);
+      if (fileData) {
+        setEditorContent(fileData);
       }
-    }, [fileContent]);
+    }, [fileData]);
   
     const handleEditorChange = (value: string | undefined) => {
       setEditorContent(value || "");
-      setFileContent(value || ""); // Update global state
+      setFileData(value || ""); // Update global state
     };
   
     return (
