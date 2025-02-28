@@ -1,6 +1,6 @@
 import { createContext, useState, useContext } from "react";
-import { open } from '@tauri-apps/plugin-dialog';
-import { readTextFile } from '@tauri-apps/plugin-fs';
+import { open} from '@tauri-apps/plugin-dialog';
+import { readTextFile, writeTextFile } from '@tauri-apps/plugin-fs';
 
 
 // Tracks state of file 
@@ -23,6 +23,7 @@ interface FilesContextType {
   addFile: (newFile: FileState) => void;
   updateFile: (index: number, updateFile: Partial<FileState>) => void;
   setCurrentFile: (index: number) => void; 
+  saveFile: () => Promise<void>;
 }
 
 export const FilesContext = createContext<FilesContextType | null>(null);
@@ -68,9 +69,32 @@ export const FilesProvider = ({children}: {children: React.ReactNode}) => {
       }));
     };
 
+    const saveFile = async () => {
+      const { files, currentFile } = openFiles;
+  
+      if (currentFile === -1) {
+        console.error('No file is currently open.');
+        return;
+      }
+      console.log("IN SAVE FILE");
+      const fileToSave = files[currentFile];
+  
+      try {
+        await writeTextFile(fileToSave.location, await fileToSave.currentVersion.text());
+  
+        updateFile(currentFile, {
+          lastSavedVersion: fileToSave.currentVersion,
+        });
+  
+        console.log(`File saved successfully to ${fileToSave.location}`);
+      } catch (error) {
+        console.error('Failed to save the file:', error);
+      }
+    };
+
     return (
       <FilesContext.Provider
-      value={{ openFiles, setOpenFiles: setOpenFilesState, addFile, updateFile, setCurrentFile }}
+      value={{ openFiles, setOpenFiles: setOpenFilesState, addFile, updateFile, setCurrentFile, saveFile }}
     >
       {children}
     </FilesContext.Provider>
@@ -109,6 +133,6 @@ export async function openFile(addFile: (file: FileState) => void) {
   return null;
 }
 
-
 // Save
+
 // New File

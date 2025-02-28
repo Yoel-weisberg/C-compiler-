@@ -14,9 +14,9 @@ export const Toolbar: React.FC = () => {
         setVisibleDropdown(null);
     };
 
+    const {saveFile} = useFilesContext();
     const {addFile} = useFilesContext();
     const handleOpenFile = async () => {
-        console.log("Handling OpenFile!!!!!!!!!!!!!!!")
         const result = await openFile(addFile);  // Call openFile and wait for the result
         if (result) {
             // Optionally, add any additional logic after the file is opened
@@ -24,9 +24,10 @@ export const Toolbar: React.FC = () => {
         }
     };
 
-    const handleSaveFile = () => {
-        // Implement save functionality here
-    };
+
+    // const handleSaveFile = () => {
+    //     // Implement save functionality here
+    // };
 
     const handleCompile = () => {
         // Implement compile functionality here
@@ -47,7 +48,7 @@ export const Toolbar: React.FC = () => {
                             <button onClick={handleOpenFile}>Open File</button>
                         </li>
                         <li>
-                            <button onClick={handleSaveFile}>Save File</button>
+                            <button onClick={saveFile}>Save File</button>
                         </li>
                         <li>
                             <button>New File</button>
