@@ -9,6 +9,8 @@ interface LiveShareContextType {
     peer: Peer | null;
     peerId: string | null;
     initialize: () => void;
+    isHost: boolean;
+    setIsHost: (content: boolean) => void;
 }
 
 interface DataType {
@@ -25,6 +27,7 @@ export const LiveShareProvider = ({ children }: { children: ReactNode }) => {
     const [peer, setPeer] = useState<Peer | null>(null);
     const [peerId, setPeerId] = useState<string | null>(null);
     const [connections, setConnections] = useState<DataConnection[]>([]);
+    const [isHost, setIsHost] = useState<boolean>(false)
     const previousFileData = useRef<string>("");
     
     // Initialize PeerJS
@@ -64,7 +67,7 @@ export const LiveShareProvider = ({ children }: { children: ReactNode }) => {
     
     // Track changes to fileData and broadcast to all connections
     useEffect(() => {
-        // Skip first render
+        // Skip first render 
         if (previousFileData.current !== fileData) {
             // Broadcast file data changes to all connections
             connections.forEach(conn => {
@@ -90,7 +93,9 @@ export const LiveShareProvider = ({ children }: { children: ReactNode }) => {
             connections,
             peer,
             peerId,
-            initialize
+            initialize,
+            isHost,
+            setIsHost
         }}>
             {children}
         </LiveShareContext.Provider>

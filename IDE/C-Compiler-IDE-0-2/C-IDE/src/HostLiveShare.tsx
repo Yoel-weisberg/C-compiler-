@@ -2,11 +2,11 @@ import { FC, useEffect } from "react";
 import { useLiveShare } from "./FileContentContext";
 
 const HostLiveShare: FC = () => {
-    const { fileData, peerId, initialize } = useLiveShare();
-
+    const { fileData, peerId, initialize, setFileData } = useLiveShare();
     // Initialize the peer connection when the component mounts
     useEffect(() => {
         initialize();
+        setFileData("new value");
     }, []);
 
     return (

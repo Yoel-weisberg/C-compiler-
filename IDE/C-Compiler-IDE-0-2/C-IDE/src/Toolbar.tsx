@@ -5,14 +5,12 @@ import { useFileOperations } from "./FileEventsHandler";
 import { openFile, saveFile } from "./FileEventsHandler";
 import { handleCompile } from "./Compile";
 import JoinLiveShare from "./JoinLiveShare";
-import HostLiveShare from "./HostLiveShare";
-
+import { useLiveShare } from "./FileContentContext";
 export const Toolbar: React.FC = () => {
   // const { setFileList } = useFileContext();
   const { fileData, setFileData } = useFileOperations();
-  const [liveShareActive, setLiveShareActive] = useState<boolean>(false);
   const [visibleDropdown, setVisibleDropdown] = useState<string | null>(null);
-
+  const {setIsHost, isHost} = useLiveShare();
   const showDropdown = (dropdownName: string) => {
     setVisibleDropdown(dropdownName);
   };
@@ -76,7 +74,7 @@ export const Toolbar: React.FC = () => {
         {visibleDropdown === "liveShare" && (
           <ul className="dropdown-list">
             <li>
-              <button onClick={() => {setLiveShareActive(true)}}>Host Live Share</button>
+              <button onClick={() => {setIsHost(!isHost)}}>{isHost ? "not host" : "host live share"}</button>
             </li>
             <li>
               <button onClick={handleJoinLiveShare}>Join Live Share</button>
@@ -102,7 +100,6 @@ export const Toolbar: React.FC = () => {
           </ul>
         )}
       </div>
-      {liveShareActive && <HostLiveShare/>}
     </div>
   );
 };
