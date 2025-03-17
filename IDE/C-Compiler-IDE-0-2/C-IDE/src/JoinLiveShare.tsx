@@ -1,19 +1,34 @@
-import { Peer } from "peerjs";
+import { Peer, DataConnection } from "peerjs";
 import { useLiveShare } from "./FileContentContext";
-type JoinLiveShareProps = {
-    peerId: string; // Adjust type based on your actual data type
+
+// Create a function that handles connecting to a peer
+// This is NOT a React component, just a regular function
+export const connectToPeer = (targetPeerId: string, setFileData: (data: string) => void) => {
+  const peer = new Peer();
+  
+  console.log(`Attempting to connect to peer: ${targetPeerId}`);
+  
+  const conn = peer.connect(targetPeerId);
+  
+  conn.on('open', function() {
+    console.log('Connection established');
+    
+    conn.on('data', function(data: any) {
+      console.log('Received data:', data.data);
+      if (data && data.DATA) {
+        setFileData(String(data.da));
+      }
+    });
+  });
+  
+  conn.on('error', function(err) {
+    console.error(`Connection error:`, err);
+  });
+  
+  peer.on('error', function(err) {
+    console.error(`Peer error:`, err);
+  });
+  
+  // Return the connection and peer for cleanup purposes
+  return { conn, peer };
 };
-
-const JoinLiveShare = ({peerId}: JoinLiveShareProps) => {
-    var peer = new Peer();
-    var conn =  peer.connect(peerId)
-    const {fileData, setFileData} = useLiveShare();
-    conn.on('open', function(){
-        conn.on('data', function(data:any){
-            setFileData(String(data.data));
-        })
-    })
-};
-
-
-export default JoinLiveShare;
