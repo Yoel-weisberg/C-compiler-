@@ -70,6 +70,7 @@ export const LiveShareProvider = ({ children }: { children: ReactNode }) => {
         // Skip first render 
         if (previousFileData.current !== fileData) {
             // Broadcast file data changes to all connections
+            console.log("previeous data:", previousFileData.current)
             connections.forEach(conn => {
                 if (conn.open) {
                     conn.send({ type: 'fileData', data: fileData });
@@ -81,15 +82,12 @@ export const LiveShareProvider = ({ children }: { children: ReactNode }) => {
         }
     }, [fileData, connections]);
     
-    // Custom setFileData that handles updates properly
-    const updateFileData = (content: string) => {
-        setFileData(content);
-    };
+
     
     return (
         <LiveShareContext.Provider value={{ 
             fileData, 
-            setFileData: updateFileData, 
+            setFileData, 
             connections,
             peer,
             peerId,
@@ -108,5 +106,5 @@ export const useLiveShare = (): LiveShareContextType => {
     if (!context) {
         throw new Error("useLiveShare must be used within a LiveShareProvider");
     }
-    return context;
+    return context;
 };

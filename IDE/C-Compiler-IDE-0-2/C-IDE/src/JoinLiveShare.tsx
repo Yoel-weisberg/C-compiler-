@@ -9,6 +9,7 @@ const JoinLiveShare = ({peerId}: JoinLiveShareProps) => {
     var conn =  peer.connect(peerId)
     const {fileData, setFileData} = useLiveShare();
     conn.on('open', function(){
+        alert("connected");
         conn.on('data', function(data:any){
             setFileData(String(data.data));
         })
