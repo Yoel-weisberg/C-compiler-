@@ -41,6 +41,7 @@ export const LiveShareProvider = ({ children }: { children: ReactNode }) => {
         
         newPeer.on('connection', (conn) => {
             conn.on('open', () => {
+                alert("open");
                 // Send current file data to new connection
                 conn.send({ type: 'fileData', data: fileData });
                 
