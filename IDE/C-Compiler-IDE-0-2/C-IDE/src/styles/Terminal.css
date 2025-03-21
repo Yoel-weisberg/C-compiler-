@@ -1,0 +1,141 @@
+@import url('https://fonts.googleapis.com/css2?family=Cascadia+Code&display=swap');
+
+/* Terminal Wrapper */
+.terminal-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 292px;
+    max-height: 200px;
+    background-color: #1E1E1E; 
+    border-top: 1px solid #333; 
+    overflow: hidden;
+    top: 0;
+}
+
+/* Terminal Header */
+.terminal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #252526;
+    color: white;
+    font-size: 14px;
+    padding: 8px;
+    border-bottom: 1px solid #333;
+    font-family: 'Segoe UI', sans-serif;
+    flex-shrink: 0;
+}
+
+.terminal-header span {
+    font-weight: bold;
+}
+
+/* Toggle Button */
+.terminal-toggle-btn {
+    background: #333;
+    color: white;
+    border: none;
+    padding: 4px 10px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.terminal-toggle-btn:hover {
+    background: #444;
+}
+
+/* Terminal Container */
+.terminal-container {
+    width: 100%;
+    flex-grow: 1; 
+    min-height: 0; 
+    background-color: #1E1E1E;
+    overflow-y: auto; 
+}
+
+/* xterm.js Modifications */
+.terminal .xterm-viewport {
+    overflow-y: auto !important;
+}
+
+/* Remove the stdin input box */
+.terminal .xterm-helper-textarea {
+    opacity: 0;
+    position: absolute;
+    width: 0;
+    height: 0;
+}
+
+
+
+/* Scrollbar container */
+.terminal-container::-webkit-scrollbar {
+    width: 10px;  
+    height: 10px; 
+}
+
+/* Scrollbar track (background) */
+.terminal-container::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1); 
+}
+
+/* Scrollbar thumb (movable part) */
+.terminal-container::-webkit-scrollbar-thumb {
+    background: rgba(121, 121, 121, 0.4); 
+    transition: background 0.3s;
+}
+
+/* Scrollbar thumb on hover */
+.terminal-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(121, 121, 121, 0.7);
+}
+
+/* Scrollbar thumb when active */
+.terminal-container::-webkit-scrollbar-thumb:active {
+    background: rgba(121, 121, 121, 0.9);
+}
+
+
+
+
+/* .xterm-char-measure-element {
+  display: none !important;
+} */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* .terminal-container {
+  font-family: 'Cascadia Code', sans-serif;
+  background-color: #08434e;
+  flex-direction: column;
+  overflow: auto;
+  max-height: calc(100vh - 200px); 
+  height: 200px;
+  bottom: 0;
+}                                                          */
+
+  
+/* .terminal-header{
+  font-family: Sans-serif;
+  font: Arial;
+  background-color:rgb(43, 43, 43);
+  color: white;
+  height: 210px;
+} */
+
+

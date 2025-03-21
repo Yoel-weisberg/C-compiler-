@@ -53,7 +53,7 @@ std::vector<Token> Tokeniser::getTokens() const
 
 Tokens_type Tokeniser::categoriseLiteral(const std::string& literal)
 {
-	std::cout << "Literal: " << literal << std::endl;
+	//std::cout << "Literal: " << literal << std::endl;
 	if (Helper::literalToType.find(literal) != Helper::literalToType.end())
 	{
 		return Helper::literalToType.find(literal)->second;

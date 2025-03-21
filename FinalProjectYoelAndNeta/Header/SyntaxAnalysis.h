@@ -32,6 +32,7 @@ private:
 
 	int checkFunctionDecleration(int& pos);
 	int checkIdentifier(int& pos);
+	int checkReturnStatement(int& pos);
 
 
 	// a function to check if a decleration is of a function or a varieble

@@ -123,7 +123,9 @@ void TopLevelParser::mainLoop()
             }
             break;
         default:
+            std::cerr << parser.currentToken().getLiteral() << std::endl;
             std::cerr << "WTF is wrong now ?!" << std::endl;
+            break;
             //HandleTopLevelExpression();
         }
     }

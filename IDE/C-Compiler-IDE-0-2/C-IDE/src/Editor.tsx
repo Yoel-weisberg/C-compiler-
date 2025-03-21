@@ -1,64 +1,100 @@
+import "./styles/Editor.css";
 import React, { useContext, useEffect, useState } from "react";
 import { FilesContext } from "./FileManager";
-import Editor from "@monaco-editor/react";
+import Editor, { OnMount } from "@monaco-editor/react";
+import { useTerminal } from "./TerminalProvider";
+import * as monaco from 'monaco-editor';
+
+// import { useTerminal } from "./TerminalManager";
+//import { useSizeContext } from "./DisplayManager";
 
 export const CodeEditor: React.FC = () => {
+    const { openFiles, updateFile } = useContext(FilesContext)!; // Make sure the context is not null
+    // Get the current file's content (currentVersion is a File object)
+    const currentFileIndex = openFiles.currentFile;
+    const currentFile = currentFileIndex !== -1 ? openFiles.files[currentFileIndex] : null;
+    // State for editor content (to hold text from the File object)
+    const [editorContent, setEditorContent] = useState<string>("");
 
-  const { openFiles, updateFile } = useContext(FilesContext)!; // Make sure the context is not null
+    //const {editorHeight} = useSizeContext();
+    const { terminalHeight } = useTerminal(); 
 
-  // Get the current file's content (currentVersion is a File object)
-  const currentFileIndex = openFiles.currentFile;
-  const currentFile = currentFileIndex !== -1 ? openFiles.files[currentFileIndex] : null;
+    // Function to read the content of a File object
+    const readFileContent = (file: File) => {
+        const reader = new FileReader();
+        return new Promise<string>((resolve, reject) => {
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = (err) => reject(err);
+            reader.readAsText(file); // Read the file as text
+        });
+    };
 
-  // State for editor content (to hold text from the File object)
-  const [editorContent, setEditorContent] = useState<string>("");
-
-  // Function to read the content of a File object
-  const readFileContent = (file: File) => {
-    const reader = new FileReader();
-    return new Promise<string>((resolve, reject) => {
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = (err) => reject(err);
-      reader.readAsText(file); // Read the file as text
-    });
-  };
-
-  // Update editor content whenever the current file changes
-  useEffect(() => {
-    if (currentFile) {
-      readFileContent(currentFile.currentVersion).then((content) => {
-        setEditorContent(content); // Set editor content to the file content
+    // Apply the custom theme when Monaco loads
+    const handleEditorMount: OnMount = (editor, monaco) => {
+      monaco.editor.defineTheme("myCustomTheme", {
+          base: "vs-dark",
+          inherit: true,
+          rules: [],
+          colors: {
+              // "editor.background": "#1E1E1E",
+              // "editor.foreground": "#D4D4D4",
+              // "editor.lineHighlightBackground": "#33333355",
+              // "editorCursor.foreground": "#A0A0A0",
+              "editorWidget.border": "#3e3e3e",
+              // "editor.lineHighlightBorder": "#FF0000",
+          },
       });
-    }
-  }, [currentFileIndex, currentFile]);
 
-  // Handle content changes in Monaco editor
-  const handleEditorChange = (value: string | undefined) => {
-    if (value && currentFile) {
-      // Convert the string back to a File object and update it
-      const updatedFile = new File([value], currentFile.location, { type: "text/plain" });
-      updateFile(currentFileIndex, { currentVersion: updatedFile }); // Update the file content
-    }
+      // Apply the theme after defining it
+      monaco.editor.setTheme("myCustomTheme");
   };
+
+
+    // Update editor content whenever the current file changes
+    useEffect(() => {
+        if (currentFile) {
+            readFileContent(currentFile.currentVersion).then((content) => {
+                setEditorContent(content); // Set editor content to the file content
+            });
+        }
+    }, [currentFileIndex, currentFile]);
+
+    // Handle content changes in editor
+    const handleEditorChange = (value: string | undefined) => {
+        if (value && currentFile) {
+            // Convert the string back to a File object and update it
+            let updatedFile = null;
+            if (currentFile.location.endsWith(".c") ) {
+                updatedFile = new File([value], currentFile.location, { type: "text/x-csrc" });
+            }
+            else { // If it's a headr file (".h")
+                updatedFile = new File([value], currentFile.location, { type: "text/x-chdr" });
+            }
+            updateFile(currentFileIndex, { currentVersion: updatedFile }); // Update the file content
+        }
+    };
+
 
     return (
-        <div className="editor-container">
+      <div className="editor-container">
             <Editor
             className="monaco-editor"
-            height="100vh" // Editor height
+            //height={`calc(100vh - ${terminalHeight}px - 19px)`} // Editor height (with the terminals' border)
+            height={`calc(100vh - ${terminalHeight}px - 10px)`} 
             defaultLanguage="c" // Default language
             value={editorContent} // Editor value
             onChange={handleEditorChange} // Handle content changes
-            theme="vs-dark" // Theme (vs-light, hc-black, etc.)
+            onMount={handleEditorMount} // Apply the theme on mount
+            theme="myCustomTheme" // Monaco will use this once set
             options={{
                 fontSize: 14,
-                minimap: { enabled: false }, // Disable minimap
+                minimap: { enabled: false }, 
                 wordWrap: "on",
                 scrollBeyondLastLine: false,
             }}
             />
       </div>
-    );
-  };
+  );
+};
   
 

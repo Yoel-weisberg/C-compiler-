@@ -149,14 +149,12 @@ std::unique_ptr<ExprAST> Parser::ptrAssignmentParsing()
 		consume(); 
 
 		std::string pointedToVar = Helper::removeSpecialCharacter(currentToken().getLiteral());
-		auto PTVit = Helper::SymbolTable.find(pointedToVar);
-		if (Helper::SymbolTable.end() == PTVit)
+		
+		llvm::AllocaInst* address = Helper::_symbolTable.getVarAddress(var_name);
+		if (!address)
 		{
-			throw ParserError("can't point to non-existing variable --> " + pointedToVar);
+			throw std::runtime_error("Non-existing variable");
 		}
-		llvm::AllocaInst* allocInst = Helper::SymbolTable[pointedToVar];
-
-		Helper::addSymbol(var_name, type);
 
 		// Return
 		auto value_literal = std::make_unique<ptrExprAST>(pointedToVar);
@@ -270,7 +268,7 @@ std::unique_ptr<ExprAST> Parser::arrAssignmentParsing(const std::string& type)
 		}
 		consume();
 		consume();
-		Helper::addSymbol(varName, "arr", type, len);
+		//Helper::addSymbol(varName, "arr", type, len);
 		std::string convertalbleLen = std::to_string(len);
 		auto value_literal = std::make_unique<arrExprAST>(type, convertalbleLen, init, varName);
 		return std::make_unique<AssignExprAST>(varName, std::move(value_literal), type);
@@ -324,7 +322,7 @@ std::unique_ptr<ExprAST> Parser::parseFloatNumberExpr()
 {
 	auto Result = std::make_unique<FloatNumberExprAST>(std::stof(currentToken().getLiteral()));
 	consume();
-	if (currentToken().getType() == SEMICOLUMN)
+	if (currentToken().getType() == SEMICOLON)
 	{
 		consume();
 	}
@@ -339,15 +337,9 @@ std::unique_ptr<ExprAST> Parser::parseIntagerNumberExpr()
 }
 
 bool Parser::isStructVariable(const std::string& varName) {
-	auto it = Helper::SymbolTable.find(varName);
-	if (it == Helper::SymbolTable.end()) {
-		return false;  // Variable not found
-	}
+	llvm::StructType* type = Helper::_symbolTable.getStructType(varName);
 
-	llvm::AllocaInst* alloca = it->second;
-	llvm::Type* varType = alloca->getAllocatedType();
-
-	return varType->isStructTy();  // Check if it's a struct type
+	return type != nullptr;  // Check if it's a struct type
 }
 
 std::unique_ptr<ExprAST> Parser::parseIdentifierExpr()
@@ -365,7 +357,7 @@ std::unique_ptr<ExprAST> Parser::parseIdentifierExpr()
 
 	if (currentToken().getType() != LPAREN) // Simple variable ref.
 	{
-		if (currentToken().getType() == SEMICOLUMN) 
+		if (currentToken().getType() == SEMICOLON) 
 		{
 			consume();
 		}
@@ -399,12 +391,23 @@ std::unique_ptr<ExprAST> Parser::parseIdentifierExpr()
 
 	// Eat the ')'.
 	consume();
-	if (currentToken().getType() == SEMICOLUMN)
+	if (currentToken().getType() == SEMICOLON)
 	{
 		consume();
 	}
 
 	return std::make_unique<CallExprAST>(IdName, std::move(Args));
+}
+
+std::unique_ptr<ExprAST> Parser::parseReturnStatement()
+{
+	consume(); // Move past 'return' 
+
+	std::string statement = currentToken().getLiteral();
+
+	consume(2); // Move past return value and semicolon
+	
+	return std::make_unique<ReturnStatementExprAST>(statement);
 }
 
 std::unique_ptr<ExprAST> Parser::parseParenExpr()
@@ -454,7 +457,7 @@ std::unique_ptr<ExprAST> Parser::parsePrimary()
 		return parseIdentifierExpr();
 	// TODO: parse return statement  (return VariableExprAST)
 	case RETURN_STATEMENT:
-		return nullptr;
+		return parseReturnStatement();
 	case INT:
 		return parseIntagerNumberExpr();
 	case WHILE_LOOP:
@@ -586,7 +589,7 @@ std::unique_ptr<ExprAST> Parser::parseStructDefinition()
 			consume();
 			std::string name = currentToken().getLiteral();
 			consume();
-			if (currentToken().getType() == SEMICOLUMN)
+			if (currentToken().getType() == SEMICOLON)
 				consume();
 
 			members.push_back({ type, name });
@@ -597,13 +600,15 @@ std::unique_ptr<ExprAST> Parser::parseStructDefinition()
 	return std::make_unique<StructDefinitionExprAST>(name, members);
 }
 
+
+// Parses struct declerations, e.g: 'struct x;'
 std::unique_ptr<ExprAST> Parser::parseStruct()
 {
 	consume(); // Move past 'struct'
 
 	std::string structT = currentToken().getLiteral();
 	// Check that struct exists
-	if (Helper::StructTable.find(structT) == Helper::StructTable.end())
+	if (Helper::_symbolTable.getStructType(structT) == nullptr)
 	{
 		SyntaxError("Non-existing struct");
 	}

@@ -1,9 +1,15 @@
 import "./styles/Toolbar.css";
 import React, { useState } from 'react';
 import {  openFile, useFilesContext } from "./FileManager";
+import {findFileToCompile} from "./Compile";
+import { useTerminal } from "./TerminalProvider";
+// import { useTerminal } from "./TerminalManager";
+//import { useSizeContext } from "./DisplayManager";
 
 export const Toolbar: React.FC = () => {
 
+
+    // --------- Dropdown Managing ---------
     const [visibleDropdown, setVisibleDropdown] = useState<string | null>(null);
 
     const showDropdown = (dropdownName: string) => {
@@ -14,24 +20,41 @@ export const Toolbar: React.FC = () => {
         setVisibleDropdown(null);
     };
 
+    // ------------------------------------
+
+    // ------ File Dropdown Functions -----
     const {saveFile} = useFilesContext();
     const {addFile} = useFilesContext();
     const handleOpenFile = async () => {
         const result = await openFile(addFile);  // Call openFile and wait for the result
         if (result) {
-            // Optionally, add any additional logic after the file is opened
             console.log("File opened successfully:", result);
         }
     };
 
-
-    // const handleSaveFile = () => {
-    //     // Implement save functionality here
+    const {getCurrentFile} = useFilesContext();
+    //const {printToTerminal} = useTerminal();
+    // const handleCompile = async () => {
+    //     const str = await findFileToCompile(getCurrentFile);
+        
+    //     // setEditorHeight(window.innerHeight);
+    //     // setTerminalHeight();
+    //     //console.log(str);
+    //     //printToTerminal(str);
     // };
-
-    const handleCompile = () => {
-        // Implement compile functionality here
+    
+    const handleCreateFile = () => {
+            console.log("Does Nothing, TODO");
+            // Create File in the current directory 
+            // Open file for display
     };
+
+    // ------------------------------------
+
+    // ------ View Dropdown Functions -----
+    const { toggleTerminal, isTerminalVisible, writeToTerminal } = useTerminal();
+
+    // ------------------------------------
     
     return (
         <div className="toolbar">
@@ -45,20 +68,46 @@ export const Toolbar: React.FC = () => {
                 {visibleDropdown === "file" && (
                     <ul className="dropdown-list">
                         <li>
-                            <button onClick={handleOpenFile}>Open File</button>
+                            <button onClick={handleOpenFile}>
+                                Open File
+                            </button>
                         </li>
                         <li>
-                            <button onClick={saveFile}>Save File</button>
+                            <button onClick={saveFile}>
+                                Save File
+                            </button>
                         </li>
                         <li>
-                            <button>New File</button>
+                            <button onClick={handleCreateFile}>
+                                New File
+                            </button>
                         </li>
                     </ul>
                 )}
             </div>
 
-            {/* Other Buttons */}
-            <button className="toolbar-button">Does Nothing</button>
+            {/* View Dropdown */}
+            <div 
+            className="dropdown" 
+            onMouseEnter={() => showDropdown("view")}
+            onMouseLeave={hideDropdown}
+            >
+                <button className="toolbar-button">View</button>
+                {visibleDropdown === "view" && (
+                    <ul className="dropdown-list">
+                        <li>
+                            <button onClick={() => {toggleTerminal();}}>
+                                {isTerminalVisible ? 'Hide Terminal' : 'Show Terminal'}
+                            </button>
+                        </li>
+                        <li>
+                            <button>
+                                Add something
+                            </button>
+                        </li>
+                    </ul>
+                )}
+            </div>
             <button className="toolbar-button">Does Nothing</button>
 
             {/* Run Dropdown */}
@@ -71,10 +120,14 @@ export const Toolbar: React.FC = () => {
                 {visibleDropdown === "run" && (
                     <ul className="dropdown-list">
                         <li>
-                            <button onClick={handleCompile}>Compile</button>
+                            <button /*onClick={handleCompile}*/>
+                                Compile
+                            </button>
                         </li>
                         <li>
-                            <button>Run Executable</button>
+                            <button>
+                                Run Executable
+                            </button>
                         </li>
                     </ul>
                 )}

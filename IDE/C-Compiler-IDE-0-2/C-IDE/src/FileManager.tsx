@@ -4,7 +4,7 @@ import { readTextFile, writeTextFile } from '@tauri-apps/plugin-fs';
 
 
 // Tracks state of file 
-interface FileState {
+export interface FileState {
   location: string;
   lastSavedVersion: File;
   currentVersion: File;
@@ -24,6 +24,7 @@ interface FilesContextType {
   updateFile: (index: number, updateFile: Partial<FileState>) => void;
   setCurrentFile: (index: number) => void; 
   saveFile: () => Promise<void>;
+  getCurrentFile: () => FileState | null;
 }
 
 export const FilesContext = createContext<FilesContextType | null>(null);
@@ -79,9 +80,14 @@ export const FilesProvider = ({children}: {children: React.ReactNode}) => {
       console.log("IN SAVE FILE");
       const fileToSave = files[currentFile];
   
+    // Ensure the file has a valid extension (.c or .h)
+    if (!fileToSave.location.endsWith(".c") && !fileToSave.location.endsWith(".h")) {
+      console.error("Invalid file type. Only '.c' and '.h' files can be saved.");
+      return;
+  }
+
       try {
         await writeTextFile(fileToSave.location, await fileToSave.currentVersion.text());
-  
         updateFile(currentFile, {
           lastSavedVersion: fileToSave.currentVersion,
         });
@@ -92,9 +98,14 @@ export const FilesProvider = ({children}: {children: React.ReactNode}) => {
       }
     };
 
+    const getCurrentFile = (): FileState | null => {
+      const { files, currentFile } = openFiles;
+      return currentFile !== -1 ? files[currentFile] : null;
+    };
+
     return (
       <FilesContext.Provider
-      value={{ openFiles, setOpenFiles: setOpenFilesState, addFile, updateFile, setCurrentFile, saveFile }}
+      value={{ openFiles, setOpenFiles: setOpenFilesState, addFile, updateFile, setCurrentFile, saveFile, getCurrentFile }}
     >
       {children}
     </FilesContext.Provider>
@@ -116,14 +127,22 @@ export async function openFile(addFile: (file: FileState) => void) {
 
   if (filePath) {
     const content = await readTextFile(filePath as string); // Read file content
-    const fileName = filePath.split('/').pop() || 'Untitled'; // Extract file name
+    const fileName = filePath.split('\\').pop() || 'Untitled'; // Extract file name
+    const fileExtension = fileName.split('.').pop() || ''; 
+
+    // Assign a MIME type 
+    let mimeType = 'text/plain'; // Default MIME type for text files
+    if (fileExtension === 'c' || fileExtension === "h") {
+      mimeType = 'text/x-c'; // MIME type for C source/header code files
+    }
+
 
     const newFile: FileState = {
       location: filePath as string,
-      lastSavedVersion: new File([content], fileName),
-      currentVersion: new File([content], fileName),
+      lastSavedVersion: new File([content], fileName, { type: mimeType }),
+      currentVersion: new File([content], fileName, { type: mimeType }),
     };
-
+    console.log("File Name: " + newFile.currentVersion.name)
     // Add the file using the function received as an argument
     addFile(newFile);
 
@@ -136,3 +155,9 @@ export async function openFile(addFile: (file: FileState) => void) {
 // Save
 
 // New File
+
+
+
+
+
+

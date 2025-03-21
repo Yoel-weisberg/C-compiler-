@@ -79,7 +79,7 @@ int SyntaxAnalysis::variableDefinitionStructure(int pos)
 		// advancing pos by 4 to get to the next action
 		return pos + MAX_NUM_OF_OPERATIONS_FOR_DECLERATION;
 	}
-	else if (_tokens[pos + MIN_NUM_OF_OPERATIONS].getType() == SEMICOLUMN)
+	else if (_tokens[pos + MIN_NUM_OF_OPERATIONS].getType() == SEMICOLON)
 	{
 		return pos + MIN_NUM_OF_OPERATIONS;
 	}
@@ -175,7 +175,7 @@ void SyntaxAnalysis::validSentences()
 			}
 			else if (_tokens[pos].getType() == RETURN_STATEMENT)
 			{
-				pos++;
+				pos = checkReturnStatement(pos);
 			}
 			else if (_tokens[pos].getType() >= DO_WHILE_LOOP && _tokens[pos].getType() <= FOR_LOOP)
 			{
@@ -234,7 +234,7 @@ int SyntaxAnalysis::ptrVariableDefenitionStructure(int pos)
 			throw SyntaxError("Incorrect identifier");
 		}
 		pos++;
-		if (_tokens[pos].getType() != SEMICOLUMN)
+		if (_tokens[pos].getType() != SEMICOLON)
 		{
 			throw SyntaxError("Missing Line Ending");
 		}
@@ -296,8 +296,26 @@ int SyntaxAnalysis::checkIdentifier(int& pos)
 		}
 		if (_tokens[pos].getType() == RPAREN) pos++;
 	}
-	if (_tokens[pos].getType() != SEMICOLUMN && pos < _tokens.size()) throw SyntaxError("Excepted a semicolumn");
+	if (_tokens[pos].getType() != SEMICOLON && pos < _tokens.size()) throw SyntaxError("Excepted a semicolumn");
 	return ++pos;
+}
+
+int SyntaxAnalysis::checkReturnStatement(int& pos)
+{
+	// has something betwwen 'return' and ';'
+	pos++;
+	if (_tokens[pos].getType() != INT && _tokens[pos].getType() != IDENTIFIER)
+	{
+		throw SyntaxError("Expected value after 'return'");
+	}
+
+	pos++;
+	// Ends with semicolon
+	if (_tokens[pos].getType() != SEMICOLON)
+	{
+		throw SyntaxError("Missing semicolon");
+	}
+	return pos + 1;
 }
 
 
@@ -428,7 +446,7 @@ int SyntaxAnalysis::checkConditionStructure(int& pos, bool isForLoop)
 	while (numPran != 0)
 	{
 		Tokens_type tokT = _tokens[pos].getType();
-		if (tokT == SEMICOLUMN && isForLoop) // If it's a statement in a for loop
+		if (tokT == SEMICOLON && isForLoop) // If it's a statement in a for loop
 		{
 			break;
 		}
@@ -477,7 +495,7 @@ int SyntaxAnalysis::checkDoWhileStructure(int& pos)
 	pos++;
 	pos++;
 	checkConditionStructure(pos);
-	if (_tokens[pos].getType() != SEMICOLUMN)
+	if (_tokens[pos].getType() != SEMICOLON)
 	{
 		throw SyntaxError("Expected ';' ", pos);
 	}
@@ -562,7 +580,7 @@ int SyntaxAnalysis::checkForLoopInitialization(int& pos)
 		throw SyntaxError("Expected value for init ", pos);
 	}
 	pos++;
-	if (_tokens[pos].getType() != SEMICOLUMN)
+	if (_tokens[pos].getType() != SEMICOLON)
 	{
 		throw SyntaxError("Expected ';' ", pos);
 	}
@@ -582,7 +600,7 @@ int SyntaxAnalysis::checkStructStructure(int& pos)
 
 	pos++;
 	// Check for struct Allocation
-	if (_tokens[pos].getType() == IDENTIFIER && _tokens[pos + 1].getType() == SEMICOLUMN)
+	if (_tokens[pos].getType() == IDENTIFIER && _tokens[pos + 1].getType() == SEMICOLON)
 	{
 		return pos + 2; 
 	}

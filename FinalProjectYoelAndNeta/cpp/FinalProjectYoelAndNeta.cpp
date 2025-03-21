@@ -37,12 +37,12 @@ int main(int argc, char* argv[]) {
 
 		// ----     Lexical Analyzer               ----
 		Tokeniser tokeniser = Tokeniser(preprocessFile.getFinalStream());
-		std::cout << tokeniser << std::endl;
-		std::cout << "After tokeniser " << std::endl;
+		//std::cout << tokeniser << std::endl;
+		//std::cout << "After tokeniser " << std::endl;
 
 		// ----     Syntax Analyzer                ----
 		SyntaxAnalysis syntaxAnalysis = SyntaxAnalysis(tokeniser.getTokens());
-		std::cout << "Syntax analysed" << std::endl;
+		//std::cout << "Syntax analysed" << std::endl;
 
 		// ----     Parser                         ----
 		TopLevelParser parser = TopLevelParser(tokeniser.getTokens());

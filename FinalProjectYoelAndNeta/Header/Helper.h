@@ -1,6 +1,9 @@
 #pragma once
 #define _OPEN_SYS_ITOA_EXT
 
+#ifndef HELPER_H
+#define HELPER_H
+
 #include <iostream>
 #include <vector>
 #include <memory>
@@ -9,10 +12,10 @@
 #include <cmath>
 #include <sstream>
 #include <map>      
-
-#include <map>
+#include <tuple>
 #include "Constants.h"
 #include "ExprAST.h"
+#include "STable.h"
 
 #include "KaleidoscopeJIT.h"
 #include "llvm/ADT/APFloat.h"
@@ -58,6 +61,7 @@
 
 class PrototypeAST;
 class StructDefinitionExprAST;
+class STable;
 
 
 using namespace llvm;
@@ -70,8 +74,6 @@ public:
     static std::unique_ptr<LLVMContext> TheContext;
     static std::unique_ptr<Module> TheModule;
     static std::unique_ptr<IRBuilder<>> Builder;
-    static std::map<std::string, AllocaInst*> SymbolTable; // Symbol Table
-    static std::map<std::string, llvm::StructType*> StructTable;
     static std::unique_ptr<llvm::orc::KaleidoscopeJIT> TheJIT;
     static std::unique_ptr<FunctionPassManager> TheFPM;
     static std::unique_ptr<LoopAnalysisManager> TheLAM;
@@ -87,10 +89,8 @@ public:
     static llvm::LLVMContext& getContext() { return *TheContext; }
     static llvm::IRBuilder<>& getBuilder() { return *Builder; }
     static llvm::Module& getModule() { return *TheModule; }
-    static void createAnonymousFunction();
+    //static void createAnonymousFunction();
     static Function* getFunction(std::string Name);
-    static llvm::AllocaInst* allocForNewSymbol(std::string var_name, std::string var_type, const int size, const std::string& pTT);
-    static bool addSymbol(std::string var_name, std::string var_type, const std::string& pTT = EMPTY_STR, const int size = 1);
     
 
     // Utility methods
@@ -103,10 +103,13 @@ public:
 
     // New Symbol Table Methods
     static llvm::Value* getSymbolValue(const std::string& var_name);
-    static void printLLVMSymbolTable();
+
+    // Symbol Table
+    static STable _symbolTable;
+
+
 
     static uint64_t hexToDec(std::string& str);
-    //static llvm::Type* getLLVMptrType(std::string var_type, llvm::LLVMContext& Context, std::string var_name);
     static llvm::Type * getLLVMType(std::string var_type, llvm::LLVMContext& context);
 
     // Data members
@@ -114,6 +117,7 @@ public:
     static std::map<std::string, Tokens_type> literalToType;
     //static SymbolTable symbolTable;
     static std::map<std::string, Tokens_type> Keywords;
+    static std::vector<std::string> scopes;
 
     // memory related 
     static llvm::Function* MallocFunc;
@@ -126,3 +130,6 @@ public:
     // compiling files
     static void builfObjectFile();
 };
+
+
+#endif

@@ -284,8 +284,12 @@ public:
 	StructDeclerationExprAST(const std::string& type, const std::string& name) : _type(type), _name(name){}
 	llvm::Value* codegen() override;
 };
-// code like a = 5;
-//class RedefinitionExprAst : public ExprAST
-//{
-//
-//};
+
+
+class ReturnStatementExprAST : public ExprAST
+{
+	std::string _statement;
+public: 
+	ReturnStatementExprAST(const std::string& statement) : _statement(statement) {}
+	llvm::Value* codegen() override;
+};
