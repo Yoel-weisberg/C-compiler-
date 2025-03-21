@@ -34,14 +34,7 @@ export const Toolbar: React.FC = () => {
 
     const {getCurrentFile} = useFilesContext();
     //const {printToTerminal} = useTerminal();
-    // const handleCompile = async () => {
-    //     const str = await findFileToCompile(getCurrentFile);
-        
-    //     // setEditorHeight(window.innerHeight);
-    //     // setTerminalHeight();
-    //     //console.log(str);
-    //     //printToTerminal(str);
-    // };
+
     
     const handleCreateFile = () => {
             console.log("Does Nothing, TODO");
@@ -56,6 +49,17 @@ export const Toolbar: React.FC = () => {
 
     // ------------------------------------
     
+    // ------ Run Dropdown Functions -----
+
+        const handleCompile = async () => {
+        const str = await findFileToCompile(getCurrentFile);
+        console.log(str);
+        writeToTerminal(str); // Show output in terminal
+    };
+
+    // ------------------------------------
+
+
     return (
         <div className="toolbar">
             {/* File Dropdown */}
@@ -120,7 +124,7 @@ export const Toolbar: React.FC = () => {
                 {visibleDropdown === "run" && (
                     <ul className="dropdown-list">
                         <li>
-                            <button /*onClick={handleCompile}*/>
+                            <button onClick={handleCompile}>
                                 Compile
                             </button>
                         </li>
