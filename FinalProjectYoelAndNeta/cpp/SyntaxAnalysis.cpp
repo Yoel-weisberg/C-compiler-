@@ -164,7 +164,7 @@ void SyntaxAnalysis::validSentences()
 			else if (_tokens[pos].getType() == IF_WORD)
 			{
 				checkFlowControlStructure(pos);
-			}
+			}				    
 			else if (_tokens[pos].getType() == R_CURLY_BRACK)
 			{
 				pos++;
@@ -175,7 +175,7 @@ void SyntaxAnalysis::validSentences()
 			}
 			else if (_tokens[pos].getType() == RETURN_STATEMENT)
 			{
-				pos++;
+				pos = checkReturnStatement(pos);
 			}
 			else if (_tokens[pos].getType() >= DO_WHILE_LOOP && _tokens[pos].getType() <= FOR_LOOP)
 			{
@@ -459,6 +459,16 @@ int SyntaxAnalysis::checkConditionStructure(int& pos, bool isForLoop)
 		}
 		pos++;
 	}
+}
+
+int SyntaxAnalysis::checkReturnStatement(int& pos)
+{
+	pos++;
+	while (_tokens[pos].getType() != SEMICOLUMN)
+	{
+		pos++;
+	}
+	return ++pos;
 }
 
 

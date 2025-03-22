@@ -53,7 +53,7 @@ private:
 	// Helper methods
 	std::pair<int, int> findMatchingCurlB(int& pos);
 	int checkConditionStructure(int& pos, bool ifForLoop = false);
-
+	int checkReturnStatement(int& pos);
 	// a function to check if a decleration is of a function or a varieble
 	// 
 };
