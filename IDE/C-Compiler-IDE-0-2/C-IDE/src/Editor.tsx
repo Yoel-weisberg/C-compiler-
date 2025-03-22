@@ -4,6 +4,7 @@ import { FilesContext } from "./FileManager";
 import Editor, { OnMount } from "@monaco-editor/react";
 import { useTerminal } from "./TerminalProvider";
 import * as monaco from 'monaco-editor';
+import { useLiveShare } from "./FileContentContext";
 
 // import { useTerminal } from "./TerminalManager";
 //import { useSizeContext } from "./DisplayManager";
@@ -15,6 +16,7 @@ export const CodeEditor: React.FC = () => {
     const currentFile = currentFileIndex !== -1 ? openFiles.files[currentFileIndex] : null;
     // State for editor content (to hold text from the File object)
     const [editorContent, setEditorContent] = useState<string>("");
+    const { isHost, fileData: liveShareFileData, setFileData: setLiveShareFileData } = useLiveShare();
 
     //const {editorHeight} = useSizeContext();
     const { terminalHeight } = useTerminal(); 
@@ -52,12 +54,18 @@ export const CodeEditor: React.FC = () => {
 
     // Update editor content whenever the current file changes
     useEffect(() => {
+        if (liveShareFileData) {
+            // If we're receiving data through live share, prioritize it
+            setEditorContent(liveShareFileData);
+
+        }
         if (currentFile) {
             readFileContent(currentFile.currentVersion).then((content) => {
                 setEditorContent(content); // Set editor content to the file content
             });
         }
-    }, [currentFileIndex, currentFile]);
+        
+    }, [currentFileIndex, currentFile, liveShareFileData]);
 
     // Handle content changes in editor
     const handleEditorChange = (value: string | undefined) => {
@@ -72,6 +80,19 @@ export const CodeEditor: React.FC = () => {
             }
             updateFile(currentFileIndex, { currentVersion: updatedFile }); // Update the file content
         }
+
+            const newContent = value || "";
+        setEditorContent(newContent);
+        
+        // Update both local and live share state
+        // setLocalFileData(newContent);
+        
+        // If we're hosting, also update the live share data to broadcast changes
+        if (isHost) {
+        setLiveShareFileData(newContent);
+        }
+        
+        console.log("Editor content changed:", newContent.substring(0, 50) + (newContent.length > 50 ? "..." : ""));
     };
 
 
