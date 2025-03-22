@@ -9,7 +9,6 @@ const FileExplorer: React.FC = () => {
     <div className="file-explorer">
       <div className="file-explorer-header">
         <span>Explorer</span>
-        {/* <button onClick={openFolder}>Open Folder</button> */}
       </div>
       <div className="file-explorer-content">
         {fileTree ? (
