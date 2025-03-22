@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import {  openFile, useFilesContext } from "./FileManager";
 import {findFileToCompile} from "./Compile";
 import { useTerminal } from "./TerminalProvider";
+import { useFileExplorer } from "./FileExplorerProvider";
 // import { useTerminal } from "./TerminalManager";
 //import { useSizeContext } from "./DisplayManager";
 
@@ -41,6 +42,8 @@ export const Toolbar: React.FC = () => {
             // Create File in the current directory 
             // Open file for display
     };
+
+    const {openFolder} = useFileExplorer();
 
     // ------------------------------------
 
@@ -84,6 +87,11 @@ export const Toolbar: React.FC = () => {
                         <li>
                             <button onClick={handleCreateFile}>
                                 New File
+                            </button>
+                        </li>
+                        <li>
+                            <button onClick={openFolder}>
+                                open Folder
                             </button>
                         </li>
                     </ul>

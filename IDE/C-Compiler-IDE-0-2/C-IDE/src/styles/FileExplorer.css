@@ -1,0 +1,115 @@
+/* File Explorer Container */
+.file-explorer {
+    padding-top: 20px;
+    position: absolute;
+    width: 200px;  /* Set a fixed width */
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background-color: #1e1e1e; /* VS Code sidebar background */
+    color: #cccccc; /* Text color */
+    font-family: "Segoe UI", sans-serif;
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    height: 580px;
+    overflow: none;
+    border-right: 1px solid #333;
+}
+
+/* Header */
+.file-explorer-header {
+    background-color: #333;
+    width: 200px;  /* Set a fixed width */
+    left: 0;
+    top: 0;
+    bottom: 0;
+    color: white;
+    padding: 4px;
+    font-weight: bold;
+    font-size: 12px;
+    text-transform: uppercase;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* File List */
+.file-explorer-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 2px;
+}
+
+/* Folder and File Styling */
+.file-item {
+    /* padding-left: 2px; */
+    /* padding: 2px 4px; */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    user-select: none;
+}
+
+/* Folder Icons */
+.folder {
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.folder::before {
+    content: "📁";
+    margin-right: 5px;
+}
+
+/* File Icons */
+.file::before {
+    content: "📄";
+    margin-right: 5px;
+}
+
+/* Hover Effect */
+.file-item:hover {
+    background-color: #3a3d41;
+}
+
+/* Selected File */
+.file-item.selected {
+    background-color: #094771;
+    color: white;
+}
+
+/* Indentation for nested folders */
+.file-item.indent-1 { padding-left: 1px; }
+.file-item.indent-2 { padding-left: 2px; }
+.file-item.indent-3 { padding-left: 3px; }
+
+
+
+/* Scrollbar container */
+.file-explorer-content::-webkit-scrollbar {
+    width: 10px;  
+    height: 10px; 
+}
+
+/* Scrollbar track (background) */
+.file-explorer-content::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1); 
+}
+
+/* Scrollbar thumb (movable part) */
+.file-explorer-content::-webkit-scrollbar-thumb {
+    background: rgba(121, 121, 121, 0.4); 
+    transition: background 0.3s;
+}
+
+/* Scrollbar thumb on hover */
+.file-explorer-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(121, 121, 121, 0.7);
+}
+
+/* Scrollbar thumb when active */
+.file-explorer-content::-webkit-scrollbar-thumb:active {
+    background: rgba(121, 121, 121, 0.9);
+}

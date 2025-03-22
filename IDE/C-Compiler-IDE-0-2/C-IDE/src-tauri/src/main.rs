@@ -1,7 +1,48 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 use tauri::Manager; 
+// --- For File explorer --- 
+use std::fs;
+use std::path::Path;
+use tauri::command;
+use serde::{Serialize, Deserialize};
 
+// File Explorer related
+#[derive(Serialize, Deserialize)]
+struct FileNode {
+    name: String,
+    path: String,
+    is_directory: bool,
+    children: Option<Vec<FileNode>>, // Optional children for folders
+}
+
+#[command]
+fn read_directory(path: String) -> Vec<FileNode> {
+    let mut entries = vec![];
+    if let Ok(dir) = fs::read_dir(Path::new(&path)) {
+        for entry in dir.flatten() {
+            let path = entry.path();
+            let file_name = entry.file_name().into_string().unwrap_or_default();
+            let is_directory = path.is_dir();
+
+            entries.push(FileNode {
+                name: file_name,
+                path: path.to_string_lossy().into_owned(),
+                is_directory,
+                children: if is_directory {
+                    Some(read_directory(path.to_string_lossy().into_owned()))
+                } else {
+                    None
+                },
+            });
+        }
+    }
+    entries
+}
+
+
+
+// --- Compiling ---
 #[tauri::command]
 fn run_exe(file_path: String) -> Result<String, String> {
     use std::process::Command;
@@ -42,7 +83,7 @@ fn main() {
             }
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![run_exe])
+        .invoke_handler(tauri::generate_handler![run_exe, read_directory])
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
         .run(tauri::generate_context!())

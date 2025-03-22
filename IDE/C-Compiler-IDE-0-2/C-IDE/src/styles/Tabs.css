@@ -5,8 +5,12 @@
     padding-top: 20px;
     height: 70px;
     display: flex;
-
+    /* right: 0; */
+    /* left: 200px; */
+    width: calc(100% - 200px);
+    padding-left: 200px;
     /* padding: 8px; */
+    overflow-x: auto; 
     background-color: #2e2e2e; /* Dark background color */
     /* border-bottom: 1px solid #444;  */
 }
@@ -35,3 +39,32 @@
 .tab:hover {
     background-color: #444;
 }
+
+
+/* Scrollbar container */
+.open-tabs::-webkit-scrollbar {
+    width: 10px;  
+    height: 3px; 
+}
+
+/* Scrollbar track (background) */
+.open-tabs::-webkit-scrollbar-track {
+    background: #3e3e3e; 
+}
+
+/* Scrollbar thumb (movable part) */
+.open-tabs::-webkit-scrollbar-thumb {
+    background: transparent; 
+    transition: background 0.3s;
+}
+
+/* Scrollbar thumb on hover */
+.open-tabs::-webkit-scrollbar-thumb:hover {
+    background: rgba(121, 121, 121, 0.7);
+}
+
+/* Scrollbar thumb when active */
+.open-tabs::-webkit-scrollbar-thumb:active {
+    background: rgba(121, 121, 121, 0.9);
+}
+

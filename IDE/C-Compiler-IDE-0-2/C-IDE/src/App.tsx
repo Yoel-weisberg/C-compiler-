@@ -5,21 +5,25 @@ import { FilesProvider } from "./FileManager";
 import { Tabs } from "./Tabs";
 import { TerminalComponent } from "./Terminal";
 import { TerminalProvider } from "./TerminalProvider";
+import FileExplorer from "./FileExplorer";
+import { FileExplorerProvider } from "./FileExplorerProvider";
 
 function App() {
-
-  return (
-    <TerminalProvider>
-        <FilesProvider> 
-            <div className="app-container">
-              <Toolbar/>
-              <Tabs/>
-              <CodeEditor/>
-              <TerminalComponent/>
-            </div>
-        </FilesProvider>
-      </TerminalProvider>
-  )
+    return (
+        <FileExplorerProvider>
+            <TerminalProvider>
+                <FilesProvider> 
+                    <div className="app-container">
+                        <Toolbar/>
+                        <Tabs/>
+                        <CodeEditor/>
+                        <TerminalComponent/>
+                        <FileExplorer/>
+                    </div>
+                </FilesProvider>
+            </TerminalProvider>
+        </FileExplorerProvider>
+        )
 }
 
 export default App;
