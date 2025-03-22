@@ -7,12 +7,14 @@ import { TerminalComponent } from "./Terminal";
 import { TerminalProvider } from "./TerminalProvider";
 import FileExplorer from "./FileExplorer";
 import { FileExplorerProvider } from "./FileExplorerProvider";
+import { LiveShareProvider } from "./FileContentContext";
 
 function App() {
     return (
         <FileExplorerProvider>
             <TerminalProvider>
-                <FilesProvider> 
+              <LiveShareProvider>
+                  <FilesProvider> 
                     <div className="app-container">
                         <Toolbar/>
                         <Tabs/>
@@ -21,6 +23,7 @@ function App() {
                         <FileExplorer/>
                     </div>
                 </FilesProvider>
+              </LiveShareProvider>
             </TerminalProvider>
         </FileExplorerProvider>
         )
