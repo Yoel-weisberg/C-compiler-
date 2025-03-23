@@ -11,21 +11,21 @@ import { LiveShareProvider } from "./FileContentContext";
 
 function App() {
     return (
-        <FileExplorerProvider>
             <TerminalProvider>
               <LiveShareProvider>
                   <FilesProvider> 
-                    <div className="app-container">
-                        <Toolbar/>
-                        <Tabs/>
-                        <CodeEditor/>
-                        <TerminalComponent/>
-                        <FileExplorer/>
-                    </div>
+                    <FileExplorerProvider>
+                      <div className="app-container">
+                          <Toolbar/>
+                          <Tabs/>
+                          <CodeEditor/>
+                          <TerminalComponent/>
+                          <FileExplorer/>
+                      </div>
+                    </FileExplorerProvider>
                 </FilesProvider>
               </LiveShareProvider>
             </TerminalProvider>
-        </FileExplorerProvider>
         )
 }
 
