@@ -148,6 +148,7 @@ class VariableExprAST : public ExprAST
 public:
 	VariableExprAST(const std::string& Name) : _name(Name) {}
 	virtual Value* codegen() override;
+	std::string getName() { return _name; }
 };
 
 // code like int a = 5;

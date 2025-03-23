@@ -56,8 +56,6 @@ bool Parser::isUnaryOp()
 	{
 		if (currentToken().getType() == ADDITION && _tokens[_currentTokenIndex + 1].getType() == ADDITION)
 		{
-			consume();
-			consume();
 			return true;
 		} 
 	}
@@ -65,8 +63,6 @@ bool Parser::isUnaryOp()
 	{
 		if (currentToken().getType() == ADDITION && _tokens[_currentTokenIndex + 1].getType() == SUBTRACTION)
 		{
-			consume();
-			consume();
 			return true;
 		}
 	}
@@ -116,10 +112,31 @@ std::unique_ptr<ExprAST> Parser::parseBinOpRHS(int ExprPrec, std::unique_ptr<Exp
 	}
 }
 
-std::unique_ptr<ExprAST> Parser::parseUnaryOp(std::unique_ptr<ExprAST> LHS)
-{
+std::unique_ptr<ExprAST> Parser::parseUnaryOp(std::unique_ptr<ExprAST> LHS) {
+	// Before we consume tokens, check that LHS is a valid variable reference
+	// (only variables can be incremented/decremented)
+	VariableExprAST* varExpr = dynamic_cast<VariableExprAST*>(LHS.get());
+	if (!varExpr) {
+		throw SyntaxError("Increment/decrement can only be applied to variables");
+	}
+
 	Tokens_type op = currentToken().getType();
-	return std::make_unique<UnaryOpExprAST>(op, std::move(LHS));
+
+	// For post-increment/decrement (i++, i--), we already have the variable as LHS
+	if (op == ADDITION && _tokens[_currentTokenIndex + 1].getType() == ADDITION) {
+		// Post-increment (i++)
+		consume(2); // Skip "++"
+		return std::make_unique<UnaryOpExprAST>(ADDITION, std::move(LHS));
+	}
+	else if (op == SUBTRACTION && _tokens[_currentTokenIndex + 1].getType() == SUBTRACTION) {
+		// Post-decrement (i--)
+		consume(2); // Skip "--"
+		return std::make_unique<UnaryOpExprAST>(SUBTRACTION, std::move(LHS));
+	}
+
+	// This part would handle pre-increment/decrement (++i, --i) if needed
+
+	throw SyntaxError("Unrecognized unary operator");
 }
 
 // Current token getter
@@ -637,39 +654,62 @@ std::unique_ptr<ExprAST> Parser::parseDoWhileLoop()
 
 std::unique_ptr<ExprAST> Parser::parseForLoop()
 {
-	consume(2); // Move past 'for' and '('
-	// Parse condition
-	auto condInit = parseExpression();
-	if (!condInit)
-	{
-		return nullptr;
+	consume(); // Move past 'for'
+
+	if (currentToken().getType() != LPAREN) {
+		throw SyntaxError("Expected '(' after 'for'");
 	}
-	
-	auto condC = parseExpression();
-	if (!condC)
-	{
+	consume(); // Move past '('
+
+	// Parse initialization
+	auto condInit = parseExpression();
+	if (!condInit) {
 		return nullptr;
 	}
 
-	consume(); // Move past ';'
-	auto condInc = parseExpression();
-	if (!condInc)
-	{
+	// Parse condition
+	auto condC = parseExpression();
+	if (!condC) {
 		return nullptr;
 	}
-	consume(3);
+
+	if (currentToken().getType() != SEMICOLUMN) {
+		throw SyntaxError("Expected ';' after for loop condition");
+	}
+	consume(); // Move past ';'
+
+	// Parse increment expression
+	auto condInc = parseExpression();
+	if (!condInc) {
+		return nullptr;
+	}
+
+	if (currentToken().getType() != RPAREN) {
+		throw SyntaxError("Expected ')' after for loop increment expression");
+	}
+	consume(); // Move past ')'
+
+	// Look for and consume the opening curly brace
+	if (currentToken().getType() != L_CURLY_BRACK) {
+		throw SyntaxError("Expected '{' after for loop header");
+	}
+	consume(); // Move past '{'
+
 	// Parse body
 	std::vector<std::unique_ptr<ExprAST>> body;
-	while (currentToken().getType() != R_CURLY_BRACK)
-	{
+	while (currentToken().getType() != R_CURLY_BRACK) {
 		auto expr = parseExpression();
-		if (!expr)
-		{
+		if (!expr) {
 			return nullptr;
 		}
 		body.emplace_back(std::move(expr));
 	}
-	consume(); // Move past '}' 
+
+	if (currentToken().getType() != R_CURLY_BRACK) {
+		throw SyntaxError("Expected '}' at end of for loop body");
+	}
+	consume(); // Move past '}'
+
 	return std::make_unique<ForLoopAST>(std::move(body), std::move(condInit), std::move(condC), std::move(condInc));
 }
 

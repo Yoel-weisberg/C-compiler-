@@ -2,15 +2,9 @@ int foo() {
     return 5;
 }
 int main() {
-    int a = 3;
-    int b = 3;
-    if (a == 2)
+    for (int i = 0; i < 3; i++)
     {
-        printf("a is 2");
-    }
-    else
-    {
-        printf("a is not 2");
+        printf("loop");
     }
     return 0;
 }
