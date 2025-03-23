@@ -42,7 +42,8 @@ enum Tokens_type {
 	// YET TO BE SUPPORTED:
 	NOT,
 	UNARY_MINUS,
-	SIZE_OF
+	SIZE_OF,
+	STRING_LITERAL
 };
 
 // Other
@@ -81,6 +82,6 @@ enum Tokens_type {
 #define DIS_BETWEEN_SINGLE_QOUTES 2
 #define NEW_LINE_STR "\n"
 
-#define OBJECT_FILE_LOC "object.o"
+#define OBJECT_FILE_LOC "D:/Yoel-Stuff/Maghimim/Final-Project/FinalProjectYoelAndNeta/object.obj"
 #define EXE_FILE_LOC "executable.exe"
 #define LLD_FILE "ld.lld.exe"

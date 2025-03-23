@@ -125,11 +125,23 @@ int SyntaxAnalysis::arrTypeVariableDefinitionStructure(int pos)
 
 bool SyntaxAnalysis::doesVariableFitType(const std::string &type, std::string value)
 {
-	if (type == FLOAT_TYPE_LIT )
+	// If the value contains any operators, consider it an expression
+	// and skip the type check (will be evaluated later)
+	if (value.find('+') != std::string::npos ||
+		value.find('-') != std::string::npos ||
+		value.find('*') != std::string::npos ||
+		value.find('/') != std::string::npos ||
+		Helper::checkIdentifier(value)) // If it's a variable reference
+	{
+		return true; // Skip the check for expressions
+	}
+
+	// Original type checking for literals
+	if (type == FLOAT_TYPE_LIT)
 	{
 		return Helper::isFloat(value);
 	}
-	else if (type == INT_TYPE_LIT )
+	else if (type == INT_TYPE_LIT)
 	{
 		return Helper::isInteger(value);
 	}
@@ -137,6 +149,8 @@ bool SyntaxAnalysis::doesVariableFitType(const std::string &type, std::string va
 	{
 		return Helper::isChar(value);
 	}
+
+	return false;
 }
 
 void SyntaxAnalysis::validSentences()
@@ -285,16 +299,10 @@ int SyntaxAnalysis::checkIdentifier(int& pos)
 	if (_tokens[pos].getType() == LPAREN)
 	{
 		// move past LPRAN
-		pos++;
-		while (_tokens[pos].getType() == INT || _tokens[pos].getType() == FLOAT)
+		while (_tokens[pos++].getType() != RPAREN)
 		{
-			pos++;
-			if (_tokens[pos].getType() != COMMA && _tokens[pos].getType() != RPAREN)
-			{
-				throw SyntaxError("Excepted a comma or a ) after argument in function call");
-			}
+
 		}
-		if (_tokens[pos].getType() == RPAREN) pos++;
 	}
 	if (_tokens[pos].getType() != SEMICOLUMN && pos < _tokens.size()) throw SyntaxError("Excepted a semicolumn");
 	return ++pos;

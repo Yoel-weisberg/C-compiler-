@@ -27,6 +27,7 @@ private:
     int getTokenPrecedence();
 
     std::map<Tokens_type, int> _BinopPrecedence;
+    Function* _currentFunctionContext;  // nullptr when not in a function
 
 public:
     // Constructor
@@ -73,9 +74,10 @@ public:
     std::unique_ptr<PrototypeAST> parsePrototype();
     std::unique_ptr<FunctionAST> parseFunctionDefinition();
     std::unique_ptr<ExprAST> parseVoid();
+    std::unique_ptr<ExprAST> parseStringLiteral();
     // Getter for the root AST
     ExprAST* getAst();
-
+    bool isInsideFunction() ;
     bool isUnaryOp();
 };
 

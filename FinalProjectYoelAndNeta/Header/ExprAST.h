@@ -227,6 +227,7 @@ public:
 	llvm::Function* codegen();
 	const std::string& getName() const { return Name; }
 	const std::string& getReturnType() const { return returnType; }
+	const std::string  getParamName(unsigned idx) const;
 };
 
 /// FunctionAST - This class represents a function definition itself.
@@ -283,6 +284,16 @@ class StructDeclerationExprAST : public ExprAST
 public:
 	StructDeclerationExprAST(const std::string& type, const std::string& name) : _type(type), _name(name){}
 	llvm::Value* codegen() override;
+};
+
+class StringExprAST : public ExprAST
+{
+private:
+	std::string _str;
+
+public:
+	StringExprAST(const std::string& str) : _str(str) {}
+	Value* codegen() override;
 };
 // code like a = 5;
 //class RedefinitionExprAst : public ExprAST

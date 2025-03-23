@@ -27,7 +27,7 @@ int Parser::getTokenPrecedence()
 
 // Constructor for Parser
 Parser::Parser(const std::vector<Token>& tokens)
-	: _tokens(tokens), _currentTokenIndex(0) 
+	: _tokens(tokens), _currentTokenIndex(0), _currentFunctionContext(nullptr)
 {
 
 	// comparing operaters
@@ -44,6 +44,12 @@ Parser::Parser(const std::vector<Token>& tokens)
 ExprAST* Parser::getAst()
 {
 	return _head.get();
+}
+
+bool Parser::isInsideFunction()
+{
+	return _currentTokenIndex > 0 &&
+		_tokens[_currentTokenIndex - 1].getType() == L_CURLY_BRACK;
 }
 
 bool Parser::isUnaryOp()
@@ -64,7 +70,7 @@ bool Parser::isUnaryOp()
 std::unique_ptr<ExprAST> Parser::parseBinOpRHS(int ExprPrec, std::unique_ptr<ExprAST> LHS)
 {
 	// If this is a binop, find its precedence.
-	while (true) 
+	while (true)
 	{
 		int TokPrec = getTokenPrecedence();
 
@@ -93,6 +99,11 @@ std::unique_ptr<ExprAST> Parser::parseBinOpRHS(int ExprPrec, std::unique_ptr<Exp
 
 		// Merge LHS/RHS.
 		LHS = std::make_unique<BinaryExprAST>(BinOp, std::move(LHS), std::move(RHS));
+
+		// If we're in a function call and we hit a comma or closing parenthesis,
+		// we should return early to let the function call parser handle it
+		if (currentToken().getType() == COMMA || currentToken().getType() == RPAREN)
+			return LHS;
 	}
 }
 
@@ -350,10 +361,11 @@ bool Parser::isStructVariable(const std::string& varName) {
 	return varType->isStructTy();  // Check if it's a struct type
 }
 
+
 std::unique_ptr<ExprAST> Parser::parseIdentifierExpr()
 {
 	std::string IdName = currentToken().getLiteral();
-	
+
 	// Check for struct
 	if (isStructVariable(IdName))
 	{
@@ -365,7 +377,7 @@ std::unique_ptr<ExprAST> Parser::parseIdentifierExpr()
 
 	if (currentToken().getType() != LPAREN) // Simple variable ref.
 	{
-		if (currentToken().getType() == SEMICOLUMN) 
+		if (currentToken().getType() == SEMICOLUMN)
 		{
 			consume();
 		}
@@ -379,6 +391,7 @@ std::unique_ptr<ExprAST> Parser::parseIdentifierExpr()
 	{
 		while (true)
 		{
+			// Parse the expression for this argument
 			if (auto Arg = parseExpression())
 			{
 				Args.push_back(std::move(Arg));
@@ -388,12 +401,24 @@ std::unique_ptr<ExprAST> Parser::parseIdentifierExpr()
 				return nullptr;
 			}
 
+			// Check if we've reached the end of the argument list
 			if (currentToken().getType() == RPAREN)
 			{
 				break;
 			}
 
-			consume();
+			// Handle commas between arguments
+			if (currentToken().getType() == COMMA)
+			{
+				consume(); // Eat the comma
+			}
+			else
+			{
+				// Error: expected comma or closing parenthesis
+				throw SyntaxError("Expected ',' or ')' in function call argument list, got " +
+					currentToken().getLiteral() + " of type " +
+					std::to_string(currentToken().getType()));
+			}
 		}
 	}
 
@@ -427,10 +452,18 @@ std::unique_ptr<ExprAST> Parser::parseExpression() {
 	{
 		return nullptr;
 	}
+
+	// Check for early return in function call context
+	if (currentToken().getType() == COMMA || currentToken().getType() == RPAREN)
+	{
+		return LHS;
+	}
+
 	if (isUnaryOp()) // Currently handling only Postfix Ops. Such as "x++" and not "++x"
 	{
 		return parseUnaryOp(std::move(LHS));
 	}
+
 	return parseBinOpRHS(0, std::move(LHS));
 }
 
@@ -453,7 +486,7 @@ std::unique_ptr<ExprAST> Parser::parsePrimary()
 	case IDENTIFIER:
 		return parseIdentifierExpr();
 	// TODO: parse return statement  (return VariableExprAST)
-	case RETURN_STATEMENT:
+	case RETURN_STATEMENT:	
 		return nullptr;
 	case INT:
 		return parseIntagerNumberExpr();
@@ -465,6 +498,8 @@ std::unique_ptr<ExprAST> Parser::parsePrimary()
 		return parseForLoop();
 	case STRUCT:
 		return parseStruct();
+	case STRING_LITERAL:
+		return parseStringLiteral();
 	default:
 		throw SyntaxError("Undefined Sentence begining");
 	}
@@ -649,7 +684,6 @@ std::unique_ptr<PrototypeAST> Parser::parsePrototype()
 	consume(2); // eat ') and { or ;
 	return std::make_unique<PrototypeAST>(FnName, std::move(argsTypesAndNames), returnType);
 }
-
 std::unique_ptr<FunctionAST> Parser::parseFunctionDefinition()
 {
 	auto Proto = parsePrototype();
@@ -661,7 +695,7 @@ std::unique_ptr<FunctionAST> Parser::parseFunctionDefinition()
 
 	std::vector<std::unique_ptr<ExprAST>> funcBody;
 
-	// Iterate through function and parse it
+	// Iterate through function body
 	while (currentToken().getType() != RETURN_STATEMENT && currentToken().getType() != R_CURLY_BRACK)
 	{
 		std::unique_ptr<ExprAST> expr = parseExpression();
@@ -672,29 +706,74 @@ std::unique_ptr<FunctionAST> Parser::parseFunctionDefinition()
 		funcBody.emplace_back(std::move(expr));
 	}
 
+	// Parse return statement if present
 	std::unique_ptr<ExprAST> returnStatement = nullptr;
 	if (currentToken().getType() == RETURN_STATEMENT)
 	{
-		//consume();
-		returnStatement = parseExpression();
-		return std::make_unique<FunctionAST>(std::move(Proto), std::move(funcBody), std::move(returnStatement), funcType);
+		consume(); // Skip 'return' keyword
+
+		// Check if there's a return value
+		if (currentToken().getType() != SEMICOLUMN)
+		{
+			returnStatement = parseExpression();
+
+			// Consume semicolon if needed
+			if (currentToken().getType() == SEMICOLUMN)
+				consume();
+		}
+		else
+		{
+			// Void return with no value
+			consume(); // Skip semicolon
+		}
 	}
 	else if (Proto.get()->getReturnType() == "void")
 	{
-		auto voidRet = parseVoid();
-		return std::make_unique<FunctionAST>(std::move(Proto), std::move(funcBody), std::move(returnStatement), funcType);
+		// Void function with no explicit return
+		returnStatement = parseVoid();
 	}
 	else
 	{
-		throw SyntaxError("Excepted a return statement");
+		throw SyntaxError("Expected a return statement for non-void function");
 	}
 
-	return nullptr;
+	return std::make_unique<FunctionAST>(std::move(Proto), std::move(funcBody), std::move(returnStatement), funcType);
 }
 
 std::unique_ptr<ExprAST> Parser::parseVoid()
 {
 	return std::make_unique<VoidAst>();
+}
+
+// Add to your Parser class
+std::unique_ptr<ExprAST> Parser::parseStringLiteral() {
+	// Assuming the current token is a string literal
+	std::string str = currentToken().getLiteral();
+
+	// Remove the quotation marks
+	str = str.substr(1, str.length() - 2);
+
+	// Handle escape sequences
+	std::string result;
+	for (size_t i = 0; i < str.length(); ++i) {
+		if (str[i] == '\\' && i + 1 < str.length()) {
+			switch (str[i + 1]) {
+			case 'n': result += '\n'; break;
+			case 't': result += '\t'; break;
+			case 'r': result += '\r'; break;
+				// Add more escape sequences as needed
+			default: result += str[i + 1];
+			}
+			i++; // Skip the escape character
+		}
+		else {
+			result += str[i];
+		}
+	}
+
+	consume(); // Eat the string token
+
+	return std::make_unique<StringExprAST>(result);
 }
 
 std::unique_ptr<FunctionAST> Parser::parseTopLevelExpr()
