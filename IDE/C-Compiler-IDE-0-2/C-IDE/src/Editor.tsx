@@ -101,7 +101,7 @@ export const CodeEditor: React.FC = () => {
             <Editor
             className="monaco-editor"
             //height={`calc(100vh - ${terminalHeight}px - 19px)`} // Editor height (with the terminals' border)
-            height={`calc(100vh - ${terminalHeight}px - 10px)`} 
+            height={`calc(100vh - ${terminalHeight}px)`} 
             defaultLanguage="c" // Default language
             value={editorContent} // Editor value
             onChange={handleEditorChange} // Handle content changes

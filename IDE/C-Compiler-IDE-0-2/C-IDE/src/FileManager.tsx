@@ -118,39 +118,82 @@ export const FilesProvider = ({children}: {children: React.ReactNode}) => {
 
 // Open
 
-export async function openFile(addFile: (file: FileState) => void) {
-  // Open a file using the dialog
-  const filePath = await open({
-    multiple: false,
-    directory: false,
-  });
+export async function openFile(addFile: (file: FileState) => void, filePath?: string | null| undefined) {
+  let selectedFilePath: string | null | undefined = filePath;
 
-  if (filePath) {
-    const content = await readTextFile(filePath as string); // Read file content
-    const fileName = filePath.split('\\').pop() || 'Untitled'; // Extract file name
-    const fileExtension = fileName.split('.').pop() || ''; 
+  console.log("File path: " + selectedFilePath);
 
-    // Assign a MIME type 
-    let mimeType = 'text/plain'; // Default MIME type for text files
-    if (fileExtension === 'c' || fileExtension === "h") {
-      mimeType = 'text/x-c'; // MIME type for C source/header code files
+  // If no file path is provided, open the file dialog
+  if (!selectedFilePath) {
+    selectedFilePath = await open({
+      multiple: false,
+      directory: false,
+    });
+
+    if (!selectedFilePath) {
+      return null; // If no file is selected, return null
     }
-
-
-    const newFile: FileState = {
-      location: filePath as string,
-      lastSavedVersion: new File([content], fileName, { type: mimeType }),
-      currentVersion: new File([content], fileName, { type: mimeType }),
-    };
-    console.log("File Name: " + newFile.currentVersion.name)
-    // Add the file using the function received as an argument
-    addFile(newFile);
-
-    return { content, filePath };
   }
 
-  return null;
+  const content = await readTextFile(selectedFilePath); // Read file content
+  const fileName = selectedFilePath.split('\\').pop() || 'Untitled'; // Extract file name
+  const fileExtension = fileName.split('.').pop() || '';
+
+  // Assign a MIME type
+  let mimeType = 'text/plain'; // Default MIME type for text files
+  if (fileExtension === 'c' || fileExtension === "h") {
+    mimeType = 'text/x-c'; // MIME type for C source/header code files
+  }
+
+  const newFile: FileState = {
+    location: selectedFilePath, // Use the selected file path
+    lastSavedVersion: new File([content], fileName, { type: mimeType }),
+    currentVersion: new File([content], fileName, { type: mimeType }),
+  };
+
+  console.log("File Name: " + newFile.currentVersion.name);
+  // Add the file using the function received as an argument
+  addFile(newFile);
+
+  return { content, selectedFilePath };
 }
+
+
+
+
+// export async function openFile(addFile: (file: FileState) => void) {
+//   // Open a file using the dialog
+//   const filePath = await open({
+//     multiple: false,
+//     directory: false,
+//   });
+
+//   if (filePath) {
+//     const content = await readTextFile(filePath as string); // Read file content
+//     const fileName = filePath.split('\\').pop() || 'Untitled'; // Extract file name
+//     const fileExtension = fileName.split('.').pop() || ''; 
+
+//     // Assign a MIME type 
+//     let mimeType = 'text/plain'; // Default MIME type for text files
+//     if (fileExtension === 'c' || fileExtension === "h") {
+//       mimeType = 'text/x-c'; // MIME type for C source/header code files
+//     }
+
+
+//     const newFile: FileState = {
+//       location: filePath as string,
+//       lastSavedVersion: new File([content], fileName, { type: mimeType }),
+//       currentVersion: new File([content], fileName, { type: mimeType }),
+//     };
+//     console.log("File Name: " + newFile.currentVersion.name)
+//     // Add the file using the function received as an argument
+//     addFile(newFile);
+
+//     return { content, filePath };
+//   }
+
+//   return null;
+// }
 
 
 

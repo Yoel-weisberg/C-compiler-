@@ -1,6 +1,8 @@
-import React, { createContext, useState, useContext, ReactNode } from "react";
+import { createContext, useState, useContext, ReactNode } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { open} from '@tauri-apps/plugin-dialog';
+import React from "react";
+import { openFile, useFilesContext } from "./FileManager";
 
 interface FileNode {
     name: string;
@@ -68,7 +70,16 @@ export const RenderTree: React.FC<{ node: FileNode; level: number }> = ({ node, 
         setIsOpen(prev => !prev); // Toggle the visibility
     };
 
-    const displayName = node.is_directory ? `${node.name.split("\\").pop()}/` : ` - ${node.name}`; 
+    const {addFile} = useFilesContext();
+    const handleOpenCurrentFile = async () => {
+        console.log("Handling: " + node.path);
+        const result = await openFile(addFile, node.path);  // Call openFile and wait for the result
+        if (result) {
+            console.log("File opened successfully:", result);
+        }
+    }
+
+    const displayName = node.is_directory ? `${node.name.split("\\").pop()}` : ` - ${node.name}`; 
 
     return (
         <div className="file-item-container">
@@ -78,10 +89,14 @@ export const RenderTree: React.FC<{ node: FileNode; level: number }> = ({ node, 
             >
                 {node.is_directory && (
                     <button onClick={toggleFolder} className="folder-toggle-btn">
-                        {isOpen ? '−' : '+'} 
+                        {isOpen ? '−' : '+'}{` ${displayName}`}
                     </button>
                 )}
-                {displayName}
+                {!node.is_directory && (
+                <button className="file-item-button" onClick={handleOpenCurrentFile}> 
+                    {displayName}
+                </button>
+                )}
             </div>
             
             {/* Render only if folder is open */}

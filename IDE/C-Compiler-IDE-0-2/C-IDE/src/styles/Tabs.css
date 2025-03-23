@@ -3,7 +3,7 @@
 
 .open-tabs {
     padding-top: 20px;
-    height: 70px;
+    height: 45px;
     display: flex;
     /* right: 0; */
     /* left: 200px; */
@@ -11,7 +11,7 @@
     padding-left: 200px;
     /* padding: 8px; */
     overflow-x: auto; 
-    background-color: #2e2e2e; /* Dark background color */
+    background-color: #161515; /* Dark background color */
     /* border-bottom: 1px solid #444;  */
 }
 

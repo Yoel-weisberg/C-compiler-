@@ -4,14 +4,14 @@
 .terminal-wrapper {
     display: flex;
     flex-direction: column;
-    height: 292px;
+    height: 200px;
     max-height: 200px;
     /* margin-right: 1px; */
     margin-left: 200px;
     /* padding-right: 100px; */
     /* right: 0;  */
     /* padding-left: 20%;   */
-    background-color: #1E1E1E; 
+    background-color: #161515; 
     border-top: 1px solid #333; 
     overflow: hidden;
     top: 0;
@@ -22,7 +22,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #252526;
+    background-color: #161515;
     color: white;
     font-size: 14px;
     padding-top: 8px;
@@ -41,11 +41,11 @@
 /* Toggle Button */
 .terminal-toggle-btn {
 
-    padding-right: 20px;
+    margin-right: 20px;
     background: #333;
     color: white;
     border: none;
-    /* padding: 4px 10px; */
+    padding: 4px 10px;
     cursor: pointer;
     font-size: 12px;
 }
@@ -58,20 +58,23 @@
 .terminal-container {
     width: 96.5%;
     right: 0;
-    /* left: 20%; */
     flex-grow: 1; 
     min-height: 0; 
     padding-left: 20px;
-    /* padding-right: 27px; */
-    background-color: #1e1e1e;
-    border: 2px solid;
-    border-color: rgb(228, 10, 191);
+    background-color: #161515;
     overflow-y: auto; 
+    overflow-x:hidden;
 }
+
+
 
 /* xterm.js Modifications */
 .terminal .xterm-viewport {
     overflow-y: auto !important;
+}
+
+.xterm-helpers{
+    opacity: 0;
 }
 
 /* Remove the stdin input box */
@@ -89,6 +92,13 @@
     padding-right: 20px;
     width: 10px;  
     height: 10px; 
+    opacity: 0; /* Initially make it invisible */
+    transition: opacity 0.3s; /* Smooth transition for visibility */
+}
+
+/* Show scrollbar when the container is hovered */
+.terminal-container:hover::-webkit-scrollbar {
+    opacity: 1; /* Make the scrollbar visible on hover */
 }
 
 /* Scrollbar track (background) */
