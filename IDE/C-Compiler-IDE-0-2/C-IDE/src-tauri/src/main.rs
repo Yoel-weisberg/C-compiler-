@@ -19,12 +19,15 @@ struct FileNode {
 #[command]
 fn read_directory(path: String) -> Vec<FileNode> {
     let mut entries = vec![];
+    println!("Reading directory: {}", path);
     if let Ok(dir) = fs::read_dir(Path::new(&path)) {
         for entry in dir.flatten() {
             let path = entry.path();
             let file_name = entry.file_name().into_string().unwrap_or_default();
             let is_directory = path.is_dir();
-
+            
+            println!("Found: {} (Directory: {})", file_name, is_directory); 
+            
             entries.push(FileNode {
                 name: file_name,
                 path: path.to_string_lossy().into_owned(),
