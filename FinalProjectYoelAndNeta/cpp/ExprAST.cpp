@@ -173,7 +173,7 @@ Value* AssignExprAST::codegen()
     return value;
 }
 
-Value* IfExprAST::codegen() 
+Value* IfExprAST::codegen()
 {
     Value* CondV = Cond->codegen();
     if (!CondV)
@@ -181,9 +181,21 @@ Value* IfExprAST::codegen()
         return nullptr;
     }
 
-    // Convert condition to a bool by comparing non-equal to 0.0.
-    CondV = Helper::Builder->CreateFCmpONE(
-        CondV, ConstantFP::get(*Helper::TheContext, APFloat(0.0)), "ifcond");
+    if (CondV->getType()->isFloatingPointTy()) {
+        // For floating point types, use FCmp
+        CondV = Helper::Builder->CreateFCmpONE(
+            CondV, ConstantFP::get(*Helper::TheContext, APFloat(0.0)), "ifcond");
+    }
+    else if (CondV->getType()->isIntegerTy()) {
+        // For integer types, use ICmp
+        CondV = Helper::Builder->CreateICmpNE(
+            CondV, ConstantInt::get(CondV->getType(), 0), "ifcond");
+    }
+    else if (CondV->getType()->isPointerTy()) {
+        // For pointer types, compare with null
+        CondV = Helper::Builder->CreateICmpNE(
+            CondV, ConstantPointerNull::get(cast<PointerType>(CondV->getType())), "ifcond");
+    } // Missing closing brace was here
 
     Function* TheFunction = Helper::Builder->GetInsertBlock()->getParent();
 
@@ -192,17 +204,12 @@ Value* IfExprAST::codegen()
     BasicBlock* MergeBB = BasicBlock::Create(*Helper::TheContext, "ifcont");
 
     BasicBlock* ElseBB = nullptr;
-    if (Else) 
+    if (Else)
     {
-        ElseBB = BasicBlock::Create(*Helper::TheContext, "else", TheFunction);
-    }
-
-    // Create conditional branch.
-    if (Else) 
-    {
+        ElseBB = BasicBlock::Create(*Helper::TheContext, "else");
         Helper::Builder->CreateCondBr(CondV, ThenBB, ElseBB);
     }
-    else 
+    else
     {
         Helper::Builder->CreateCondBr(CondV, ThenBB, MergeBB);
     }
@@ -220,8 +227,9 @@ Value* IfExprAST::codegen()
 
     // Emit else block if it exists.
     Value* ElseV = nullptr;
-    if (Else) 
+    if (Else)
     {
+        // Fix this line - use getBasicBlockList() instead of insert()
         TheFunction->insert(TheFunction->end(), ElseBB);
         Helper::Builder->SetInsertPoint(ElseBB);
         ElseV = Else->codegen();
@@ -231,21 +239,66 @@ Value* IfExprAST::codegen()
         Helper::Builder->CreateBr(MergeBB);
         ElseBB = Helper::Builder->GetInsertBlock();
     }
+    else
+    {
+        // If there's no else, we still need a value for the PHI node
+        // Use the same type as ThenV but with a zero/null value
+        if (ThenV->getType()->isFloatingPointTy()) {
+            ElseV = ConstantFP::get(ThenV->getType(), 0.0);
+        }
+        else if (ThenV->getType()->isIntegerTy()) {
+            ElseV = ConstantInt::get(ThenV->getType(), 0);
+        }
+        else if (ThenV->getType()->isPointerTy()) {
+            ElseV = ConstantPointerNull::get(cast<PointerType>(ThenV->getType()));
+        }
+        else {
+            // For other types, just use undef
+            ElseV = UndefValue::get(ThenV->getType());
+        }
+    }
 
-    // Emit merge block
+    // Emit merge block - fix this line too
     TheFunction->insert(TheFunction->end(), MergeBB);
     Helper::Builder->SetInsertPoint(MergeBB);
 
-    // Get the type from the Then value
-    Type* thenType = ThenV->getType();
-    PHINode* PN = Helper::Builder->CreatePHI(thenType, 2, "iftmp");
+    if (ThenV->getType()->isVoidTy()) {
+        // For void return type, no PHI node is needed
+        return Constant::getNullValue(Type::getInt32Ty(*Helper::TheContext)); // Return dummy value
+    }
+
+    // Use ResultType consistently
+    Type* ResultType = ThenV->getType();
+
+    // If we have both then and else branches, make sure they have compatible types
+    if (Else && ThenV->getType() != ElseV->getType()) {
+        // Try to convert ElseV to match ThenV's type
+        if (ThenV->getType()->isFloatingPointTy() && ElseV->getType()->isIntegerTy()) {
+            ElseV = Helper::Builder->CreateSIToFP(ElseV, ThenV->getType(), "elsefpconv");
+        }
+        else if (ThenV->getType()->isIntegerTy() && ElseV->getType()->isFloatingPointTy()) {
+            ElseV = Helper::Builder->CreateFPToSI(ElseV, ThenV->getType(), "elseintconv");
+        }
+        else {
+            // If we can't convert, use a generic type
+            ResultType = Type::getInt32Ty(*Helper::TheContext);
+            if (ThenV->getType() != ResultType) {
+                ThenV = Helper::Builder->CreateIntCast(ThenV, ResultType, true, "thenconv");
+            }
+            if (ElseV->getType() != ResultType) {
+                ElseV = Helper::Builder->CreateIntCast(ElseV, ResultType, true, "elseconv");
+            }
+        }
+    }
+
+    // Create PHI node with ResultType instead of thenType
+    PHINode* PN = Helper::Builder->CreatePHI(ResultType, 2, "iftmp");
     PN->addIncoming(ThenV, ThenBB);
     if (Else)
         PN->addIncoming(ElseV, ElseBB);
 
     return PN;
 }
-
 /*
 * Generates LLVM IR code for a while loop:
 * Starting with the condition and moving on to the inner part,
@@ -824,4 +877,17 @@ Value* StringExprAST::codegen()
         indices,
         "str",
         Helper::getBuilder().GetInsertBlock());
+}
+
+llvm::Value* BlockExprAST::codegen()
+{
+    llvm::Value* lastVal = nullptr;
+
+    // Generate code for each statement in the block
+    for (auto& stmt : Statements) {
+        lastVal = stmt->codegen();
+    }
+
+    // Return the value of the last statement
+    return lastVal;
 }

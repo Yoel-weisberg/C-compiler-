@@ -7,6 +7,13 @@ Tokeniser::Tokeniser(const std::string& raw_code_str)
 
     for (int i = 0; i < raw_code_str.size(); i++)
     {
+        // handaling equel cmp
+        if (raw_code_str[i] == '=' && raw_code_str[i + 1] == '=')
+        {
+            this->_tokens.push_back({ "==", EQUELS_CMP});
+            currentLiteral = EMPTY_STR;
+            i += 2;
+        }
         // Handle string literals
         if (raw_code_str[i] == '"')
         {

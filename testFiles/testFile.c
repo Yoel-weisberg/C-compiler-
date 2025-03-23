@@ -1,9 +1,16 @@
+int foo() {
+    return 5;
+}
 int main() {
-    int a = 2;
+    int a = 3;
     int b = 3;
-    
-    // Since you've added support for libc functions
-    printf("The result of %d + %d = %d\n", a, b, a+b);
-    
+    if (a == 2)
+    {
+        printf("a is 2");
+    }
+    else
+    {
+        printf("a is not 2");
+    }
     return 0;
 }

@@ -295,6 +295,29 @@ public:
 	StringExprAST(const std::string& str) : _str(str) {}
 	Value* codegen() override;
 };
+
+class  EmptyExprAST : public ExprAST
+{
+public:
+	EmptyExprAST() {}
+
+	llvm::Value* codegen() override {
+		// An empty statement generates no code
+		return nullptr;
+	}
+};
+
+class BlockExprAST : public ExprAST {
+private:
+	std::vector<std::unique_ptr<ExprAST>> Statements;
+
+public:
+	BlockExprAST(std::vector<std::unique_ptr<ExprAST>> statements)
+		: Statements(std::move(statements)) {}
+
+	llvm::Value* codegen() override;
+	const std::vector<std::unique_ptr<ExprAST>>& getStatements() const { return Statements;  }
+};
 // code like a = 5;
 //class RedefinitionExprAst : public ExprAST
 //{

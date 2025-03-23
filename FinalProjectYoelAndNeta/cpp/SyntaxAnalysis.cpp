@@ -298,11 +298,13 @@ int SyntaxAnalysis::checkIdentifier(int& pos)
 	pos++;
 	if (_tokens[pos].getType() == LPAREN)
 	{
+		pos++;
 		// move past LPRAN
 		while (_tokens[pos++].getType() != RPAREN)
 		{
-
+			
 		}
+		if (_tokens[pos].getType() == RPAREN) pos++;
 	}
 	if (_tokens[pos].getType() != SEMICOLUMN && pos < _tokens.size()) throw SyntaxError("Excepted a semicolumn");
 	return ++pos;
