@@ -52,6 +52,7 @@ public:
     std::unique_ptr<ExprAST> parseFloatNumberExpr();
     std::unique_ptr<ExprAST> parseIntagerNumberExpr();
 
+    std::unique_ptr<ExprAST> parseReturnStatement();
     std::unique_ptr<ExprAST> parseParenExpr();
     std::unique_ptr<ExprAST> parseIdentifierExpr();
     std::unique_ptr<ExprAST> parseExpression();

@@ -1,0 +1,70 @@
+
+
+
+.open-tabs {
+    padding-top: 20px;
+    height: 45px;
+    display: flex;
+    /* right: 0; */
+    /* left: 200px; */
+    width: calc(100% - 200px);
+    padding-left: 200px;
+    /* padding: 8px; */
+    overflow-x: auto; 
+    background-color: #161515; /* Dark background color */
+    /* border-bottom: 1px solid #444;  */
+}
+
+.tab {
+    font-size: 14px;
+    font-family: Sans-serif;
+    font: Arial;
+    padding-top: 13px;
+    /* padding-bottom: 0px; */
+    padding-right: 25px;
+    padding-left: 25px;
+    /* padding: 8px 16px; */
+    /* margin-right: 8px; */
+    background-color: #3e3e3e;
+    /* border-radius: 4px; */
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.tab.active {
+    background-color: #1E1E1E; /* Active tab color */
+    color: white;
+}
+
+.tab:hover {
+    background-color: #444;
+}
+
+
+/* Scrollbar container */
+.open-tabs::-webkit-scrollbar {
+    width: 10px;  
+    height: 3px; 
+}
+
+/* Scrollbar track (background) */
+.open-tabs::-webkit-scrollbar-track {
+    background: #3e3e3e; 
+}
+
+/* Scrollbar thumb (movable part) */
+.open-tabs::-webkit-scrollbar-thumb {
+    background: transparent; 
+    transition: background 0.3s;
+}
+
+/* Scrollbar thumb on hover */
+.open-tabs::-webkit-scrollbar-thumb:hover {
+    background: rgba(121, 121, 121, 0.7);
+}
+
+/* Scrollbar thumb when active */
+.open-tabs::-webkit-scrollbar-thumb:active {
+    background: rgba(121, 121, 121, 0.9);
+}
+

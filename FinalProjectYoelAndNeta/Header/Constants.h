@@ -13,7 +13,7 @@ enum Tokens_type {
 	SUBTRACTION,
 	TYPE_DECLERATION,
 	EQUAL_SIGN,
-	SEMICOLUMN,
+	SEMICOLON,
 	IDENTIFIER,
 	IF_WORD,
 	AND,
@@ -86,3 +86,13 @@ enum Tokens_type {
 #define OBJECT_FILE_LOC "D:/Yoel-Stuff/Maghimim/Final-Project/FinalProjectYoelAndNeta/object.obj"
 #define EXE_FILE_LOC "executable.exe"
 #define LLD_FILE "ld.lld.exe"
+
+
+// -- Scopes
+#define GLOBAL_SCOPE "-GLOBAL-"
+#define WHILE_SCOPE "-while-"
+#define FOR_SCOPE "-for-"
+#define IF_SCOPE "-if-"
+#define ELSE_SCOPE "-else-"
+#define ELSEIF_SCOPE "-elseif-" // NOT IMPLEMENTED
+#define DOWHILE_SCOPE "-dowhile-"

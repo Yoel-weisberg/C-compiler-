@@ -15,6 +15,7 @@ struct macroTableEntry
     bool isFunction;
     std::vector<std::string> args;
 };
+
 class Preprocess{
 public:
     Preprocess(const std::string& fileContent);

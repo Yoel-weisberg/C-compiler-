@@ -19,8 +19,8 @@ Value* CharExprAST::codegen()
 
 Value* ptrExprAST::codegen()
 {
-    auto it = Helper::SymbolTable.find(_valAsStr);
-    llvm::AllocaInst* allocaInst = it->second;
+
+    llvm::AllocaInst* allocaInst = Helper::_symbolTable.getVarAddress(_valAsStr);
 
     if (!allocaInst) {
         std::cerr << "Error: AllocaInst for variable '" << _valAsStr << "' is null.\n";
@@ -55,7 +55,7 @@ arrExprAST::arrExprAST(const std::string& type, std::string& size, const std::st
 
 Value* arrExprAST::codegen() {
     // Retrieve the pointer to the allocated array
-    AllocaInst* arrayPtr = Helper::SymbolTable[_name]; 
+    AllocaInst* arrayPtr = Helper::_symbolTable.getVarAddress(_name);
     if (!arrayPtr) {
         throw std::runtime_error("Array pointer not found in symbol table.");
     }
@@ -138,7 +138,7 @@ void arrExprAST::initArrayRef(const std::string& val, const std::string& type)
 Value* VariableExprAST::codegen()
 {
     // Lookup the variable in the symbol table
-    AllocaInst* variable = Helper::SymbolTable[_name];
+    AllocaInst* variable = Helper::_symbolTable.getVarAddress(_name);
     if (!variable)
     {
         throw std::runtime_error("Unknown variable name: " + _name);
@@ -153,7 +153,9 @@ Value* VariableExprAST::codegen()
 // code like int a = 5;
 Value* AssignExprAST::codegen()
 {
-    Helper::addSymbol(_varName, _varType, _varType);
+    //Helper::addSymbol(_varName, _varType, _varType); 
+    // Add to symbol table
+    Helper::_symbolTable.addVarEntry(_varName, _varType, _varType);
 
     llvm::Value* varAlloca = Helper::getSymbolValue(_varName);
     if (!varAlloca)
@@ -175,6 +177,9 @@ Value* AssignExprAST::codegen()
 
 Value* IfExprAST::codegen()
 {
+    // Add as new scope
+    Helper::_symbolTable.addScope(IF_SCOPE);
+
     Value* CondV = Cond->codegen();
     if (!CondV)
     {
@@ -373,6 +378,9 @@ llvm::Value* WhileLoopAST::codegen() {
 
 llvm::Value* DoWhileLoopAST::codegen()
 {
+    // Add as new scope 
+    Helper::_symbolTable.addScope(DOWHILE_SCOPE);
+
     llvm::Function* currentFunction = Helper::Builder->GetInsertBlock()->getParent();
 
     // Create basic blocks for loop's body, condition and exit
@@ -449,6 +457,9 @@ llvm::Value* DoWhileLoopAST::codegen()
 }
 llvm::Value* ForLoopAST::codegen()
 {
+    // Add as new scope 
+    Helper::_symbolTable.addScope(FOR_SCOPE);
+
     llvm::Function* currentFunction = Helper::Builder->GetInsertBlock()->getParent();
 
     // Create basic blocks for loop's initialization, condition check, body, increment, and exit
@@ -600,6 +611,13 @@ Function* FunctionAST::codegen()
     {
         return nullptr;
     }
+
+    // Add to symbol table
+    Helper::_symbolTable.addFuncEntry(P.getName(), returnType, TheFunction);
+
+    // Add as a new scope
+    Helper::_symbolTable.addScope("-" + P.getName() + "-");
+
 
     // Create a new basic block to start insertion into.
     BasicBlock* BB = BasicBlock::Create(Helper::getContext(), "entry", TheFunction);
@@ -921,7 +939,9 @@ llvm::Value* StructDefinitionExprAST::codegen()
     llvm::StructType* structType = llvm::StructType::create(Context, memberTypes, _name);
 
     // Store in symbol table (for future reference)
-    Helper::StructTable[_name] = structType;
+    Helper::_symbolTable.addStructDefinitionEntry(_name, structType);
+    //Helper::StructTable[_name] = structType;
+
     structType->print(errs());
     return nullptr;
 }
@@ -931,12 +951,14 @@ llvm::Value* StructDeclerationExprAST::codegen()
     llvm::LLVMContext& Context = Helper::getContext();
     llvm::IRBuilder<>& builder = Helper::getBuilder();
 
-    auto it = Helper::StructTable.find(_type);
-    llvm::StructType* type = it->second;
+    // Get StructType
+    llvm::StructType* type = Helper::_symbolTable.getStructType(_type);
 
     llvm::AllocaInst* alloca = builder.CreateAlloca(type, nullptr, _name);
 
-    Helper::SymbolTable[_name] = alloca;
+    // Add to symbol table
+    Helper::_symbolTable.addStructVarEntry(_name, _type, alloca);
+    //Helper::SymbolTable[_name] = alloca;
     return alloca;
 }
 

@@ -9,11 +9,7 @@
     "core:default",
     "opener:default",
     "dialog:default",
-    "fs:default",
-    "fs:default",
-    "dialog:default",
-    "fs:default",
-    "fs:default",
-    "log:default"
+    "fs:write-all",
+    "fs:default"
   ]
 }

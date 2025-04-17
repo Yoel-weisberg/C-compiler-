@@ -10,7 +10,7 @@ std::map<std::string, Tokens_type> Helper::literalToType = {
     {"/", DIVISION},
     {"-", SUBTRACTION},
     {"=", EQUAL_SIGN},
-    {";", SEMICOLUMN},
+    {";", SEMICOLON},
     {"&&", AND},
     {"||", OR},
     {"{", L_CURLY_BRACK},
@@ -39,11 +39,11 @@ std::map<std::string, Tokens_type> Helper::Keywords = {
     {"struct", STRUCT}
 };
 
+std::vector<std::string> Helper::scopes = {GLOBAL_SCOPE, WHILE_SCOPE, FOR_SCOPE, IF_SCOPE, ELSE_SCOPE, DOWHILE_SCOPE};
+
 std::unique_ptr<llvm::LLVMContext> Helper::TheContext = nullptr;
 std::unique_ptr<llvm::Module> Helper::TheModule = nullptr;
 std::unique_ptr<llvm::IRBuilder<>> Helper::Builder = nullptr;
-std::map<std::string, llvm::AllocaInst*> Helper::SymbolTable = {}; // Symbol Table
-std::map<std::string, llvm::StructType*> Helper::StructTable = {};
 std::unique_ptr<llvm::orc::KaleidoscopeJIT> Helper::TheJIT = nullptr;
 std::unique_ptr<llvm::FunctionPassManager> Helper::TheFPM = nullptr;
 std::unique_ptr<llvm::LoopAnalysisManager> Helper::TheLAM = nullptr;
@@ -56,6 +56,7 @@ std::map<std::string, std::unique_ptr<PrototypeAST>> Helper::FunctionProtos;
 llvm::ExitOnError Helper::ExitOnErr;
 llvm::Function* Helper::MallocFunc = nullptr;
 llvm::Function* Helper::ScanfFunc = nullptr;
+STable Helper::_symbolTable;
 
 void Helper::InitializeModuleAndManagers()
 {
@@ -238,6 +239,10 @@ void Helper::builfObjectFile()
 {
     // Finding the machine attributes
     auto TargetTriple = sys::getDefaultTargetTriple();
+    if (TargetTriple == "")
+    {
+        TargetTriple = "x86_64-pc-windows-msvc";
+    }
     TheModule->setTargetTriple(TargetTriple);
 
     std::string Error;
@@ -404,19 +409,19 @@ llvm::Value* Helper::getSymbolValue(const std::string& var_name)
 }
 
 
-bool Helper::addSymbol(std::string var_name, std::string var_type,const std::string& pTT, const int size)
-{
-    if (SymbolTable.find(var_name) != SymbolTable.end()) { // NOTE: THIS STATEMENT DOESN'T CONSIDER SCOPES 
-                                            // (YET TO BE IMPLEMENTED)
-        std::cerr << "Error: Symbol '" << var_name << "' already exists.\n";
-        return false; // Symbol already exists
-    }
-    llvm::AllocaInst* var_address = allocForNewSymbol(var_name, var_type, size, pTT);
-
-    Helper::SymbolTable[var_name] = var_address; // Add to symbol table 
-    printLLVMSymbolTable();
-    return true;
-}
+//bool Helper::addSymbol(std::string var_name, std::string var_type,const std::string& pTT, const int size)
+//{
+//    if (SymbolTable.find(var_name) != SymbolTable.end()) { // NOTE: THIS STATEMENT DOESN'T CONSIDER SCOPES 
+//                                            // (YET TO BE IMPLEMENTED)
+//        std::cerr << "Error: Symbol '" << var_name << "' already exists.\n";
+//        return false; // Symbol already exists
+//    }
+//    llvm::AllocaInst* var_address = allocForNewSymbol(var_name, var_type, size, pTT);
+//
+//    Helper::SymbolTable[var_name] = var_address; // Add to symbol table 
+//    printLLVMSymbolTable();
+//    return true;
+//}
 
 std::string Helper::removeSpecialCharacter(std::string str)
 {
@@ -457,28 +462,28 @@ Type* Helper::getTypeFromString(const std::string type)
 }
 
 
-void Helper::printLLVMSymbolTable() {
-    std::cout << "Symbol Table:\n";
-    std::cout << "----------------------------------\n";
-    std::cout << "| Variable Name | Type    | Address |\n";
-    std::cout << "----------------------------------\n";
-
-    for (const auto& entry : Helper::SymbolTable) {
-        const std::string& varName = entry.first;
-        llvm::AllocaInst* allocaInst = entry.second;
-
-        // Get the type of the variable
-        llvm::Type* type = allocaInst->getAllocatedType();
-
-        // Convert type to a string
-        std::string typeStr;
-        llvm::raw_string_ostream rso(typeStr);
-        type->print(rso);
-
-        // Print the variable name, type, and memory address
-        std::cout << "| " << varName << " | " << typeStr << " | "
-            << allocaInst << " |\n";
-    }
-
-    std::cout << "----------------------------------\n";
-}
+//void Helper::printLLVMSymbolTable() {
+//    std::cout << "Symbol Table:\n";
+//    std::cout << "----------------------------------\n";
+//    std::cout << "| Variable Name | Type    | Address |\n";
+//    std::cout << "----------------------------------\n";
+//
+//    for (const auto& entry : Helper::SymbolTable) {
+//        const std::string& varName = entry.first;
+//        llvm::AllocaInst* allocaInst = entry.second;
+//
+//        // Get the type of the variable
+//        llvm::Type* type = allocaInst->getAllocatedType();
+//
+//        // Convert type to a string
+//        std::string typeStr;
+//        llvm::raw_string_ostream rso(typeStr);
+//        type->print(rso);
+//
+//        // Print the variable name, type, and memory address
+//        std::cout << "| " << varName << " | " << typeStr << " | "
+//            << allocaInst << " |\n";
+//    }
+//
+//    std::cout << "----------------------------------\n";
+//}

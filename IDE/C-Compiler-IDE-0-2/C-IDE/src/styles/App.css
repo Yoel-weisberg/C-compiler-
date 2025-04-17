@@ -1,12 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Cascadia+Code&display=swap');
+
+
 html, body, #root {
     height: 100%;
     margin: 0;
     padding: 0;
     overflow: hidden; /* Prevents scrolling issues */
-  }
+    background-color: #161515;
+}
   
   /* Make the app-container flex to fill the screen */
 .app-container {
+  background-color: #161515;
+
     display: flex;
     flex-direction: column;
     height: 100vh; /* Take full viewport height */
