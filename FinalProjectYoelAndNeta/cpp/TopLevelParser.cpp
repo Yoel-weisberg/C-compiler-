@@ -5,37 +5,37 @@ TopLevelParser::TopLevelParser(const std::vector<Token>& tokens) :
 {
 }
 
-
 void TopLevelParser::HandleTopLevelExpression()
 {
-    // Evaluate a top-level expression into an anonymous function.
+    // First check what kind of expression we're dealing with
+    Tokens_type currentType = parser.currentToken().getType();
+
+    // Handle specific expression types
+    if (currentType == RETURN_STATEMENT) {
+        std::cerr << "Error: Return statement outside of function context\n";
+        parser.consume(); // Skip for error recovery
+        return;
+    }
+
+    // Try to parse as a general expression
     if (auto FnAST = parser.parseTopLevelExpr()) {
         if (FnAST->codegen()) {
             Helper::TheModule->print(llvm::errs(), nullptr); // Print IR here
-            // Create a ResourceTracker to track JIT'd memory allocated to our
-            // anonymous expression -- that way we can free it after executing.
-            auto RT = Helper::TheJIT->getMainJITDylib().createResourceTracker();
 
+            // JIT execution code...
+            auto RT = Helper::TheJIT->getMainJITDylib().createResourceTracker();
             auto TSM = llvm::orc::ThreadSafeModule(std::move(Helper::TheModule), std::move(Helper::TheContext));
             Helper::ExitOnErr(Helper::TheJIT->addModule(std::move(TSM), RT));
-
             Helper::InitializeModuleAndManagers();
-
-            // Search the JIT for the __anon_expr symbol.
-            auto ExprSymbol = Helper::ExitOnErr(Helper::TheJIT->lookup("__anon_expr"));
-
-            // Get the symbol's address and cast it to the right type (takes no
-            // arguments, returns a double) so we can call it as a native function.
-            //double (*FP)() = ExprSymbol.getAddress().toPtr<double (*)()>();
-            //fprintf(stderr, "Evaluated to %f\n", FP());
-
 
             // Delete the anonymous expression module from the JIT.
             Helper::ExitOnErr(RT->remove());
         }
     }
     else {
-        // Skip token for error recovery.
+        // Skip token for error recovery
+        std::cerr << "Failed to parse expression at token: "
+            << parser.currentToken().getLiteral() << std::endl;
         parser.consume();
     }
 }
@@ -98,35 +98,51 @@ void TopLevelParser::HandleStructDefinition()
         parser.consume();
     }
 }
-
 void TopLevelParser::mainLoop()
 {
     while (!parser.isFinished())
     {
         fprintf(stderr, " ready > ");
-        switch (parser.currentToken().getType())
+
+        // Check for common tokens that should be handled
+        Tokens_type currentType = parser.currentToken().getType();
+
+        switch (currentType)
         {
-         // TODO - add here function decleration
         case TYPE_DECLERATION:
             if (isFunctionDecleration())
             {
                 HandleDefinition();
             }
+            else
+            {
+                // Handle top-level variable declaration
+                HandleTopLevelExpression();
+            }
             break;
+
         case R_CURLY_BRACK:
             parser.consume();
             break;
+
         case STRUCT:
             if (isStructDefinition())
             {
                 HandleStructDefinition();
             }
             break;
-        default:
-            std::cerr << parser.currentToken().getLiteral() << std::endl;
-            std::cerr << "WTF is wrong now ?!" << std::endl;
+
+        case RETURN_STATEMENT:
+            // Return should be handled as part of function definition
+            // If we find it at top level, it's part of function body
+            parser.consume();
             break;
-            //HandleTopLevelExpression();
+
+        default:
+            // Uncomment this to handle expressions
+            HandleTopLevelExpression();
+            // Or use this if you want to just skip problematic tokens
+            // parser.consume();
         }
     }
 }

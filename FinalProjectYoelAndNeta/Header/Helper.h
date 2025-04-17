@@ -129,6 +129,8 @@ public:
 
     // compiling files
     static void builfObjectFile();
+
+    static void declareCLibraryFunctions();
 };
 
 

@@ -12,51 +12,32 @@
 #include "llvm/Support/ErrorHandling.h"   // For llvm::ExitOnError
 #include <llvm/Support/TargetSelect.h>
 
-
 int main(int argc, char* argv[]) {
+    try {
+        // Initialize LLVM
+        InitializeAllTargetInfos();
+        InitializeAllTargets();
+        InitializeAllTargetMCs();
+        InitializeAllAsmParsers();
+        InitializeAllAsmPrinters();
 
-	try
-	{
+        Helper::InitializeModuleAndManagers();
 
-		std::cout << "----      Compiler for C :)       ----" << std::endl;
+        SourceFileHandler sourceFile(argv, argc);
+        Preprocess preprocessFile = Preprocess(sourceFile.getSrcFileContent());
+        Tokeniser tokeniser = Tokeniser(preprocessFile.getFinalStream());
+        SyntaxAnalysis syntaxAnalysis = SyntaxAnalysis(tokeniser.getTokens());
 
+        // Create parser and JIT
+        TopLevelParser parser = TopLevelParser(tokeniser.getTokens());
+        Helper::TheJIT = Helper::ExitOnErr(llvm::orc::KaleidoscopeJIT::Create());
 
-		InitializeAllTargetInfos();
-		InitializeAllTargets();
-		InitializeAllTargetMCs();
-		InitializeAllAsmParsers();
-		InitializeAllAsmPrinters();
-		Helper::InitializeModuleAndManagers();
+        parser.mainLoop();
 
-		SourceFileHandler sourceFile(argv, argc);
-
-		// ----     Preprocessor                   ----
-		Preprocess preprocessFile = Preprocess(sourceFile.getSrcFileContent());
-
-		std::cout << "After preprocesser: " << preprocessFile.getFinalStream() << std::endl;
-
-		// ----     Lexical Analyzer               ----
-		Tokeniser tokeniser = Tokeniser(preprocessFile.getFinalStream());
-		//std::cout << tokeniser << std::endl;
-		//std::cout << "After tokeniser " << std::endl;
-
-		// ----     Syntax Analyzer                ----
-		SyntaxAnalysis syntaxAnalysis = SyntaxAnalysis(tokeniser.getTokens());
-		//std::cout << "Syntax analysed" << std::endl;
-
-		// ----     Parser                         ----
-		TopLevelParser parser = TopLevelParser(tokeniser.getTokens());
-		
-		Helper::TheJIT = Helper::ExitOnErr(llvm::orc::KaleidoscopeJIT::Create());
-
-		parser.mainLoop();
-
-		Helper::builfObjectFile();
-
-	}
-	catch (const SyntaxError& err)
-	{
-		std::cout << err.what();
-	}
-	return 0;
+        Helper::builfObjectFile();
+    }
+    catch (const SyntaxError& err) {
+        std::cout << err.what();
+    }
+    return 0;
 }

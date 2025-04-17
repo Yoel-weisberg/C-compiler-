@@ -148,6 +148,7 @@ class VariableExprAST : public ExprAST
 public:
 	VariableExprAST(const std::string& Name) : _name(Name) {}
 	virtual Value* codegen() override;
+	std::string getName() { return _name; }
 };
 
 // code like int a = 5;
@@ -227,6 +228,7 @@ public:
 	llvm::Function* codegen();
 	const std::string& getName() const { return Name; }
 	const std::string& getReturnType() const { return returnType; }
+	const std::string  getParamName(unsigned idx) const;
 };
 
 /// FunctionAST - This class represents a function definition itself.
@@ -285,11 +287,40 @@ public:
 	llvm::Value* codegen() override;
 };
 
-
-class ReturnStatementExprAST : public ExprAST
+class StringExprAST : public ExprAST
 {
-	std::string _statement;
-public: 
-	ReturnStatementExprAST(const std::string& statement) : _statement(statement) {}
-	llvm::Value* codegen() override;
+private:
+	std::string _str;
+
+public:
+	StringExprAST(const std::string& str) : _str(str) {}
+	Value* codegen() override;
 };
+
+class  EmptyExprAST : public ExprAST
+{
+public:
+	EmptyExprAST() {}
+
+	llvm::Value* codegen() override {
+		// An empty statement generates no code
+		return nullptr;
+	}
+};
+
+class BlockExprAST : public ExprAST {
+private:
+	std::vector<std::unique_ptr<ExprAST>> Statements;
+
+public:
+	BlockExprAST(std::vector<std::unique_ptr<ExprAST>> statements)
+		: Statements(std::move(statements)) {}
+
+	llvm::Value* codegen() override;
+	const std::vector<std::unique_ptr<ExprAST>>& getStatements() const { return Statements;  }
+};
+// code like a = 5;
+//class RedefinitionExprAst : public ExprAST
+//{
+//
+//};

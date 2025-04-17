@@ -12,11 +12,11 @@
   "app": {
     "windows": [
       {
-        "title": "c-ide",
+        "title": "host",
         "width": 800,
         "height": 600
       }
-    ],
+      ],
     "security": {
       "csp": "default-src 'self' blob: data: filesystem:; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: data: filesystem:;"
     }

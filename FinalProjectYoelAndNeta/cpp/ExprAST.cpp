@@ -175,7 +175,7 @@ Value* AssignExprAST::codegen()
     return value;
 }
 
-Value* IfExprAST::codegen() 
+Value* IfExprAST::codegen()
 {
     // Add as new scope
     Helper::_symbolTable.addScope(IF_SCOPE);
@@ -186,9 +186,21 @@ Value* IfExprAST::codegen()
         return nullptr;
     }
 
-    // Convert condition to a bool by comparing non-equal to 0.0.
-    CondV = Helper::Builder->CreateFCmpONE(
-        CondV, ConstantFP::get(*Helper::TheContext, APFloat(0.0)), "ifcond");
+    if (CondV->getType()->isFloatingPointTy()) {
+        // For floating point types, use FCmp
+        CondV = Helper::Builder->CreateFCmpONE(
+            CondV, ConstantFP::get(*Helper::TheContext, APFloat(0.0)), "ifcond");
+    }
+    else if (CondV->getType()->isIntegerTy()) {
+        // For integer types, use ICmp
+        CondV = Helper::Builder->CreateICmpNE(
+            CondV, ConstantInt::get(CondV->getType(), 0), "ifcond");
+    }
+    else if (CondV->getType()->isPointerTy()) {
+        // For pointer types, compare with null
+        CondV = Helper::Builder->CreateICmpNE(
+            CondV, ConstantPointerNull::get(cast<PointerType>(CondV->getType())), "ifcond");
+    } // Missing closing brace was here
 
     Function* TheFunction = Helper::Builder->GetInsertBlock()->getParent();
 
@@ -197,20 +209,12 @@ Value* IfExprAST::codegen()
     BasicBlock* MergeBB = BasicBlock::Create(*Helper::TheContext, "ifcont");
 
     BasicBlock* ElseBB = nullptr;
-    if (Else) 
+    if (Else)
     {
-        // Add as new scope 
-        Helper::_symbolTable.addScope(ELSE_SCOPE);
-
-        ElseBB = BasicBlock::Create(*Helper::TheContext, "else", TheFunction);
-    }
-
-    // Create conditional branch.
-    if (Else) 
-    {
+        ElseBB = BasicBlock::Create(*Helper::TheContext, "else");
         Helper::Builder->CreateCondBr(CondV, ThenBB, ElseBB);
     }
-    else 
+    else
     {
         Helper::Builder->CreateCondBr(CondV, ThenBB, MergeBB);
     }
@@ -228,8 +232,9 @@ Value* IfExprAST::codegen()
 
     // Emit else block if it exists.
     Value* ElseV = nullptr;
-    if (Else) 
+    if (Else)
     {
+        // Fix this line - use getBasicBlockList() instead of insert()
         TheFunction->insert(TheFunction->end(), ElseBB);
         Helper::Builder->SetInsertPoint(ElseBB);
         ElseV = Else->codegen();
@@ -239,29 +244,72 @@ Value* IfExprAST::codegen()
         Helper::Builder->CreateBr(MergeBB);
         ElseBB = Helper::Builder->GetInsertBlock();
     }
+    else
+    {
+        // If there's no else, we still need a value for the PHI node
+        // Use the same type as ThenV but with a zero/null value
+        if (ThenV->getType()->isFloatingPointTy()) {
+            ElseV = ConstantFP::get(ThenV->getType(), 0.0);
+        }
+        else if (ThenV->getType()->isIntegerTy()) {
+            ElseV = ConstantInt::get(ThenV->getType(), 0);
+        }
+        else if (ThenV->getType()->isPointerTy()) {
+            ElseV = ConstantPointerNull::get(cast<PointerType>(ThenV->getType()));
+        }
+        else {
+            // For other types, just use undef
+            ElseV = UndefValue::get(ThenV->getType());
+        }
+    }
 
-    // Emit merge block
+    // Emit merge block - fix this line too
     TheFunction->insert(TheFunction->end(), MergeBB);
     Helper::Builder->SetInsertPoint(MergeBB);
 
-    PHINode* PN = Helper::Builder->CreatePHI(Type::getInt32Ty(*Helper::TheContext), 2, "iftmp");
+    if (ThenV->getType()->isVoidTy()) {
+        // For void return type, no PHI node is needed
+        return Constant::getNullValue(Type::getInt32Ty(*Helper::TheContext)); // Return dummy value
+    }
+
+    // Use ResultType consistently
+    Type* ResultType = ThenV->getType();
+
+    // If we have both then and else branches, make sure they have compatible types
+    if (Else && ThenV->getType() != ElseV->getType()) {
+        // Try to convert ElseV to match ThenV's type
+        if (ThenV->getType()->isFloatingPointTy() && ElseV->getType()->isIntegerTy()) {
+            ElseV = Helper::Builder->CreateSIToFP(ElseV, ThenV->getType(), "elsefpconv");
+        }
+        else if (ThenV->getType()->isIntegerTy() && ElseV->getType()->isFloatingPointTy()) {
+            ElseV = Helper::Builder->CreateFPToSI(ElseV, ThenV->getType(), "elseintconv");
+        }
+        else {
+            // If we can't convert, use a generic type
+            ResultType = Type::getInt32Ty(*Helper::TheContext);
+            if (ThenV->getType() != ResultType) {
+                ThenV = Helper::Builder->CreateIntCast(ThenV, ResultType, true, "thenconv");
+            }
+            if (ElseV->getType() != ResultType) {
+                ElseV = Helper::Builder->CreateIntCast(ElseV, ResultType, true, "elseconv");
+            }
+        }
+    }
+
+    // Create PHI node with ResultType instead of thenType
+    PHINode* PN = Helper::Builder->CreatePHI(ResultType, 2, "iftmp");
     PN->addIncoming(ThenV, ThenBB);
     if (Else)
         PN->addIncoming(ElseV, ElseBB);
 
     return PN;
 }
-
 /*
 * Generates LLVM IR code for a while loop:
 * Starting with the condition and moving on to the inner part,
 * which is processed similarly to a function.
 */
-llvm::Value* WhileLoopAST::codegen()
-{
-    // Add as new scope 
-    Helper::_symbolTable.addScope(WHILE_SCOPE);
-
+llvm::Value* WhileLoopAST::codegen() {
     llvm::Function* currentFunction = Helper::Builder->GetInsertBlock()->getParent();
     // Create the basic blocks for the loop 
     llvm::BasicBlock* conditionB = llvm::BasicBlock::Create(*Helper::TheContext, "while.cond", currentFunction);
@@ -270,47 +318,62 @@ llvm::Value* WhileLoopAST::codegen()
 
     // Branch to the condition block to start the loop
     Helper::Builder->CreateBr(conditionB);
-    
+
     // Insert code into the condition block 
     Helper::Builder->SetInsertPoint(conditionB);
-    
+
     // Generate condition code
     llvm::Value* condition = _condition->codegen();
-    if (!condition)
-    {
+    if (!condition) {
         return nullptr;
     }
 
-    // Convert condition to a bool expression 
-    condition = Helper::Builder->CreateFCmpONE(condition, ConstantFP::get(*Helper::TheContext, APFloat(0.0)), "whilecond");
+    // Convert condition to a bool expression based on its type
+    if (condition->getType()->isFloatingPointTy()) {
+        // For floating point, compare with 0.0
+        condition = Helper::Builder->CreateFCmpONE(
+            condition,
+            ConstantFP::get(*Helper::TheContext, APFloat(0.0)),
+            "whilecond"
+        );
+    }
+    else if (condition->getType()->isIntegerTy()) {
+        // For integer, compare with 0
+        condition = Helper::Builder->CreateICmpNE(
+            condition,
+            ConstantInt::get(condition->getType(), 0),
+            "whilecond"
+        );
+    }
+    else {
+        // Handle other types or report an error
+        std::cerr << "Error: Condition must be a numeric type\n";
+        return nullptr;
+    }
 
     // Branch based on the condition: true -> body, false -> exit 
     Helper::Builder->CreateCondBr(condition, bodyB, exitB);
 
-
     // Generate code for loop body
     Helper::Builder->SetInsertPoint(bodyB);
 
-    // MAKE IT WORK WITH A VECTOR CONTAINER!
-    llvm::Value* bodyV = _body[0]->codegen(); // TEMPORARY!!!!!!!!!!!!!
-    if (!bodyB)
-    {
-        return nullptr;
+    llvm::Value* lastBodyValue = nullptr;
+    // Process all expressions in the body
+    for (auto& expr : _body) {
+        lastBodyValue = expr->codegen();
+        if (!lastBodyValue) {
+            return nullptr;
+        }
     }
-    llvm::Type* bodyT = bodyV->getType();
 
-    // Create PHI node 
-    llvm::PHINode* result = Helper::Builder->CreatePHI(bodyT, 2, "looptmp");
-
-    result->addIncoming(bodyV, Helper::Builder->GetInsertBlock());
-    
     // Jump back to condition block 
     Helper::Builder->CreateBr(conditionB);
 
-    // Insert code into exit code 
+    // Insert code into exit block 
     Helper::Builder->SetInsertPoint(exitB);
 
-    return result;
+    // Return a placeholder value if needed (depends on your language semantics)
+    return llvm::ConstantInt::get(*Helper::TheContext, llvm::APInt(32, 0));
 }
 
 llvm::Value* DoWhileLoopAST::codegen()
@@ -320,53 +383,78 @@ llvm::Value* DoWhileLoopAST::codegen()
 
     llvm::Function* currentFunction = Helper::Builder->GetInsertBlock()->getParent();
 
-    // Create basic blocks for loops' body, condition and exit
+    // Create basic blocks for loop's body, condition and exit
     llvm::BasicBlock* bodyB = llvm::BasicBlock::Create(*Helper::TheContext, "dowhile.body", currentFunction);
     llvm::BasicBlock* conditionB = llvm::BasicBlock::Create(*Helper::TheContext, "dowhile.cond", currentFunction);
     llvm::BasicBlock* exitB = llvm::BasicBlock::Create(*Helper::TheContext, "dowhile.exit", currentFunction);
 
-    // Create banch for loops' body
+    // Branch to the body block to start the loop (do-while always executes body first)
     Helper::Builder->CreateBr(bodyB);
 
     // Insert body code
     Helper::Builder->SetInsertPoint(bodyB);
 
-    // Generate body code
-    llvm::Value* bodyV = _body[0]->codegen(); // TEMPORARY!!!!!!!!!!!!!!!!
-    if (!bodyB)
-    {
-        return nullptr;
+    // Generate body code - process all expressions in the body
+    llvm::Value* lastBodyValue = nullptr;
+    for (auto& expr : _body) {
+        lastBodyValue = expr->codegen();
+        if (!lastBodyValue) {
+            return nullptr;
+        }
     }
-    llvm::Type* bodyT = bodyV->getType();
 
-    llvm::PHINode* result = Helper::Builder->CreatePHI(bodyT, 2, "dolooptmp");
-    result->addIncoming(bodyV, Helper::Builder->GetInsertBlock());
-
-    // Handle condition 
-    // Create branch for loops' condition
+    // After executing body, go to condition block
     Helper::Builder->CreateBr(conditionB);
 
-    // Insert code
+    // Insert code into condition block
     Helper::Builder->SetInsertPoint(conditionB);
 
-    // Generate code
+    // Generate condition code
     llvm::Value* conditionV = _condition->codegen();
-    if (!conditionB)
-    {
+    if (!conditionV) {
         return nullptr;
     }
 
-    conditionV = Helper::Builder->CreateFCmpONE(conditionV, ConstantFP::get(*Helper::TheContext, APFloat(0.0)), "dowhilecond");
+    // Convert condition to a bool expression based on its type
+    if (conditionV->getType()->isFloatingPointTy()) {
+        // For floating point, compare with 0.0
+        conditionV = Helper::Builder->CreateFCmpONE(
+            conditionV,
+            ConstantFP::get(*Helper::TheContext, APFloat(0.0)),
+            "dowhilecond"
+        );
+    }
+    else if (conditionV->getType()->isIntegerTy()) {
+        // For integer, compare with 0
+        conditionV = Helper::Builder->CreateICmpNE(
+            conditionV,
+            ConstantInt::get(conditionV->getType(), 0),
+            "dowhilecond"
+        );
+    }
+    else if (conditionV->getType()->isPointerTy()) {
+        // For pointer types, compare with null
+        conditionV = Helper::Builder->CreateICmpNE(
+            conditionV,
+            ConstantPointerNull::get(cast<PointerType>(conditionV->getType())),
+            "dowhilecond"
+        );
+    }
+    else {
+        // Handle other types or report an error
+        std::cerr << "Error: Condition must be a numeric or pointer type\n";
+        return nullptr;
+    }
 
-    // Branch based on the condition: true -> body, false -> exit 
+    // Branch based on the condition: true -> body (loop again), false -> exit
     Helper::Builder->CreateCondBr(conditionV, bodyB, exitB);
 
-    // Insert code into exit code 
+    // Insert code into exit block
     Helper::Builder->SetInsertPoint(exitB);
 
-    return result;
+    // Return a placeholder value (int 0)
+    return llvm::ConstantInt::get(*Helper::TheContext, llvm::APInt(32, 0));
 }
-
 llvm::Value* ForLoopAST::codegen()
 {
     // Add as new scope 
@@ -374,80 +462,109 @@ llvm::Value* ForLoopAST::codegen()
 
     llvm::Function* currentFunction = Helper::Builder->GetInsertBlock()->getParent();
 
-    // Create basic blocks for loops' body, condition and exit
+    // Create basic blocks for loop's initialization, condition check, body, increment, and exit
+    llvm::BasicBlock* preheaderB = llvm::BasicBlock::Create(*Helper::TheContext, "for.init", currentFunction);
     llvm::BasicBlock* headerB = llvm::BasicBlock::Create(*Helper::TheContext, "for.header", currentFunction);
-    llvm::BasicBlock* exitB = llvm::BasicBlock::Create(*Helper::TheContext, "for.exit", currentFunction);
     llvm::BasicBlock* bodyB = llvm::BasicBlock::Create(*Helper::TheContext, "for.body", currentFunction);
-    llvm::BasicBlock* latchB = llvm::BasicBlock::Create(*Helper::TheContext, "for.latch", currentFunction);
+    llvm::BasicBlock* latchB = llvm::BasicBlock::Create(*Helper::TheContext, "for.increment", currentFunction);
+    llvm::BasicBlock* exitB = llvm::BasicBlock::Create(*Helper::TheContext, "for.exit", currentFunction);
 
-    // Create branch for loop
+    // Branch to preheader block for initialization
+    Helper::Builder->CreateBr(preheaderB);
+
+    // Insert initialization code
+    Helper::Builder->SetInsertPoint(preheaderB);
+
+    // Generate code for initialization
+    llvm::Value* initV = _condInit->codegen();
+    if (!initV) {
+        return nullptr;
+    }
+
+    // After initialization, branch to the condition check
     Helper::Builder->CreateBr(headerB);
-    // Insert entry code
+
+    // Insert condition check code
     Helper::Builder->SetInsertPoint(headerB);
 
-    // Generate code for loops' header: initilization and condition
-    llvm::Value* initV = _condInit->codegen();
-    if (!initV)
-    {
-        return nullptr;
-    }
-
-    // Create PHI node for loop iterator
-    llvm::Type* initT = initV->getType();
-    llvm::PHINode* iterator = Helper::Builder->CreatePHI(initT, 2, "fortmpit");
-    iterator->addIncoming(initV, headerB); // Initial value comes from entry block 
-
-
+    // Generate condition code
     llvm::Value* condV = _condC->codegen();
-    if (!condV)
-    {
+    if (!condV) {
         return nullptr;
     }
 
-    // Convert condition to a boolean value
-    condV = Helper::Builder->CreateFCmpONE(condV, ConstantFP::get(*Helper::TheContext, APFloat(0.0)), "forcond");
+    // Convert condition to a bool expression based on its type
+    if (condV->getType()->isFloatingPointTy()) {
+        // For floating point, compare with 0.0
+        condV = Helper::Builder->CreateFCmpONE(
+            condV,
+            ConstantFP::get(*Helper::TheContext, APFloat(0.0)),
+            "forcond"
+        );
+    }
+    else if (condV->getType()->isIntegerTy()) {
+        // For integer, compare with 0
+        condV = Helper::Builder->CreateICmpNE(
+            condV,
+            ConstantInt::get(condV->getType(), 0),
+            "forcond"
+        );
+    }
+    else if (condV->getType()->isPointerTy()) {
+        // For pointer types, compare with null
+        condV = Helper::Builder->CreateICmpNE(
+            condV,
+            ConstantPointerNull::get(cast<PointerType>(condV->getType())),
+            "forcond"
+        );
+    }
+    else {
+        // Handle other types or report an error
+        std::cerr << "Error: Condition must be a numeric or pointer type\n";
+        return nullptr;
+    }
 
-
-    // Create conditional branch: true -> body, false -> exit
+    // Branch based on condition
     Helper::Builder->CreateCondBr(condV, bodyB, exitB);
 
     // Insert code into the body block
     Helper::Builder->SetInsertPoint(bodyB);
 
-    llvm::Value* bodyV = _body[0]->codegen(); // TEMPORARY!!!!
-    if (!bodyV)
-    {
-        return nullptr;
+    // Process all expressions in the body
+    llvm::Value* lastBodyValue = nullptr;
+    for (auto& expr : _body) {
+        lastBodyValue = expr->codegen();
+        if (!lastBodyValue) {
+            return nullptr;
+        }
     }
 
-    // After executing body, go to latch block
+    // After body execution, go to the increment block
     Helper::Builder->CreateBr(latchB);
 
-    // Insert code into latch block 
+    // Insert code into increment block
     Helper::Builder->SetInsertPoint(latchB);
 
-    llvm::Value* condStepV = _condStep->codegen();
-    if (!condStepV)
-    {
+    // Generate code for the increment expression
+    // For standard for-loops in C-like languages, _condStep would typically
+    // be an expression like i++ or i=i+1, which should handle the store operation
+    // if properly implemented in the respective AST nodes.
+    llvm::Value* stepV = _condStep->codegen();
+    if (!stepV) {
         return nullptr;
     }
 
-    // Compute the new iterator value
-    llvm::Value* nextVal = Helper::Builder->CreateAdd(iterator, condStepV, "nextVal"); // !NOTE! Only supports increment for now
-        
-    // Add new value to PHI node
-    iterator->addIncoming(nextVal, latchB);
-    
-    // Jump back to header to re-evaluate the condition
+
+    // After increment, jump back to the condition check
     Helper::Builder->CreateBr(headerB);
 
-    // Insert code into exit block 
+    // Insert code into exit block
     Helper::Builder->SetInsertPoint(exitB);
-    // Handle return value!!! need to return something in order to print anything!
-    return bodyV;
+
+    // Return the last value from the body or a placeholder if none
+    return lastBodyValue ? lastBodyValue :
+        llvm::ConstantInt::get(*Helper::TheContext, llvm::APInt(32, 0));
 }
-
-
 llvm::Function* PrototypeAST::codegen()
 {
     // TO-DO make that it would not only work eith double
@@ -474,12 +591,21 @@ llvm::Function* PrototypeAST::codegen()
     return F;
 }
 
+const std::string PrototypeAST::getParamName(unsigned idx) const
+{
+    if (idx < Args.size()) {
+        return Args[idx].Name;
+    }
+    return "";
+}
+
 Function* FunctionAST::codegen()
 {
     // Transfer ownership of the prototype to the FunctionProtos map, but keep a
-   // reference to it for use below.
+    // reference to it for use below.
     auto& P = *Proto;
     Helper::FunctionProtos[Proto->getName()] = std::move(Proto);
+ 
     Function* TheFunction = Helper::getFunction(P.getName());
     if (!TheFunction)
     {
@@ -497,6 +623,23 @@ Function* FunctionAST::codegen()
     BasicBlock* BB = BasicBlock::Create(Helper::getContext(), "entry", TheFunction);
     Helper::getBuilder().SetInsertPoint(BB);
 
+    // Create allocas for function parameters
+    // This ensures we properly handle parameter variables
+    unsigned idx = 0;
+    for (auto& Arg : TheFunction->args()) {
+        // Create an alloca for this argument
+        AllocaInst* Alloca = Helper::getBuilder().CreateAlloca(
+            Arg.getType(), nullptr, P.getParamName(idx));
+
+        // Store the argument value into the alloca
+        Helper::getBuilder().CreateStore(&Arg, Alloca);
+
+        // Add to symbol table
+        Helper::SymbolTable[P.getParamName(idx)] = Alloca;
+        idx++;
+    }
+
+    // Generate code for all expressions in the function body
     for (const auto& expr : Body)
     {
         if (!expr->codegen())
@@ -506,6 +649,7 @@ Function* FunctionAST::codegen()
         }
     }
 
+    // Handle return value
     llvm::Value* retVal = nullptr;
     if (ReturnValue)
     {
@@ -516,109 +660,263 @@ Function* FunctionAST::codegen()
             return nullptr;
         }
     }
-    
+
+    // Add appropriate return instruction based on function type
     if (returnType == "void")
     {
         Helper::getBuilder().CreateRetVoid();
     }
     else if (retVal)
     {
+        // Ensure the return value matches the function's return type
+        Type* funcRetType = TheFunction->getReturnType();
+        Type* retValType = retVal->getType();
+
+        if (funcRetType != retValType) {
+            // Convert the return value if types don't match
+            if (funcRetType->isIntegerTy() && retValType->isFloatingPointTy()) {
+                retVal = Helper::getBuilder().CreateFPToSI(retVal, funcRetType, "conv");
+            }
+            else if (funcRetType->isFloatingPointTy() && retValType->isIntegerTy()) {
+                retVal = Helper::getBuilder().CreateSIToFP(retVal, funcRetType, "conv");
+            }
+            // Add more conversions if needed
+        }
+
         Helper::getBuilder().CreateRet(retVal);
     }
     else
     {
-        TheFunction->eraseFromParent();
-        throw std::runtime_error("Non-void function missing a return value");
+        // Ensure any basic block has a terminator
+        if (!Helper::getBuilder().GetInsertBlock()->getTerminator()) {
+            if (returnType == "void") {
+                Helper::getBuilder().CreateRetVoid();
+            }
+            else {
+                // Create a default return value of the appropriate type
+                Type* returnTy = TheFunction->getReturnType();
+                if (returnTy->isIntegerTy()) {
+                    Helper::getBuilder().CreateRet(
+                        ConstantInt::get(returnTy, 0));
+                }
+                else if (returnTy->isFloatingPointTy()) {
+                    Helper::getBuilder().CreateRet(
+                        ConstantFP::get(returnTy, 0.0));
+                }
+                else {
+                    TheFunction->eraseFromParent();
+                    throw std::runtime_error("Unsupported return type");
+                }
+            }
+        }
     }
 
-    llvm::verifyFunction(*TheFunction);
+    // Verify the function
+    try {
+        llvm::verifyFunction(*TheFunction);
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Function verification failed: " << e.what() << std::endl;
+        std::cerr << "Function dump: " << std::endl;
+        TheFunction->print(llvm::errs());
+        TheFunction->eraseFromParent();
+        return nullptr;
+    }
+
     return TheFunction;
 }
 
-Value* BinaryExprAST::codegen()
-{
+Value* BinaryExprAST::codegen() {
     Value* L = LHS->codegen();
     Value* R = RHS->codegen();
     if (!L || !R)
         return nullptr;
 
+    // Ensure the operands are of the same type
+    Type* LType = L->getType();
+    Type* RType = R->getType();
+
+    // If types don't match, perform necessary conversions
+    if (LType != RType) {
+        // Choose the "higher" type (e.g., float is higher than int)
+        if (LType->isFloatingPointTy() && RType->isIntegerTy()) {
+            // Convert R to float
+            R = Helper::Builder->CreateSIToFP(R, LType, "convtmp");
+        }
+        else if (LType->isIntegerTy() && RType->isFloatingPointTy()) {
+            // Convert L to float
+            L = Helper::Builder->CreateSIToFP(L, RType, "convtmp");
+        }
+        else if (LType->isIntegerTy() && RType->isIntegerTy()) {
+            // If both are integers but of different bit widths, convert to the wider one
+            unsigned LWidth = LType->getIntegerBitWidth();
+            unsigned RWidth = RType->getIntegerBitWidth();
+
+            if (LWidth < RWidth) {
+                L = Helper::Builder->CreateIntCast(L, RType, true, "convtmp");
+            }
+            else {
+                R = Helper::Builder->CreateIntCast(R, LType, true, "convtmp");
+            }
+        }
+        // Add more type conversion cases as needed
+    }
+
+    // Now perform the operation with operands of the same type
     switch (Op) {
     case ADDITION:
-        return Helper::Builder->CreateFAdd(L, R, ADD_TMP);
+        if (L->getType()->isFloatingPointTy())
+            return Helper::Builder->CreateFAdd(L, R, "addtmp");
+        else
+            return Helper::Builder->CreateAdd(L, R, "addtmp");
     case SUBTRACTION:
-        return Helper::Builder->CreateFSub(L, R, SUB_TMP);
+        if (L->getType()->isFloatingPointTy())
+            return Helper::Builder->CreateFSub(L, R, "subtmp");
+        else
+            return Helper::Builder->CreateSub(L, R, "subtmp");
     case MULTIPLICATION:
-        return Helper::Builder->CreateFMul(L, R, MUL_TMP);
+        if (L->getType()->isFloatingPointTy())
+            return Helper::Builder->CreateFMul(L, R, "multmp");
+        else
+            return Helper::Builder->CreateMul(L, R, "multmp");
+    case DIVISION:
+        if (L->getType()->isFloatingPointTy())
+            return Helper::Builder->CreateFDiv(L, R, "divtmp");
+        else
+            return Helper::Builder->CreateSDiv(L, R, "divtmp");
     case LOWER_THEN:
-        L = Helper::Builder->CreateFCmpULT(L, R, CMP_TMP);
-        // Convert bool 0/1 to double 0.0 or 1.0
-        return Helper::Builder->CreateUIToFP(L, Type::getDoubleTy(Helper::getContext()), BOOL_TMP);
+        if (L->getType()->isFloatingPointTy())
+            L = Helper::Builder->CreateFCmpOLT(L, R, "cmptmp");
+        else
+            L = Helper::Builder->CreateICmpSLT(L, R, "cmptmp");
+        break;
     case HIGHER_THEN:
-        L = Helper::Builder->CreateFCmpUGT(L, R, CMP_TMP);
-        return Helper::Builder->CreateUIToFP(L, Type::getDoubleTy(Helper::getContext()), BOOL_TMP);
+        if (L->getType()->isFloatingPointTy())
+            L = Helper::Builder->CreateFCmpOGT(L, R, "cmptmp");
+        else
+            L = Helper::Builder->CreateICmpSGT(L, R, "cmptmp");
+        break;
     case EQUELS_CMP:
-        L = Helper::Builder->CreateFCmpUEQ(L, R, CMP_TMP);
-        return Helper::Builder->CreateUIToFP(L, Type::getDoubleTy(Helper::getContext()), BOOL_TMP);
+        if (L->getType()->isFloatingPointTy())
+            L = Helper::Builder->CreateFCmpOEQ(L, R, "cmptmp");
+        else
+            L = Helper::Builder->CreateICmpEQ(L, R, "cmptmp");
+        break;
     default:
         throw SyntaxError("invalid binary operator");
     }
+
+    // For comparison operators, convert the boolean result to the appropriate type
+    if (Op >= LOWER_THEN && Op <= EQUELS_CMP) {
+        // Check if we need to convert to float or int32
+        if (L->getType()->isIntegerTy(1)) { // Boolean type in LLVM is i1
+            if (LType->isFloatingPointTy() || RType->isFloatingPointTy()) {
+                return Helper::Builder->CreateUIToFP(L, Type::getDoubleTy(Helper::getContext()), "booltmp");
+            }
+            else {
+                return Helper::Builder->CreateZExt(L, Type::getInt32Ty(Helper::getContext()), "booltmp");
+            }
+        }
+    }
+
+    return L;
 }
 
-llvm::Value* UnaryOpExprAST::codegen()
-{
-    llvm::Value* L = _LHS->codegen(); 
-    if (!L)
-    {
+llvm::Value* UnaryOpExprAST::codegen() {
+    // We need to handle post-increments and post-decrements correctly
+    // First, check if _LHS is a variable reference
+    VariableExprAST* varExpr = dynamic_cast<VariableExprAST*>(_LHS.get());
+    if (!varExpr) {
+        // If not a variable, just do the operation without storing
+        llvm::Value* L = _LHS->codegen();
+        if (!L) {
+            return nullptr;
+        }
+
+        switch (_op) {
+        case ADDITION:
+            return Helper::Builder->CreateAdd(L, llvm::ConstantInt::get(L->getType(), 1), "increment");
+        case SUBTRACTION:
+            return Helper::Builder->CreateSub(L, llvm::ConstantInt::get(L->getType(), 1), "decrement");
+        default:
+            throw SyntaxError("Invalid unary operator");
+        }
+    }
+
+    // If we're here, _LHS is a variable reference
+    std::string varName = varExpr->getName();
+
+    // Get the variable's alloca instruction
+    llvm::AllocaInst* varAlloca = Helper::SymbolTable[varName];
+    if (!varAlloca) {
+        std::cerr << "Error: Variable '" << varName << "' not found in symbol table.\n";
         return nullptr;
     }
 
-    //llvm::Value* oldV = nullptr;
-    // parse unary operator
-    switch (_op)
-    {
-    case ADDITION:
-        // Save the current value (used in the expression result)
-        //oldV = L;
+    // Load the current value
+    llvm::Value* currentVal = Helper::Builder->CreateLoad(
+        varAlloca->getAllocatedType(), varAlloca, varName + "_val");
 
-        // Increment variable
-        return Helper::Builder->CreateAdd(L, llvm::ConstantInt::get(L->getType(), 1), "increment");
-        //return oldV;
-    case SUBTRACTION:       
-        // Save the current value (used in the expression result)
-        //oldV = L;
-
-        // Decrese variable
-        return Helper::Builder->CreateAdd(L, llvm::ConstantInt::get(L->getType(), 1), "decrement");
-        //return oldV;
+    // Compute the new value
+    llvm::Value* newVal = nullptr;
+    switch (_op) {
+    case ADDITION: // For i++
+        newVal = Helper::Builder->CreateAdd(
+            currentVal, llvm::ConstantInt::get(currentVal->getType(), 1), "increment");
+        break;
+    case SUBTRACTION: // For i--
+        newVal = Helper::Builder->CreateSub(
+            currentVal, llvm::ConstantInt::get(currentVal->getType(), 1), "decrement");
+        break;
     default:
-        throw SyntaxError("Invalid unary oprator");
+        throw SyntaxError("Invalid unary operator");
     }
-    return nullptr;
+
+    // Store the new value back to the variable
+    Helper::Builder->CreateStore(newVal, varAlloca);
+
+    // For post-increment/decrement, the original value is returned
+    return currentVal;
 }
 
-Value* CallExprAST::codegen()
-{
+Value* CallExprAST::codegen() {
     // Look up the name in the global module table.
     Function* CalleeF = Helper::getFunction(Callee);
     if (!CalleeF)
         throw SyntaxError("Unknown function name");
 
-    // If argument mismatch error.
-    if (CalleeF->arg_size() != Args.size())
+    // Check if function has varargs
+    bool isVarArg = CalleeF->getFunctionType()->isVarArg();
+
+    // If argument mismatch error (only if not varargs)
+    if (!isVarArg && CalleeF->arg_size() != Args.size())
         throw SyntaxError("Incorrect # arguments passed");
 
     std::vector<Value*> ArgsV;
     for (unsigned i = 0, e = Args.size(); i != e; ++i) {
-        ArgsV.push_back(Args[i]->codegen());
-        if (!ArgsV.back())
+        Value* argVal = Args[i]->codegen();
+        if (!argVal)
             return nullptr;
-    }
-    if (CalleeF->getReturnType()->isVoidTy())
-    {
-        return Helper::Builder->CreateCall(CalleeF, ArgsV);
 
+        // For printf/scanf, convert integers to the expected type if needed
+        if ((Callee == "printf" || Callee == "scanf") && i > 0) {
+            if (argVal->getType()->isIntegerTy() &&
+                argVal->getType()->getIntegerBitWidth() < 32) {
+                argVal = Helper::getBuilder().CreateZExt(
+                    argVal,
+                    Type::getInt32Ty(Helper::getContext()),
+                    "zext");
+            }
+        }
+
+        ArgsV.push_back(argVal);
     }
-    return Helper::Builder->CreateCall(CalleeF, ArgsV, CALL_TMP);
+
+    if (CalleeF->getReturnType()->isVoidTy()) {
+        return Helper::getBuilder().CreateCall(CalleeF, ArgsV);
+    }
+
+    return Helper::getBuilder().CreateCall(CalleeF, ArgsV, CALL_TMP);
 }
 
 Value* VoidAst::codegen()
@@ -664,8 +962,48 @@ llvm::Value* StructDeclerationExprAST::codegen()
     return alloca;
 }
 
-llvm::Value* ReturnStatementExprAST::codegen()
+Value* StringExprAST::codegen()
 {
-    // Assuming return type is an integer
-    return nullptr;
+    // Create a global string constant
+    llvm::Constant* strConstant = llvm::ConstantDataArray::getString(
+        Helper::getContext(),
+        _str,
+        true);  // Add null terminator
+
+    // Create a global variable to hold the string
+    llvm::GlobalVariable* gVar = new llvm::GlobalVariable(
+        Helper::getModule(),
+        strConstant->getType(),
+        true,  // isConstant
+        llvm::GlobalValue::PrivateLinkage,
+        strConstant,
+        ".str");
+
+    // Get a pointer to the beginning of the string
+    llvm::Value* zero = llvm::ConstantInt::get(
+        llvm::Type::getInt32Ty(Helper::getContext()), 0);
+
+    std::vector<llvm::Value*> indices;
+    indices.push_back(zero);
+    indices.push_back(zero);
+
+    return llvm::GetElementPtrInst::Create(
+        strConstant->getType(),
+        gVar,
+        indices,
+        "str",
+        Helper::getBuilder().GetInsertBlock());
+}
+
+llvm::Value* BlockExprAST::codegen()
+{
+    llvm::Value* lastVal = nullptr;
+
+    // Generate code for each statement in the block
+    for (auto& stmt : Statements) {
+        lastVal = stmt->codegen();
+    }
+
+    // Return the value of the last statement
+    return lastVal;
 }

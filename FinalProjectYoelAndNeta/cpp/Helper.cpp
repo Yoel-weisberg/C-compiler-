@@ -60,6 +60,10 @@ STable Helper::_symbolTable;
 
 void Helper::InitializeModuleAndManagers()
 {
+    TheModule.reset();
+    TheContext.reset();
+    Builder.reset();
+
     // Open a new context and module.
     TheContext = std::make_unique<LLVMContext>();
     TheModule = std::make_unique<Module>("Yoel and neta JIT", *TheContext);
@@ -94,9 +98,8 @@ void Helper::InitializeModuleAndManagers()
     PB.registerModuleAnalyses(*TheMAM);
     PB.registerFunctionAnalyses(*TheFAM);
     PB.crossRegisterProxies(*TheLAM, *TheFAM, *TheCGAM, *TheMAM);
-
-    defineMalloc();
-    defineScanf();
+    
+    declareCLibraryFunctions();
 }
 
 
@@ -232,11 +235,9 @@ void Helper::defineScanf() {
     // Print confirmation
     llvm::outs() << "Declared scanf function.\n";
 }
-
 void Helper::builfObjectFile()
 {
-
-    // finding the machines attributes
+    // Finding the machine attributes
     auto TargetTriple = sys::getDefaultTargetTriple();
     if (TargetTriple == "")
     {
@@ -248,8 +249,6 @@ void Helper::builfObjectFile()
     auto Target = TargetRegistry::lookupTarget(TargetTriple, Error);
 
     // Print an error and exit if we couldn't find the requested target.
-    // This generally occurs if we've forgotten to initialise the
-    // TargetRegistry or we have a bogus target triple.
     if (!Target) {
         errs() << Error;
         return;
@@ -284,56 +283,106 @@ void Helper::builfObjectFile()
     pass.run(*TheModule);
     dest.flush();
 
-    outs() << "Wrote " << Filename << "\n";
 
+
+    // Add a function to get current directory
+
+    // Now link with libc to create an executable
+    std::string linkCmd;
+#ifdef _WIN32
+    linkCmd = "cl " + std::string(OBJECT_FILE_LOC) + " -o " + std::string(EXE_FILE_LOC);
+#else
+    linkCmd = "clang " + std::string(OBJECT_FILE_LOC) + " -o " + std::string(EXE_FILE_LOC);
+#endif
+
+    outs() << "Linking with command: " << linkCmd << "\n";
+    int linkResult = system(linkCmd.c_str());
+
+    if (linkResult == 0) {
+        outs() << "Successfully created executable: " << EXE_FILE_LOC << "\n";
+    }
+    else {
+        errs() << "Linking failed with exit code: " << linkResult << "\n";
+    }
 }
 
+// Add this to your Helper class initialization
+void Helper::declareCLibraryFunctions() {
+    // Get references to the context and module
+    LLVMContext& context = *TheContext;
+    Module& module = *TheModule;  // Notice the dereference
 
+    // Declare printf
+    std::vector<Type*> printfArgs;
+    // Use PointerType::getUnqual() instead of Type::getInt8PtrTy
+    printfArgs.push_back(PointerType::getUnqual(Type::getInt8Ty(context))); // Format string (char*)
+    FunctionType* printfType = FunctionType::get(
+        Type::getInt32Ty(context),  // Return type (int)
+        printfArgs,                 // Parameter types
+        true);                      // varargs
+    Function::Create(
+        printfType,
+        Function::ExternalLinkage,
+        "printf",
+        module);  // Pass the module reference, not pointer
 
+    // Declare scanf
+    std::vector<Type*> scanfArgs;
+    scanfArgs.push_back(PointerType::getUnqual(Type::getInt8Ty(context))); // Format string (char*)
+    FunctionType* scanfType = FunctionType::get(
+        Type::getInt32Ty(context),  // Return type (int)
+        scanfArgs,                  // Parameter types
+        true);                      // varargs
+    Function::Create(
+        scanfType,
+        Function::ExternalLinkage,
+        "scanf",
+        module);  // Pass the module reference, not pointer
 
+    // You can add more library functions here (malloc, free, etc.)
+}
+    
+llvm::AllocaInst* Helper::allocForNewSymbol(std::string var_name, std::string var_type, const int size, const std::string& pTT)
+{
+   
+    llvm::IRBuilder<>& Builder = Helper::getBuilder();
+    llvm::LLVMContext& Context = Helper::getContext();
+    llvm::Type* llvmType = nullptr;
+    if (var_type == "*") { // Pointer
+        llvmType = llvm::PointerType::getUnqual(Helper::getLLVMType(Helper::removeSpecialCharacter(var_type.substr(0, var_type.size() - 1)), Context));
+    }
+    var_type = Helper::removeSpecialCharacter(var_type);
+    // Map variable type to LLVM type
+    if (var_type == INT_TYPE_LIT ) {
+        llvmType = llvm::Type::getInt32Ty(Context);
+    }
+    else if (var_type == FLOAT_TYPE_LIT ) {
+        llvmType = llvm::Type::getFloatTy(Context);
+    }
+    else if (var_type == CHAR_TYPE_LIT) {
+        llvmType = llvm::Type::getInt8Ty(Context);
+    }
+    else if (var_type == "arr") {
+        llvmType = llvm::ArrayType::get(Helper::getLLVMType(pTT, Context), size);
+    }
+    else {
+        std::cerr << "Error: Unsupported variable type '" << var_type << "'.\n";
+        return nullptr;
+    }
 
-//    
-//llvm::AllocaInst* Helper::allocForNewSymbol(std::string var_name, std::string var_type, const int size, const std::string& pTT)
-//{
-//   
-//    llvm::IRBuilder<>& Builder = Helper::getBuilder();
-//    llvm::LLVMContext& Context = Helper::getContext();
-//    llvm::Type* llvmType = nullptr;
-//    if (var_type == "*") { // Pointer
-//        llvmType = llvm::PointerType::getUnqual(Helper::getLLVMType(Helper::removeSpecialCharacter(var_type.substr(0, var_type.size() - 1)), Context));
-//    }
-//    var_type = Helper::removeSpecialCharacter(var_type);
-//    // Map variable type to LLVM type
-//    if (var_type == INT_TYPE_LIT ) {
-//        llvmType = llvm::Type::getInt32Ty(Context);
-//    }
-//    else if (var_type == FLOAT_TYPE_LIT ) {
-//        llvmType = llvm::Type::getFloatTy(Context);
-//    }
-//    else if (var_type == CHAR_TYPE_LIT) {
-//        llvmType = llvm::Type::getInt8Ty(Context);
-//    }
-//    else if (var_type == "arr") {
-//        llvmType = llvm::ArrayType::get(Helper::getLLVMType(pTT, Context), size);
-//    }
-//    else {
-//        std::cerr << "Error: Unsupported variable type '" << var_type << "'.\n";
-//        return nullptr;
-//    }
-//
-//    // Ensure the function context
-//    llvm::Function* currentFunction = Builder.GetInsertBlock()->getParent();
-//    if (!currentFunction) {
-//        std::cerr << "Error: Attempting to allocate variable outside of a function.\n";
-//        return nullptr;
-//    }
-//
-//    // Allocate memory in the entry block
-//    llvm::IRBuilder<> tempBuilder(&currentFunction->getEntryBlock(), currentFunction->getEntryBlock().begin());
-//    llvm::AllocaInst* allocaInst = tempBuilder.CreateAlloca(llvmType, nullptr, var_name);
-//
-//    return allocaInst; // LLVM automatically tracks the name in its symbol table
-//}
+    // Ensure the function context
+    llvm::Function* currentFunction = Builder.GetInsertBlock()->getParent();
+    if (!currentFunction) {
+        std::cerr << "Error: Attempting to allocate variable outside of a function.\n";
+        return nullptr;
+    }
+
+    // Allocate memory in the entry block
+    llvm::IRBuilder<> tempBuilder(&currentFunction->getEntryBlock(), currentFunction->getEntryBlock().begin());
+    llvm::AllocaInst* allocaInst = tempBuilder.CreateAlloca(llvmType, nullptr, var_name);
+
+    return allocaInst; // LLVM automatically tracks the name in its symbol table
+}
 
 llvm::Value* Helper::getSymbolValue(const std::string& var_name) 
 {

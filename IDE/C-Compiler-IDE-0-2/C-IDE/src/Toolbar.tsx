@@ -13,13 +13,13 @@ export const Toolbar: React.FC = () => {
     // --------- Dropdown Managing ---------
     const [visibleDropdown, setVisibleDropdown] = useState<string | null>(null);
 
-    const showDropdown = (dropdownName: string) => {
-        setVisibleDropdown(dropdownName);
-    };
+  const showDropdown = (dropdownName: string) => {
+    setVisibleDropdown(dropdownName);
+  };
 
-    const hideDropdown = () => {
-        setVisibleDropdown(null);
-    };
+  const hideDropdown = () => {
+    setVisibleDropdown(null);
+  };
 
     // ------------------------------------
 

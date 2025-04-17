@@ -1,5 +1,5 @@
 import "./styles/App.css";
-import {Toolbar} from "./Toolbar";
+import { Toolbar } from "./Toolbar";
 import { CodeEditor } from "./Editor";
 import { FilesProvider } from "./FileManager";
 import { Tabs } from "./Tabs";

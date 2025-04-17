@@ -42,7 +42,8 @@ enum Tokens_type {
 	// YET TO BE SUPPORTED:
 	NOT,
 	UNARY_MINUS,
-	SIZE_OF
+	SIZE_OF,
+	STRING_LITERAL
 };
 
 // Other
@@ -70,6 +71,7 @@ enum Tokens_type {
 #define PRECEDENCE_AND 3
 #define PRECEDENCE_LOWER_THEN 4
 #define PRECEDENCE_HIGHER_THEN 5
+#define PRECEDENCE_EQUEL_CMP 6
 #define PRECEDENCE_ADDITION 20
 #define PRECEDENCE_SUBTRACTION 20
 #define PRECEDENCE_MULTIPLICATION 30
@@ -81,7 +83,7 @@ enum Tokens_type {
 #define DIS_BETWEEN_SINGLE_QOUTES 2
 #define NEW_LINE_STR "\n"
 
-#define OBJECT_FILE_LOC "object.o"
+#define OBJECT_FILE_LOC "D:/Yoel-Stuff/Maghimim/Final-Project/FinalProjectYoelAndNeta/object.obj"
 #define EXE_FILE_LOC "executable.exe"
 #define LLD_FILE "ld.lld.exe"
 

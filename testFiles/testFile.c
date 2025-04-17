@@ -1,13 +1,10 @@
-
-
-#define NUM 3
-
-int main()
-{
-    int x = 3 ;
-    while ( x < 2 )
+int foo() {
+    return 5;
+}
+int main() {
+    for (int i = 0; i < 3; i++)
     {
-        int y = 3 ;
+        printf("%d\n", i);
     }
-    return 0 ;
+    return 0;
 }

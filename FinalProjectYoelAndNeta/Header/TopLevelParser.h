@@ -12,5 +12,6 @@ private:
 
 	bool isStructDefinition();
 	void HandleStructDefinition();
+
 	Parser parser;
 };
